@@ -1,0 +1,9 @@
+# Build directory and its contents
+build/
+
+# Misc working files
+*.swp
+*.pdf
+*.tar
+tags
+
