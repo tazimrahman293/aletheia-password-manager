@@ -2,6 +2,7 @@
 build/
 
 # Misc working files
+*.sqlite3
 *.swp
 *.pdf
 *.tar

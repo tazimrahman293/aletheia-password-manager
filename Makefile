@@ -2,7 +2,7 @@
 
 CC      = gcc
 CFLAGS  = -std=c++17 -Wall -Werror
-LDFLAGS = -lstdc++
+LDFLAGS = -Llib -lstdc++ -lsqlite3 -lpthread -ldl
 INCLUDE = -Iinclude/
 
 BUILD   = ./build
