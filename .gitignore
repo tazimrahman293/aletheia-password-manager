@@ -6,5 +6,8 @@ build/
 *.swp
 *.pdf
 *.tar
+*.xml
 tags
 
+# Dot-files
+.idea/
