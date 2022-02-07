@@ -5,21 +5,60 @@
 
 #include <memory>
 
-#include <tbd.h>
 #include <tbd-storage.h>
+#include <data/user.h>
+#include <data/user-record.h>
 
-class Storage::_Storage {
-public:
-    Database db;
-    explicit _Storage(const std::string &db_filename) :
-            db(create_database(db_filename))
-    {
-        db.sync_schema();
+using namespace data;
+
+namespace db {
+
+    inline auto createDatabase(const std::string &dbFilename) {
+        using namespace sqlite_orm;
+
+        return make_storage(
+                dbFilename,
+                make_table(
+                        "users",
+                        make_column("id", &UserRecord::id, autoincrement(), primary_key()),
+                        make_column("first_name", &UserRecord::firstName),
+                        make_column("last_name", &UserRecord::lastName)
+                )
+        );
     }
-};
+    using Database = decltype(createDatabase(""));
 
-Storage::Storage(const std::string &db_filename) :
-        _s(std::make_unique<_Storage>(db_filename))
-{ }
 
-Storage::~Storage() = default;
+    class Storage::_Storage {
+    public:
+        Database database;
+
+        explicit _Storage(const std::string &db_filename) :
+                database(createDatabase(db_filename)) {
+            database.sync_schema();
+        }
+    };
+
+
+    Storage::Storage(const std::string &dbFilename) :
+            _s(std::make_unique<_Storage>(dbFilename)) {}
+
+
+    Storage::~Storage() = default;
+
+
+    User Storage::addUser(const std::string &firstName, const std::string &lastName) noexcept
+    {
+        UserRecord record {
+            .id = -1,
+            .firstName = firstName,
+            .lastName = lastName
+        };
+        const int id = _s->database.insert(record);
+        record.id = id;
+
+        return User(record);
+    }
+
+}  // namespace db
+

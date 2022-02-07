@@ -8,33 +8,26 @@
 #include <sqlite3.h>
 #include <sqlite_orm.h>
 
+#include <data/user.h>
+
 /////////////////////////
 /* Basic DB Operations */
 /////////////////////////
 
-inline auto create_database(const std::string &db_filename) {
-    using namespace sqlite_orm;
-    return make_storage(
-            db_filename,
-            make_table(
-                    "users",
-                    make_column("id", &User::id, autoincrement(), primary_key()),
-                    make_column("first_name", &User::firstName),
-                    make_column("last_name", &User::lastName)
-            )
-    );
-}
-using Database = decltype(create_database(""));
+namespace db {
 
-class Storage {
-    class _Storage;
-    std::unique_ptr<_Storage> _s;
+    class Storage {
+        class _Storage;
+        std::unique_ptr<_Storage> _s;
 
-public:
-    explicit Storage(const std::string &db_filename);
-    ~Storage();
-    // Add more db functionalities here
-};
+    public:
+        explicit Storage(const std::string &dbFilename);
+        ~Storage();
+        // Add more db functionalities here
+        data::User addUser(const std::string &firstName, const std::string &lastName) noexcept;
+    };
+
+}  // namespace db
 
 //////////////////////
 

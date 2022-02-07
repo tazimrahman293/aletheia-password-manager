@@ -5,3 +5,7 @@
 
 #include <tbd.h>
 #include <tbd-storage.h>
+
+namespace storage {
+
+}  // namespace storage

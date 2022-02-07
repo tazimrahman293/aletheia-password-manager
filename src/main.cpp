@@ -13,7 +13,9 @@ int main(int argc, char *argv[])
 {
     puts("Hello, world!");
 
-    Storage s("db.sqlite3");
+    db::Storage database("db.sqlite3");
+
+    database.addUser("Jeremy", "Rempel");
 
     return 0;
 }
