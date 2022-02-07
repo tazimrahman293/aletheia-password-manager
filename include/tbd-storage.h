@@ -23,8 +23,10 @@ namespace db {
     public:
         explicit Storage(const std::string &dbFilename);
         ~Storage();
-        // Add more db functionalities here
+
         data::User addUser(const std::string &firstName, const std::string &lastName) noexcept;
+        std::unique_ptr<data::User> getUserByID(int id) noexcept;
+        void removeUser(int id) noexcept;
     };
 
 }  // namespace db

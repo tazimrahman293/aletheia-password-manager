@@ -60,5 +60,22 @@ namespace db {
         return User(record);
     }
 
+
+    std::unique_ptr<User> Storage::getUserByID(int id) noexcept
+    {
+        using namespace sqlite_orm;
+        if (auto user = _s->database.get_pointer<UserRecord>(id)) {
+            return std::make_unique<User>(*user);
+        } else {
+            return nullptr;
+        }
+    }
+
+
+    void Storage::removeUser(int id) noexcept
+    {
+        _s->database.remove<UserRecord>(id);
+    }
+
 }  // namespace db
 

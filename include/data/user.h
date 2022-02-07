@@ -5,6 +5,7 @@
 #ifndef USER_H
 #define USER_H
 
+#include <string>
 #include <utility>
 
 #include <data/user-record.h>
@@ -18,7 +19,8 @@ namespace data {
         // using UserType = db::UserRecord::UserType;
 
         explicit User(data::UserRecord record) : _record(std::move(record)) { }
-
+        std::string name() const { return _record.firstName + " " + _record.lastName; }
+        int id() const { return _record.id; }
     };
 }  // namespace data
 
