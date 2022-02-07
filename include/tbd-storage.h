@@ -3,7 +3,21 @@
 
 // Definitions, classes, and types specific to the storage functions go here
 
+#include <cstdio>
+#include <cstdlib>
+#include <string>
+#include <unordered_map>
+#include <vector>
+
 #include <sqlite3.h>
+
+#define TBD_CONFLICT "DO NOTHING"
+
+/////////////////////////
+/* Basic DB Operations */
+/////////////////////////
+
+int createTable(sqlite3 *db, std::string table_name, std::vector<std::string> cols);
 
 //////////////////////
 /* SQLite3 Wrappers */
