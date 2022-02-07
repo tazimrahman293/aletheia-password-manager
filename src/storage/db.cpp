@@ -20,10 +20,16 @@ using umap = std::unordered_map<K,V>;
 /* Utility Functions */
 ///////////////////////
 
-str joinVector(vec<str> data, str delim)
+/**
+ * Joins all of the strings in a string vector, delimited with a provided substring.
+ * @param vector<string> data The vector containing the strings to be joined together
+ * @param string delim The delimiter string
+ * @return The joined string
+ */
+str joinVector(vec<str> data, const str &delim)
 {
-    str result = "";
-    for (vec<str>::iterator it = data.begin(); it != data.end(); ++it) {
+    str result;
+    for (auto it = data.begin(); it != data.end(); ++it) {
         result += *it;
         if (it+1 != data.end())
             result += delim;
@@ -43,19 +49,20 @@ str joinVector(vec<str> data, str delim)
  * @return SQLITE_OK if the operation succeeds, or the appropriate error code
  *   (see https://www.sqlite.org/rescode.html for a list)
  */
-int createTable(sqlite3 *db, str table_name, vec<str> col_names)
+int createTable(sqlite3 *db, const str &table_name, const vec<str> &col_names)
 {
     std::stringstream s_sql;
     str sql, cols;
     char *err;
+    const str delim = ",";
 
-    cols = joinVector(col_names, ",");
+    cols = joinVector(col_names, delim);
 
     s_sql << "CREATE TABLE IF NOT EXISTS " << table_name;
     s_sql << " (" << cols << ")" << std::ends;
     sql = s_sql.str();
 
-    return sqlite3Exec(db, sql.c_str(), NULL, NULL, &err);
+    return sqlite3Exec(db, sql.c_str(), nullptr, nullptr, &err);
 }
 
 
@@ -68,16 +75,16 @@ int createTable(sqlite3 *db, str table_name, vec<str> col_names)
  * @return SQLITE_OK if the operation succeeds, or the appropriate error code
  *   (see https://www.sqlite.org/rescode.html for a list)
  */
-int insertRow(sqlite3 *db, str table_name, umap<str,str> row_data)
+int insertRow(sqlite3 *db, const str &table_name, const umap<str,str> &row_data)
 {
     std::stringstream s_sql;
     str sql, cols, data;
     vec<str> col_vec, data_vec;
     char *err;
 
-    for (umap<str,str>::iterator it = row_data.begin(); it != row_data.end(); ++it) {
-        col_vec.push_back(it->first);
-        data_vec.push_back(it->second);
+    for (auto &it : row_data) {
+        col_vec.push_back(it.first);
+        data_vec.push_back(it.second);
     }
     cols = joinVector(col_vec, ",");
     data = joinVector(data_vec, ",");
@@ -88,7 +95,7 @@ int insertRow(sqlite3 *db, str table_name, umap<str,str> row_data)
     s_sql << " ON CONFLICT " << TBD_CONFLICT << std::ends;
     sql = s_sql.str();
 
-    return sqlite3Exec(db, sql.c_str(), NULL, NULL, &err);
+    return sqlite3Exec(db, sql.c_str(), nullptr, nullptr, &err);
 }
 
 

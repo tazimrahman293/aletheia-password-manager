@@ -2,8 +2,6 @@
 // Contains the main entrypoint for the TBD password manager project.
 // Authors: <insert here>
 
-#include <stdio.h>
-
 #include <tbd.h>
 #include <tbd-crypto.h>
 #include <tbd-storage.h>
@@ -21,14 +19,16 @@ int main(int argc, char *argv[])
 
     std::vector<std::string> tcols, mcols;
 
-    tcols.push_back("key PRIMARY KEY");
-    tcols.push_back("value");
+    tcols.emplace_back("key PRIMARY KEY");
+    tcols.emplace_back("value");
 
-    mcols.push_back("ok PRIMARY KEY");
-    mcols.push_back("go UNIQUE NOT NULL");
+    mcols.emplace_back("ok PRIMARY KEY");
+    mcols.emplace_back("go UNIQUE NOT NULL");
     
     createTable(db, "test", tcols);
     createTable(db, "make", mcols);
+
+    sqlite3Close(db);
 
     return 0;
 }
