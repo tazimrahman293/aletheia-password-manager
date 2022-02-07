@@ -6,30 +6,27 @@
 #include <tbd-crypto.h>
 #include <tbd-storage.h>
 
+inline auto initStorage(const std::string &db_filename)
+{
+    using namespace sqlite_orm;
+    return make_storage(
+            db_filename,
+            make_table("users",
+                       make_column("id", &User::id, primary_key(), autoincrement()),
+                       make_column("first_name", &User::firstName),
+                       make_column("last_name", &User::lastName),
+                       make_column("type_id", &User::typeID)));
+}
+using Storage = decltype(initStorage(""));
+
 /**
  * Manages passwords
  */
 int main(int argc, char *argv[])
 {
-    puts("Hello, world!\n");
+    puts("Hello, world!");
 
-    sqlite3 *db;
-
-    sqlite3Open("db.sqlite3", &db);
-
-    std::vector<std::string> tcols, mcols;
-
-    tcols.emplace_back("key PRIMARY KEY");
-    tcols.emplace_back("value");
-
-    mcols.emplace_back("ok PRIMARY KEY");
-    mcols.emplace_back("go UNIQUE NOT NULL");
-    
-    createTable(db, "test", tcols);
-    createTable(db, "make", mcols);
-
-    sqlite3Close(db);
-
+    Storage storage = initStorage("db.sqlite3");
     return 0;
 }
 

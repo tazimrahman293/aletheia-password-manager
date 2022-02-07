@@ -8,10 +8,10 @@ INCLUDE = -Iinclude/
 BUILD   = ./build
 OBJ_DIR = $(BUILD)/objects
 APP_DIR = $(BUILD)/apps
-SRC     = $(wildcard src/*.cpp) \
+SRC     = $(wildcard src/storage/*.cpp) \
 		  $(wildcard src/crypto/*.cpp) \
-		  $(wildcard src/storage/*.cpp) \
-
+		  $(wildcard src/*.cpp) \
+		  
 OBJECTS = $(SRC:%.cpp=$(OBJ_DIR)/%.o)
 TARGET  = tbd
 

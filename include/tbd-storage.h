@@ -10,6 +10,7 @@
 #include <vector>
 
 #include <sqlite3.h>
+#include <sqlite_orm.h>
 
 #define TBD_CONFLICT "DO NOTHING"
 
@@ -17,17 +18,7 @@
 /* Basic DB Operations */
 /////////////////////////
 
-int createTable(sqlite3 *db, std::string table_name, std::vector<std::string> cols);
-
-//////////////////////
-/* SQLite3 Wrappers */
-//////////////////////
-
-int sqlite3Open(const char *filename, sqlite3 **pp_db);
-int sqlite3Exec(sqlite3 *db, const char *sql,
-                int (*callback)(void *, int, char **, char **), void *cb_arg,
-                char **errmsg);
-int sqlite3Close(sqlite3 *p_db);
+// auto initStorage(const std::string &db_filename);
 
 //////////////////////
 
