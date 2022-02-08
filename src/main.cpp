@@ -9,6 +9,7 @@
 #include <tbd-storage.h>
 
 #include <data/user.h>
+#include <data/user-record.h>
 
 using namespace data;
 
@@ -35,13 +36,18 @@ int main(int argc, char *argv[])
                 cout << "\ttbd [get|remove] <id>\n";
                 cout << "\ttbd help\n";
                 cout << endl;
-                return 0;
             } else if (args[1] == "getall") {
-
+                std::vector<User> allUsers = database.getAllUsers();
+                cout << "Users:\n";
+                for (auto &user : allUsers) {
+                    cout << "\t" << user.name() << " (ID: " << user.id() << ")\n";
+                }
+                cout << endl;
             } else {
                 cerr << "Unknown arg list" << endl;
+                return -1;
             }
-            return -1;
+            return 0;
         case 3:
             if (args[1] == "get") {
                 std::unique_ptr<User> pUser = database.getUserByID(std::stoi(args[2]));

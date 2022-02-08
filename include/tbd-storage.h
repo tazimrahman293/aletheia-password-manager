@@ -4,6 +4,7 @@
 // Definitions, classes, and types specific to the storage functions go here
 
 #include <string>
+#include <vector>
 
 #include <sqlite3.h>
 #include <sqlite_orm.h>
@@ -26,6 +27,7 @@ namespace db {
 
         data::User addUser(const std::string &firstName, const std::string &lastName) noexcept;
         std::unique_ptr<data::User> getUserByID(int id) noexcept;
+        std::vector<data::User> getAllUsers() noexcept;
         void removeUser(int id) noexcept;
     };
 
