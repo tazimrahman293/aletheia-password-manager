@@ -20,7 +20,7 @@ namespace db {
                 dbFilename,
                 make_table(
                         "users",
-                        make_column("id", &UserRecord::id, autoincrement(), primary_key()),
+                        make_column("ID", &UserRecord::id, autoincrement(), primary_key()),
                         make_column("first_name", &UserRecord::firstName),
                         make_column("last_name", &UserRecord::lastName)
                 )
@@ -47,7 +47,7 @@ namespace db {
     Storage::~Storage() = default;
 
 
-    User Storage::addUser(const std::string &firstName, const std::string &lastName) noexcept
+    User Storage::AddUser(const std::string &firstName, const std::string &lastName) noexcept
     {
         UserRecord record {
             .id = -1,
@@ -61,7 +61,7 @@ namespace db {
     }
 
 
-    std::unique_ptr<User> Storage::getUserByID(int id) noexcept
+    std::unique_ptr<User> Storage::GetUserByID(int id) noexcept
     {
         if (auto user = _s->database.get_pointer<UserRecord>(id)) {
             return std::make_unique<User>(*user);
@@ -71,7 +71,7 @@ namespace db {
     }
 
 
-    std::vector<User> Storage::getAllUsers() noexcept
+    std::vector<User> Storage::GetAllUsers() noexcept
     {
         auto records = _s->database.get_all<UserRecord>();
         std::vector<User> users;
@@ -82,7 +82,7 @@ namespace db {
     }
 
 
-    void Storage::removeUser(int id) noexcept
+    void Storage::RemoveUser(int id) noexcept
     {
         _s->database.remove<UserRecord>(id);
     }

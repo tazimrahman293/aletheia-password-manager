@@ -25,10 +25,10 @@ namespace db {
         explicit Storage(const std::string &dbFilename);
         ~Storage();
 
-        data::User addUser(const std::string &firstName, const std::string &lastName) noexcept;
-        std::unique_ptr<data::User> getUserByID(int id) noexcept;
-        std::vector<data::User> getAllUsers() noexcept;
-        void removeUser(int id) noexcept;
+        data::User AddUser(const std::string &firstName, const std::string &lastName) noexcept;
+        std::unique_ptr<data::User> GetUserByID(int id) noexcept;
+        std::vector<data::User> GetAllUsers() noexcept;
+        void RemoveUser(int id) noexcept;
     };
 
 }  // namespace db
