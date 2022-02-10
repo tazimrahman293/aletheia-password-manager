@@ -13,14 +13,14 @@
 namespace data {
     class User {
 
-        data::UserRecord _record;
+        data::UserRecord record;
 
     public:
         // using UserType = db::UserRecord::UserType;
 
-        explicit User(data::UserRecord record) : _record(std::move(record)) { }
-        std::string Name() const { return _record.firstName + " " + _record.lastName; }
-        int ID() const { return _record.id; }
+        explicit User(data::UserRecord record) : record(std::move(record)) { }
+        int ID() const { return record.id; }
+        std::string Name() const { return record.firstName + " " + record.lastName; }
     };
 }  // namespace data
 

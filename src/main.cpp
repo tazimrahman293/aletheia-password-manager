@@ -51,8 +51,12 @@ int main(int argc, char *argv[])
         case 3:
             if (args[1] == "get") {
                 std::unique_ptr<User> pUser = database.GetUserByID(std::stoi(args[2]));
-                if (pUser != nullptr)
+                std::vector<Account> uAccounts = database.GetAllAccountsByUserID(pUser->ID());
+                if (pUser != nullptr) {
                     cout << "Retrieved user " << pUser->Name() << " with ID " << pUser->ID() << " from the db." << endl;
+                    for (auto &it : uAccounts)
+                        cout << " Account: " << it.Label() << " Username: " << it.Username() << endl;
+                }
                 else
                     cout << "User with ID " << args[2] << " does not exist in the db." << endl;
             } else if (args[1] == "remove") {
