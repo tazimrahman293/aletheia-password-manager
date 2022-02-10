@@ -19,8 +19,8 @@ namespace data {
         // using UserType = db::UserRecord::UserType;
 
         explicit User(data::UserRecord record) : _record(std::move(record)) { }
-        [[nodiscard]] std::string Name() const { return _record.firstName + " " + _record.lastName; }
-        [[nodiscard]] int ID() const { return _record.id; }
+        std::string Name() const { return _record.firstName + " " + _record.lastName; }
+        int ID() const { return _record.id; }
     };
 }  // namespace data
 
