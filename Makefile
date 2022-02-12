@@ -2,7 +2,7 @@
 
 CC      = gcc
 CFLAGS  = -std=c++17 -Wall -Werror
-LDFLAGS = -lstdc++
+LDFLAGS = -Llib -lstdc++ -lsqlite3 -lpthread -ldl
 INCLUDE = -Iinclude/
 
 BUILD   = ./build
@@ -10,6 +10,7 @@ OBJ_DIR = $(BUILD)/objects
 APP_DIR = $(BUILD)/apps
 SRC     = $(wildcard src/*.cpp) \
 		  $(wildcard src/crypto/*.cpp) \
+		  $(wildcard src/data/*.cpp) \
 		  $(wildcard src/storage/*.cpp) \
 
 OBJECTS = $(SRC:%.cpp=$(OBJ_DIR)/%.o)

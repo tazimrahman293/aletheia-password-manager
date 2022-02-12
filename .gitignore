@@ -2,8 +2,12 @@
 build/
 
 # Misc working files
+*.sqlite3
 *.swp
 *.pdf
 *.tar
+*.xml
 tags
 
+# Dot-files
+.idea/
