@@ -11,6 +11,8 @@
 #include <data/user.h>
 #include <data/user-record.h>
 
+#include <HTTPServer.h>
+
 using namespace data;
 
 /**
