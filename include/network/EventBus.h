@@ -58,7 +58,17 @@ class EventBus {
     typedef std::list<HandlerFunctionBase *> HandlerList;
     std::map<std::type_index, HandlerList *> subscribers;
 
+protected:
+
+    static EventBus *bus;
+    EventBus() = default;
+
 public:
+
+    EventBus(EventBus&) = delete;  // no copying
+    void operator=(const EventBus&) = delete;  // no assignment
+
+    static EventBus *GetInstance();
 
     template<typename EventType>
     void Publish(EventType *event);
@@ -67,6 +77,8 @@ public:
     void Subscribe(T *instance, void (T::*memberFunction)(EventType *));
 
 };
+
+EventBus *EventBus::bus = nullptr;
 
 
 #endif //PROJECT_EVENTBUS_H

@@ -5,6 +5,14 @@
 #include <network/EventBus.h>
 
 
+EventBus *EventBus::GetInstance()
+{
+    if (bus == nullptr)
+        bus = new EventBus();
+    return bus;
+}
+
+
 template<typename EventType>
 void EventBus::Publish(EventType *event)
 {
