@@ -9,7 +9,7 @@
 #include <httplib.h>
 #include <json.h>
 
-#include "data/AccountRecord.h"
+#include "data/Account.h"
 #include "network/EventBus.h"
 #include "events/LoginAttemptEvent.h"
 #include "network/HTTPServer.h"
@@ -57,7 +57,7 @@ void HTTPServer::Init()
                 EventBus *eventBus = EventBus::GetInstance();
 
                 auto data = json::parse(request.body);
-                auto record = data.get<AccountRecord>();
+                auto record = data.get<Account>();
 
                 eventBus->Publish(new AccountCreateEvent(record));
             });
@@ -70,7 +70,7 @@ void HTTPServer::Init()
                 EventBus *eventBus = EventBus::GetInstance();
 
                 auto data = json::parse(request.body);
-                auto record = data.get<AccountRecord>();
+                auto record = data.get<Account>();
 
                 eventBus->Publish(new AccountUpdateEvent(record));
             });

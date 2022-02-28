@@ -2,24 +2,36 @@
 // Created by jeremy on 2022-02-07.
 //
 
-#ifndef USER_H
-#define USER_H
+#ifndef USER_RECORD_H
+#define USER_RECORD_H
 
 #include <string>
-#include <utility>
 
-#include <data/UserRecord.h>
+#include <json.h>
 
-class User {
+struct User {
+    enum class UserType {
+        Normal = 1,
+        Admin = 2,
+        SuperAdmin = 3
+    };
 
-    UserRecord record;
+    int pk;
+    std::string firstName;
+    std::string lastName;
+    std::string keyHash;
+    UserType typeID;
 
-public:
-    // using UserType = UserRecord::UserType;
-
-    explicit User(UserRecord record) : record(std::move(record)) { }
-    int ID() const { return record.id; }
-    std::string Name() const { return record.firstName + " " + record.lastName; }
+    User() : pk(-1), typeID(UserType::Normal) { }
 };
 
-#endif  // USER_H
+NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(\
+        User,\
+        pk,\
+        firstName,\
+        lastName,\
+        keyHash,\
+        typeID\
+        )
+
+#endif  // USER_RECORD_H

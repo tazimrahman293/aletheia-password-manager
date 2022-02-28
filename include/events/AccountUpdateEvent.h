@@ -6,14 +6,14 @@
 #define PROJECT_ACCOUNTUPDATEEVENT_H
 
 #include "events/Event.h"
-#include "data/AccountRecord.h"
+#include "data/Account.h"
 
 
 struct AccountUpdateEvent : public Event {
 
-    explicit AccountUpdateEvent(AccountRecord rec) : record(std::move(rec)) { }
+    explicit AccountUpdateEvent(Account rec) : record(std::move(rec)) { }
 
-    AccountRecord record;
+    Account record;
 
 };
 

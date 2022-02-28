@@ -9,35 +9,35 @@
 #include <sqlite3.h>
 #include <sqlite_orm.h>
 
+#include <events/LoginAttemptEvent.h>
+#include <data/Account.h>
 #include <data/User.h>
-#include "data/Account.h"
-#include "events/LoginAttemptEvent.h"
 
 inline auto createDatabase(const std::string &dbFilename) {
     using namespace sqlite_orm;
 
     return make_storage(
             dbFilename,
-            make_table(
+            make_table<User>(
                     "users",
-                    make_column("ID", &UserRecord::id, autoincrement(), primary_key()),
-                    make_column("first_name", &UserRecord::firstName),
-                    make_column("last_name", &UserRecord::lastName),
-                    make_column("key_hash", &UserRecord::keyHash)
+                    make_column("ID", &User::pk, autoincrement(), primary_key()),
+                    make_column("first_name", &User::firstName),
+                    make_column("last_name", &User::lastName),
+                    make_column("key_hash", &User::keyHash)
             ),
-            make_table(
+            make_table<Account>(
                     "accounts",
-                    make_column("ID", &AccountRecord::id, autoincrement(), primary_key()),
-                    make_column("label", &AccountRecord::label),
-                    make_column("username", &AccountRecord::username),
-                    make_column("key_hash", &AccountRecord::keyHash),
-                    make_column("url", &AccountRecord::url),
-                    make_column("created", &AccountRecord::created),
-                    make_column("last_accessed", &AccountRecord::lastAccessed),
-                    make_column("last_modified", &AccountRecord::lastModified),
-                    make_column("expiry", &AccountRecord::expiry),
-                    make_column("userID", &AccountRecord::userID),
-                    foreign_key(&AccountRecord::userID).references(&UserRecord::id)
+                    make_column("ID", &Account::pk, autoincrement(), primary_key()),
+                    make_column("label", &Account::label),
+                    make_column("username", &Account::username),
+                    make_column("key_hash", &Account::keyHash),
+                    make_column("url", &Account::url),
+                    make_column("created", &Account::created),
+                    make_column("last_accessed", &Account::lastAccessed),
+                    make_column("last_modified", &Account::lastModified),
+                    make_column("expiry", &Account::expiry),
+                    make_column("userID", &Account::userID),
+                    foreign_key(&Account::userID).references(&User::pk)
             )
     );
 }
@@ -56,19 +56,20 @@ public:
 
     void OnLoginAttempt(LoginAttemptEvent *event);
 
-    User AddUser(UserRecord& userData) noexcept;
-    // User AddUser(const std::string &firstName, const std::string &lastName) noexcept;
-    std::unique_ptr<User> GetUserByID(int id) noexcept;
-    std::vector<User> GetAllUsers() noexcept;
-    void RemoveUser(int id) noexcept;
+    template<class T>
+    void InsertOrUpdate(T record) noexcept
+    {
+        const int pk = s->database.insert(record);
+        record.pk = pk;
+    }
+    template<class T>
+    std::unique_ptr<T> GetByID(int pk) noexcept;
+    template<class T>
+    void Remove(int pk) noexcept;
 
-    Account AddAccount(
-            const std::string &label, const std::string &username, const std::string &hash,
-            const std::string &url, long expiry, int userID
-            ) noexcept;
-    std::unique_ptr<Account> GetAccountByID(int id) noexcept;
+    std::vector<User> GetAllUsers() noexcept;
     std::vector<Account> GetAllAccountsByUserID(int userID) noexcept;
-    void RemoveAccount(int id) noexcept;
+
 };
 
 //////////////////////

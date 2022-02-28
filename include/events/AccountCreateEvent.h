@@ -6,13 +6,13 @@
 #define PROJECT_ACCOUNTCREATEEVENT_H
 
 #include "events/Event.h"
-#include "data/AccountRecord.h"
+#include "data/Account.h"
 
 struct AccountCreateEvent : public Event {
 
-    explicit AccountCreateEvent(AccountRecord rec) : record(std::move(rec)) { }
+    explicit AccountCreateEvent(Account rec) : record(std::move(rec)) { }
 
-    AccountRecord record;
+    Account record;
 };
 
 #endif //PROJECT_ACCOUNTCREATEEVENT_H

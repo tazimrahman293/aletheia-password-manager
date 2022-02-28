@@ -6,38 +6,37 @@
 #define PROJECT_ACCOUNT_H
 
 #include <string>
-#include <utility>
 
-#include <data/AccountRecord.h>
+#include <json.h>
 
-class Account {
 
-    AccountRecord record;
+struct Account {
+    int pk;
+    std::string label;
+    std::string username;
+    std::string keyHash;
+    std::string url;
+    long created;
+    long lastAccessed;
+    long lastModified;
+    long expiry;
+    int userID;
 
-public:
-    explicit Account(AccountRecord record) : record(std::move(record)) { }
-    int ID() const { return record.id; }
-
-    std::string Label() const { return record.label; }
-    void Label(std::string &label) { record.label = label; }
-
-    std::string Username() const { return record.username; }
-    void Username(std::string &username) { record.username = username; }
-
-    std::string KeyHash() const { return record.keyHash; }
-    void KeyHash(std::string &hash) { record.keyHash = hash; }
-
-    std::string URL() const { return record.url; }
-    void URL(std::string &url) { record.url = url; }
-
-    long DateCreated() const { return record.created; }
-    long DateLastAccessed() const { return record.lastAccessed; }
-    long DateLastModified() const { return record.lastModified; }
-
-    long DateExpires() const { return record.expiry; }
-    void DateExpires(long datetime) { record.expiry = datetime; }
-
-    int UserID() const { return record.userID; }
+    Account() : pk(-1), created(0), lastAccessed(0), lastModified(0), expiry(0), userID(-1) { }
 };
+
+NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(\
+        Account,\
+        pk,\
+        label,\
+        username,\
+        keyHash,\
+        url,\
+        created,\
+        lastAccessed,\
+        lastModified,\
+        expiry,\
+        userID\
+        )
 
 #endif //PROJECT_ACCOUNT_H

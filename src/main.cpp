@@ -52,8 +52,16 @@ int main(int argc, char *argv[])
         dbFilename = "db.sqlite3";
     Storage database(dbFilename);
 
-    UserRecord record{-1, "Jeremy", "Rempel", "hunter2", UserRecord::UserType::Normal};
-    database.AddUser(record);
+    User record;
+    record.pk = -1;
+    record.firstName = "Jeremy";
+    record.lastName = "Rempel";
+    record.keyHash = "hunter2";
+    record.typeID = User::UserType::Normal;
+    database.InsertOrUpdate(record);
+    std::cout << "Inserted/updated " << record.firstName << " (ID " << record.pk << ")" << std::endl;
+
+    std::unique_ptr<User> pUser = database.GetByID<User>(record.pk);
 
     if (cmdParser.HasOption("-S")) {
 
