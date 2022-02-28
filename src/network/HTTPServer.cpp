@@ -3,6 +3,7 @@
 //
 
 #include <cassert>
+#include <iostream>
 
 #include <httplib.h>
 
@@ -36,5 +37,6 @@ void HTTPServer::Init()
 
 void HTTPServer::Run()
 {
+    std::cout << "HTTP server listening at " << hostAddress << " on port " << hostPort << "..." << std::endl;
     server.listen(hostAddress.c_str(), hostPort, SOCK_STREAM);
 }
