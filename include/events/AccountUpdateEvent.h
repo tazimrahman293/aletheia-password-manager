@@ -11,9 +11,9 @@
 
 struct AccountUpdateEvent : public Event {
 
-    AccountUpdateEvent(data::AccountRecord rec) : record(std::move(rec)) { }
+    explicit AccountUpdateEvent(AccountRecord rec) : record(std::move(rec)) { }
 
-    data::AccountRecord record;
+    AccountRecord record;
 
 };
 

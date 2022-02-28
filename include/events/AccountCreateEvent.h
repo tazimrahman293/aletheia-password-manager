@@ -10,9 +10,9 @@
 
 struct AccountCreateEvent : public Event {
 
-    explicit AccountCreateEvent(data::AccountRecord rec) : record(std::move(rec)) { }
+    explicit AccountCreateEvent(AccountRecord rec) : record(std::move(rec)) { }
 
-    data::AccountRecord record;
+    AccountRecord record;
 };
 
 #endif //PROJECT_ACCOUNTCREATEEVENT_H

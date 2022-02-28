@@ -9,34 +9,31 @@
 
 #include "json.h"
 
-namespace data {
 
-    struct AccountRecord {
-        int id;
-        std::string label;
-        std::string username;
-        std::string keyHash;
-        std::string url;
-        long created;
-        long lastAccessed;
-        long lastModified;
-        long expiry;
-        int userID;
-    };
+struct AccountRecord {
+    int id;
+    std::string label;
+    std::string username;
+    std::string keyHash;
+    std::string url;
+    long created;
+    long lastAccessed;
+    long lastModified;
+    long expiry;
+    int userID;
+};
 
-    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(\
-            AccountRecord,\
-            label,\
-            username,\
-            keyHash,\
-            url,\
-            created,\
-            lastAccessed,\
-            lastModified,\
-            expiry,\
-            userID\
-            )
-
-}  // namespace data
+NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(\
+        AccountRecord,\
+        label,\
+        username,\
+        keyHash,\
+        url,\
+        created,\
+        lastAccessed,\
+        lastModified,\
+        expiry,\
+        userID\
+        )
 
 #endif //PROJECT_ACCOUNTRECORD_H

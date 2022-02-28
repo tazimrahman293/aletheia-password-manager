@@ -6,12 +6,10 @@
 #include <string>
 #include <vector>
 
-#include <tbd-storage.h>
+#include <Storage.h>
 
 #include "network/HTTPServer.h"
 #include "network/EventBus.h"
-
-using namespace data;
 
 EventBus *EventBus::bus = nullptr;
 
@@ -52,7 +50,7 @@ int main(int argc, char *argv[])
         dbFilename = cmdParser.GetOptionValue("-d");
     else
         dbFilename = "db.sqlite3";
-    db::Storage database(dbFilename);
+    Storage database(dbFilename);
 
     UserRecord record{-1, "Jeremy", "Rempel", "hunter2", UserRecord::UserType::Normal};
     database.AddUser(record);

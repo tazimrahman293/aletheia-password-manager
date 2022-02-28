@@ -14,6 +14,7 @@
 #include "events/LoginAttemptEvent.h"
 #include "network/HTTPServer.h"
 #include "events/AccountCreateEvent.h"
+#include "events/AccountUpdateEvent.h"
 
 
 void HTTPServer::Init()
@@ -53,8 +54,6 @@ void HTTPServer::Init()
             "/new-account",
             [](const Request& request, Response& response) -> void
             {
-                using namespace data;
-
                 EventBus *eventBus = EventBus::GetInstance();
 
                 auto data = json::parse(request.body);
@@ -68,12 +67,12 @@ void HTTPServer::Init()
             "/edit-account",
             [](const Request& request, Response& response) -> void
             {
-                using namespace data;
-
                 EventBus *eventBus = EventBus::GetInstance();
 
                 auto data = json::parse(request.body);
                 auto record = data.get<AccountRecord>();
+
+                eventBus->Publish(new AccountUpdateEvent(record));
             });
 }
 
