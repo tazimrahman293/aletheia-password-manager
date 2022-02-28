@@ -10,11 +10,7 @@
 #include <map>
 #include <typeindex>
 
-
-class Event {
-protected:
-    virtual ~Event() { };
-};
+#include "events/Event.h"
 
 
 class HandlerFunctionBase {
@@ -40,7 +36,7 @@ public:
     MemberFunctionHandler(T *instance, MemberFunction memberFunction) :
             instance(instance), memberFunction(memberFunction) { };
 
-    void Call(Event *event)
+    void Call(Event *event) override
     {
         (instance->*memberFunction)(static_cast<EventType*>(event));
     }
@@ -68,17 +64,41 @@ public:
     EventBus(EventBus&) = delete;  // no copying
     void operator=(const EventBus&) = delete;  // no assignment
 
-    static EventBus *GetInstance();
+    static EventBus *GetInstance()
+    {
+        if (bus == nullptr)
+            bus = new EventBus();
+        return bus;
+    }
 
     template<typename EventType>
-    void Publish(EventType *event);
+    void Publish(EventType *event)
+    {
+        HandlerList *handlers = subscribers[typeid(EventType)];
+        if (handlers == nullptr)
+            return;
+
+        for (auto& handler : *handlers) {
+            if (handler != nullptr)
+                handler->Exec(event);
+        }
+    }
+
 
     template<class T, class EventType>
-    void Subscribe(T *instance, void (T::*memberFunction)(EventType *));
+    void Subscribe(T *instance, void (T::*memberFunction)(EventType *))
+    {
+        HandlerList *handlers = subscribers[typeid(EventType)];
+        if (handlers == nullptr) {
+            handlers = new HandlerList();
+            subscribers[typeid(EventType)] = handlers;
+        }
+
+        handlers->push_back(new MemberFunctionHandler<T, EventType>(instance, memberFunction));
+    }
 
 };
 
 EventBus *EventBus::bus = nullptr;
-
 
 #endif //PROJECT_EVENTBUS_H
