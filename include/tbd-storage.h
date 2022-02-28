@@ -26,7 +26,8 @@ namespace db {
         explicit Storage(const std::string &dbFilename);
         ~Storage();
 
-        data::User AddUser(const std::string &firstName, const std::string &lastName) noexcept;
+        data::User AddUser(data::UserRecord& userData) noexcept;
+        // data::User AddUser(const std::string &firstName, const std::string &lastName) noexcept;
         std::unique_ptr<data::User> GetUserByID(int id) noexcept;
         std::vector<data::User> GetAllUsers() noexcept;
         void RemoveUser(int id) noexcept;

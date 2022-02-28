@@ -24,7 +24,8 @@ namespace db {
                         "users",
                         make_column("ID", &UserRecord::id, autoincrement(), primary_key()),
                         make_column("first_name", &UserRecord::firstName),
-                        make_column("last_name", &UserRecord::lastName)
+                        make_column("last_name", &UserRecord::lastName),
+                        make_column("key_hash", &UserRecord::keyHash)
                 ),
                 make_table(
                         "accounts",
@@ -63,17 +64,12 @@ namespace db {
     Storage::~Storage() = default;
 
 
-    User Storage::AddUser(const std::string &firstName, const std::string &lastName) noexcept
+    User Storage::AddUser(UserRecord& userData) noexcept
     {
-        UserRecord record {
-            .id = -1,
-            .firstName = firstName,
-            .lastName = lastName
-        };
-        const int id = s->database.insert(record);
-        record.id = id;
+        const int id = s->database.insert(userData);
+        userData.id = id;
 
-        return User(record);
+        return User(userData);
     }
 
 

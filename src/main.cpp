@@ -2,90 +2,75 @@
 // Contains the main entrypoint for the TBD password manager project.
 // Authors: <insert here>
 
-#include <iostream>
+#include <algorithm>
+#include <string>
+#include <vector>
 
 #include <tbd.h>
 #include <tbd-crypto.h>
 #include <tbd-storage.h>
 
-#include <data/user.h>
-#include <data/user-record.h>
-
-#include <HTTPServer.h>
+#include "network/HTTPServer.h"
 
 using namespace data;
+
+class InputParser {
+
+    std::vector<std::string> tokens;
+
+public:
+
+    InputParser(int& argc, char **argv) {
+        for (int i = 1; i < argc; ++i)
+            tokens.emplace_back(std::string(argv[i]));
+    }
+
+    bool HasOption(const std::string& option) const {
+        return std::find(tokens.begin(), tokens.end(), option) != tokens.end();
+    }
+
+    const std::string& GetOptionValue(const std::string& option) const {
+        std::vector<std::string>::const_iterator it;
+        it = std::find(tokens.begin(), tokens.end(), option);
+        if (it != tokens.end() && ++it != tokens.end())
+            return *it;
+        static const std::string empty_str;
+        return empty_str;
+    }
+};
 
 /**
  * Manages passwords
  */
 int main(int argc, char *argv[])
 {
-    using std::cout, std::cerr, std::endl;
+    InputParser cmdParser(argc, argv);
 
-    db::Storage database("db.sqlite3");
+    std::string dbFilename;
+    if (cmdParser.HasOption("-d"))
+        dbFilename = cmdParser.GetOptionValue("-d");
+    else
+        dbFilename = "db.sqlite3";
+    db::Storage database(dbFilename);
 
-    std::vector<std::string> args(argv, argv+argc);
-    switch (argc) {
-        case 0:
-            cerr << "what" << endl;
-        case 1:
-            cerr << "No arguments provided!" << endl;
-            return -1;
-        case 2:
-            if (args[1] == "help") {
-                cout << "Usage:\n";
-                cout << "\ttbd add <first-name> <last-Name>\n";
-                cout << "\ttbd [get|remove] <ID>\n";
-                cout << "\ttbd help\n";
-                cout << endl;
-            } else if (args[1] == "getall") {
-                std::vector<User> allUsers = database.GetAllUsers();
-                cout << "Users:\n";
-                for (auto &user : allUsers) {
-                    cout << "\t" << user.Name() << " (ID: " << user.ID() << ")\n";
-                }
-                cout << endl;
-            } else {
-                cerr << "Unknown arg list" << endl;
-                return -1;
-            }
-            return 0;
-        case 3:
-            if (args[1] == "get") {
-                std::unique_ptr<User> pUser = database.GetUserByID(std::stoi(args[2]));
-                std::vector<Account> uAccounts = database.GetAllAccountsByUserID(pUser->ID());
-                if (pUser != nullptr) {
-                    cout << "Retrieved user " << pUser->Name() << " with ID " << pUser->ID() << " from the db." << endl;
-                    for (auto &it : uAccounts)
-                        cout << " Account: " << it.Label() << " Username: " << it.Username() << endl;
-                }
-                else
-                    cout << "User with ID " << args[2] << " does not exist in the db." << endl;
-            } else if (args[1] == "remove") {
-                database.RemoveUser(std::stoi(args[2]));
-                cout << "Removed use with ID " << args[2] << " from the db." << endl;
-            } else {
-                cerr << "Invalid subcommand: " << args[1] << endl;
-                return -1;
-            }
-            return 0;
-        case 4:
-            if (args[1] == "add") {
-                User u = database.AddUser(args[2], args[3]);
-                cout << "Added user " << u.Name() << " with ID " << u.ID() << endl;
-            } else {
-                cerr << "Invalid subcommand: " << args[1] << endl;
-                return -1;
-            }
-            return 0;
-        default:
-            cout << "Usage:\n";
-            cout << "\ttbd add <first-name> <last-Name>\n";
-            cout << "\ttbd [get|remove] <ID>\n";
-            cout << "\ttbd getall\n";
-            cout << "\ttbd help\n";
-            cout << endl;
-            return -1;
+    UserRecord record{-1, "Jeremy", "Rempel", "hunter2", UserRecord::UserType::Normal};
+    database.AddUser(record);
+
+    if (cmdParser.HasOption("-S")) {
+
+        std::string hostAddress = "0.0.0.0";
+        if (cmdParser.HasOption("-H"))
+            hostAddress = cmdParser.GetOptionValue("-H");
+
+        int hostPort = 8089;
+        if (cmdParser.HasOption("-P"))
+            hostPort = std::stoi(cmdParser.GetOptionValue("-P"));
+
+        HTTPServer server(hostAddress, hostPort);
+        server.Init();
+        server.Run();
     }
+
+    return 0;
 
 }

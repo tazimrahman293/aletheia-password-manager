@@ -18,6 +18,7 @@ namespace data {
         int id;
         std::string firstName;
         std::string lastName;
+        std::string keyHash;
         UserType typeID;
     };
 }  // namespace data
