@@ -7,6 +7,7 @@
 #include <string>
 
 #include <httplib.h>
+#include <json.h>
 
 #include "network/EventBus.h"
 #include "events/LoginAttemptEvent.h"
@@ -30,16 +31,18 @@ void HTTPServer::Init()
             "/login",
             [](const Request& request, Response& response) -> void
             {
-                if (request.is_multipart_form_data()) {
-                    auto dataUID = request.get_file_value("uid");
-                    auto dataPass = request.get_file_value("pass");
+                using json = nlohmann::json;
 
-                    int uid = std::stoi(dataUID.content);
-                    std::string pass = dataPass.content;
+                EventBus *eventBus = EventBus::GetInstance();
 
-                    EventBus *eventBus = EventBus::GetInstance();
-                    eventBus->Publish(new LoginAttemptEvent(uid, pass));
-                }
+                auto data = json::parse(request.body);
+                int uid = data["uid"].get<int>();
+                std::string pass = data["pass"].get<std::string>();
+
+                eventBus->Publish(new LoginAttemptEvent(uid, pass));
+
+                // TODO Respond after the login is validated (or invalidated)
+                response.set_content("TODO: Implement this!", "text/plain");
             });
 }
 

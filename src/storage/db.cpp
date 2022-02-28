@@ -73,6 +73,8 @@ namespace db {
     void Storage::OnLoginAttempt(LoginAttemptEvent *event)
     {
         std::cout << "Login attempt -- ID: " << event->uid << ", Pass: " << event->password << std::endl;
+        auto user = GetUserByID(event->uid);
+        std::cout << "Found user " << user->Name() << " (" << user->ID() << ")" << std::endl;
     }
 
 
