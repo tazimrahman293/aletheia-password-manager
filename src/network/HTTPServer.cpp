@@ -19,8 +19,6 @@ void HTTPServer::Init()
 
     using namespace httplib;
 
-    EventBus *eventBus = EventBus::GetInstance();
-
     server.Get(
             "/hello",
             [](const Request& request, Response& response) -> void
@@ -30,7 +28,7 @@ void HTTPServer::Init()
 
     server.Post(
             "/login",
-            [eventBus](const Request& request, Response& response) -> void
+            [](const Request& request, Response& response) -> void
             {
                 if (request.is_multipart_form_data()) {
                     auto dataUID = request.get_file_value("uid");
@@ -39,6 +37,7 @@ void HTTPServer::Init()
                     int uid = std::stoi(dataUID.content);
                     std::string pass = dataPass.content;
 
+                    EventBus *eventBus = EventBus::GetInstance();
                     eventBus->Publish(new LoginAttemptEvent(uid, pass));
                 }
             });

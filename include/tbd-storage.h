@@ -11,6 +11,7 @@
 
 #include <data/user.h>
 #include "data/account.h"
+#include "events/LoginAttemptEvent.h"
 
 /////////////////////////
 /* Basic DB Operations */
@@ -25,6 +26,8 @@ namespace db {
     public:
         explicit Storage(const std::string &dbFilename);
         ~Storage();
+
+        void OnLoginAttempt(LoginAttemptEvent *event);
 
         data::User AddUser(data::UserRecord& userData) noexcept;
         // data::User AddUser(const std::string &firstName, const std::string &lastName) noexcept;

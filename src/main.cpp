@@ -6,13 +6,14 @@
 #include <string>
 #include <vector>
 
-#include <tbd.h>
-#include <tbd-crypto.h>
 #include <tbd-storage.h>
 
 #include "network/HTTPServer.h"
+#include "network/EventBus.h"
 
 using namespace data;
+
+EventBus *EventBus::bus = nullptr;
 
 class InputParser {
 

@@ -99,6 +99,4 @@ public:
 
 };
 
-EventBus *EventBus::bus = nullptr;
-
 #endif //PROJECT_EVENTBUS_H

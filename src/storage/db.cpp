@@ -5,11 +5,13 @@
 
 #include <chrono>
 #include <ctime>
+#include <iostream>
 #include <memory>
 
 #include <tbd-storage.h>
 #include <data/user.h>
 #include <data/user-record.h>
+#include "network/EventBus.h"
 
 using namespace data;
 
@@ -58,10 +60,20 @@ namespace db {
 
 
     Storage::Storage(const std::string &dbFilename) :
-            s(std::make_unique<_Storage>(dbFilename)) {}
+            s(std::make_unique<_Storage>(dbFilename))
+    {
+        EventBus *eventBus = EventBus::GetInstance();
+        eventBus->Subscribe(this, &Storage::OnLoginAttempt);
+    }
 
 
     Storage::~Storage() = default;
+
+
+    void Storage::OnLoginAttempt(LoginAttemptEvent *event)
+    {
+        std::cout << "Login attempt -- ID: " << event->uid << ", Pass: " << event->password << std::endl;
+    }
 
 
     User Storage::AddUser(UserRecord& userData) noexcept
