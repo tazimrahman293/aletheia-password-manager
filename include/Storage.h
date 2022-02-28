@@ -42,12 +42,23 @@ inline auto createDatabase(const std::string &dbFilename) {
     );
 }
 
+using Database = decltype(createDatabase(""));
+
 /////////////////////////
 /* Basic DB Operations */
 /////////////////////////
 
 class Storage {
-    class _Storage;
+    class _Storage {
+    public:
+        Database database;
+
+        explicit _Storage(const std::string &db_filename) :
+                database(createDatabase(db_filename)) {
+            database.sync_schema();
+        }
+    };
+
     std::unique_ptr<_Storage> s;
 
 public:
@@ -57,15 +68,39 @@ public:
     void OnLoginAttempt(LoginAttemptEvent *event);
 
     template<class T>
-    void InsertOrUpdate(T record) noexcept
+    void Insert(T& record) noexcept
     {
         const int pk = s->database.insert(record);
         record.pk = pk;
     }
+
     template<class T>
-    std::unique_ptr<T> GetByID(int pk) noexcept;
+    void Update(T& record) noexcept
+    {
+        s->database.update(record);
+    }
+
     template<class T>
-    void Remove(int pk) noexcept;
+    void InsertOrUpdate(T& record) noexcept
+    {
+        s->database.replace(record);
+    }
+
+    template<class T>
+    std::unique_ptr<T> GetByID(int pk) noexcept
+    {
+        if (auto record = s->database.get_pointer<T>(pk)) {
+            return std::make_unique<T>(*record);
+        } else {
+            return nullptr;
+        }
+    }
+
+    template<class T>
+    void Remove(int pk) noexcept
+    {
+        s->database.remove<T>(pk);
+    }
 
     std::vector<User> GetAllUsers() noexcept;
     std::vector<Account> GetAllAccountsByUserID(int userID) noexcept;
