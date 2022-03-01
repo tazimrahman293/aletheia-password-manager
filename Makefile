@@ -11,10 +11,11 @@ APP_DIR = $(BUILD)/apps
 SRC     = $(wildcard src/*.cpp) \
 		  $(wildcard src/crypto/*.cpp) \
 		  $(wildcard src/data/*.cpp) \
+		  $(wildcard src/network/*.cpp) \
 		  $(wildcard src/storage/*.cpp) \
 
 OBJECTS = $(SRC:%.cpp=$(OBJ_DIR)/%.o)
-TARGET  = tbd
+TARGET  = aletheia
 
 all: build $(APP_DIR)/$(TARGET)
 

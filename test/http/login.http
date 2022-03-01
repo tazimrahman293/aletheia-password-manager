@@ -1,0 +1,7 @@
+POST http://localhost:8089/login
+Content-Type: application/json
+
+{
+  "uid": 1,
+  "pass": "hunter2"
+}
