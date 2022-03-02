@@ -11,10 +11,30 @@
 
 #include "data/Account.h"
 #include "network/EventBus.h"
-#include "events/LoginAttemptEvent.h"
 #include "network/HTTPServer.h"
+
+#include "events/LoginAttemptEvent.h"
+#include "events/LogoutEvent.h"
 #include "events/AccountCreateEvent.h"
 #include "events/AccountUpdateEvent.h"
+#include "events/AccountDeleteEvent.h"
+
+
+template<class T>
+T parseRecordFromJSON(std::string body)
+{
+    using json = nlohmann::json;
+    auto data = json::parse(body);
+    return data.get<T>();
+}
+
+
+template<class EventType, class... ArgType>
+void publishEvent(ArgType... args)
+{
+    EventBus *eventBus = EventBus::GetInstance();
+    eventBus->Publish(new EventType(args...));
+}
 
 
 void HTTPServer::Init()
@@ -37,16 +57,22 @@ void HTTPServer::Init()
             "/login",
             [](const Request& request, Response& response) -> void
             {
-                EventBus *eventBus = EventBus::GetInstance();
-
                 auto data = json::parse(request.body);
                 int uid = data["uid"].get<int>();
                 std::string pass = data["pass"].get<std::string>();
 
-                eventBus->Publish(new LoginAttemptEvent(uid, pass));
+                publishEvent<LoginAttemptEvent>(uid, pass);
 
                 // TODO Respond after the login is validated (or invalidated)
                 response.set_content("TODO: Implement this!", "text/plain");
+            });
+
+    // User logout
+    server.Get(
+            "/logout",
+            [](const Request& request, Response& response) -> void
+            {
+                publishEvent<LogoutEvent>();
             });
 
     // Create new account
@@ -54,12 +80,8 @@ void HTTPServer::Init()
             "/new-account",
             [](const Request& request, Response& response) -> void
             {
-                EventBus *eventBus = EventBus::GetInstance();
-
-                auto data = json::parse(request.body);
-                auto record = data.get<Account>();
-
-                eventBus->Publish(new AccountCreateEvent(record));
+                auto record = parseRecordFromJSON<Account>(request.body);
+                publishEvent<AccountCreateEvent>(record);
             });
 
     // Edit existing account
@@ -67,12 +89,18 @@ void HTTPServer::Init()
             "/edit-account",
             [](const Request& request, Response& response) -> void
             {
-                EventBus *eventBus = EventBus::GetInstance();
+                auto record = parseRecordFromJSON<Account>(request.body);
+                publishEvent<AccountUpdateEvent>(record);
+            });
 
+    // Remove account
+    server.Post(
+            "/remove-account",
+            [](const Request& request, Response& response) -> void
+            {
                 auto data = json::parse(request.body);
-                auto record = data.get<Account>();
-
-                eventBus->Publish(new AccountUpdateEvent(record));
+                auto id = data["id"].get<int>();
+                publishEvent<AccountDeleteEvent>(id);
             });
 }
 
