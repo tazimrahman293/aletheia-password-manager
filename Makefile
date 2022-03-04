@@ -13,6 +13,7 @@ SRC     = $(wildcard src/*.cpp) \
 		  $(wildcard src/data/*.cpp) \
 		  $(wildcard src/network/*.cpp) \
 		  $(wildcard src/storage/*.cpp) \
+		  $(wildcard src/random/*.cpp) \
 
 OBJECTS = $(SRC:%.cpp=$(OBJ_DIR)/%.o)
 TARGET  = aletheia
@@ -46,4 +47,3 @@ info:
 	@echo "Artifact dir: ${APP_DIR}"
 	@echo "Sources:      ${SRC}    "
 	@echo "Objects:      ${OBJECTS}"
-
