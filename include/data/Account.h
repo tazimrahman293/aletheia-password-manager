@@ -10,6 +10,9 @@
 #include <json.h>
 
 
+/**
+ * Represents a single account entry (i.e. username + password for a site/service).
+ */
 struct Account {
     int pk;
     std::string label;
@@ -25,6 +28,7 @@ struct Account {
     Account() : pk(-1), created(0), lastAccessed(0), lastModified(0), expiry(0), userID(-1) { }
 };
 
+// Registers the Account class for json deserialization
 NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(\
         Account,\
         pk,\

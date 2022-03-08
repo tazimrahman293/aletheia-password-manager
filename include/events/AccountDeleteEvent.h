@@ -8,9 +8,14 @@
 #include "events/Event.h"
 #include "data/Account.h"
 
+
+/**
+ * Signals the intent to delete an account.
+ */
 struct AccountDeleteEvent : public Event {
     explicit AccountDeleteEvent(int id) : target(id) { }
 
+    // Primary key of the account to be deleted
     int target;
 };
 

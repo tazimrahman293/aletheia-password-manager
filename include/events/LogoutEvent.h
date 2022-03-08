@@ -7,6 +7,10 @@
 
 #include "events/Event.h"
 
+
+/**
+ * Signals an attempt to log out of the current active user session.
+ */
 struct LogoutEvent : public Event {
     LogoutEvent() = default;
 };
