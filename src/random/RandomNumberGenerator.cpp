@@ -2,7 +2,7 @@
 // Contains the class definition for generating random numbers.
 // Authors: Tyrel Kostyk
 
-#include <Random/RandomNumberGenerator.h>
+#include <random/RandomNumberGenerator.h>
 
 #include <stdlib.h>
 #include <time.h>
