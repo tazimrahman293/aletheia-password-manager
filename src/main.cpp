@@ -11,8 +11,6 @@
 #include "network/HTTPServer.h"
 #include "network/EventBus.h"
 
-// IMPORTANT: Defines the EventBus static member `bus`
-EventBus *EventBus::bus = nullptr;
 
 /**
  * Gets flags/options/positional arguments from the command line using argc and argv)
