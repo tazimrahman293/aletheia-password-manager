@@ -9,28 +9,17 @@ BUILD   = ./build
 OBJ_DIR = $(BUILD)/objects
 APP_DIR = $(BUILD)/apps
 SRC     = $(wildcard src/*.cpp) \
-		  $(wildcard src/crypto/*.cpp) \
-		  $(wildcard src/data/*.cpp) \
-		  $(wildcard src/network/*.cpp) \
-		  $(wildcard src/storage/*.cpp) \
-		  $(wildcard src/random/*.cpp)
+		  $(wildcard src/**/*.cpp)
 
 OBJECTS = $(SRC:%.cpp=$(OBJ_DIR)/%.o)
 TARGET  = aletheia
 
-TEST_DIR = ./test
-TEST_OBJ_DIR = $(OBJ_DIR)/test
 TEST_SRC = $(wildcard test/*.cpp) \
-		   $(wildcard test/http/*.cpp) \
-		   $(wildcard test/random/*.cpp) \
-		   $(wildcard src/crypto/*.cpp) \
- 		   $(wildcard src/data/*.cpp) \
- 		   $(wildcard src/network/*.cpp) \
- 		   $(wildcard src/storage/*.cpp) \
- 		   $(wildcard src/random/*.cpp)
+		   $(wildcard test/**/*.cpp) \
+ 		   $(filter-out src/main.cpp,$(SRC))
 
-TEST_OBJECTS = $(TEST_SRC:%.cpp=$(TEST_OBJ_DIR)/%.o)
-TEST_TARGET = aletheia_test
+TEST_OBJECTS = $(TEST_SRC:%.cpp=$(OBJ_DIR)/%.o)
+TEST_TARGET = $(TARGET)_test
 
 all: build $(APP_DIR)/$(TARGET)
 
@@ -50,10 +39,6 @@ test: CFLAGS += -DTEST
 test: INCLUDE += -Itest/include/
 test: build $(APP_DIR)/$(TEST_TARGET)
 	@./$(APP_DIR)/$(TEST_TARGET)
-
-$(TEST_OBJ_DIR)/%.o: %.cpp
-	@mkdir -p $(@D)
-	$(CC) $(CFLAGS) $(INCLUDE) -c $< -MMD -o $@
 
 $(APP_DIR)/$(TEST_TARGET): $(TEST_OBJECTS)
 	@mkdir -p $(@D)
