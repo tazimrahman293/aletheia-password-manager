@@ -20,6 +20,12 @@
 #include "events/AccountDeleteEvent.h"
 
 
+/**
+ * Helper function for returning an object parsed by the json utility
+ * @tparam T the type of record object to be generated
+ * @param body a string of valid JSON
+ * @return an object of type T with member variables set to the fields in the JSON
+ */
 template<class T>
 T parseRecordFromJSON(std::string body)
 {
@@ -29,6 +35,12 @@ T parseRecordFromJSON(std::string body)
 }
 
 
+/**
+ * Helper function for publishing a new Event to the Event Bus
+ * @tparam EventType the type of event to be published
+ * @tparam ArgType the types of the variadic arguments
+ * @param args variadic arguments to be passed as parameters to the Event constructor
+ */
 template<class EventType, class... ArgType>
 void publishEvent(ArgType... args)
 {
@@ -37,6 +49,9 @@ void publishEvent(ArgType... args)
 }
 
 
+/**
+ * Initializes the HTTP server instance by setting up all the available API endpoints.
+ */
 void HTTPServer::Init()
 {
     assert(hostPort > 1023 && hostPort <= 65535 && "Port must be between 1024 and 65535");
@@ -105,6 +120,9 @@ void HTTPServer::Init()
 }
 
 
+/**
+ * Runs the main listen loop for the HTTP server.
+ */
 void HTTPServer::Run()
 {
     std::cout << "HTTP server listening at " << hostAddress << " on port " << hostPort << "..." << std::endl;

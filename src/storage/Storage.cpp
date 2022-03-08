@@ -11,6 +11,10 @@
 #include <network/EventBus.h>
 
 
+/**
+ * Constructor for a new Storage instance. Subscribes the instance to various Events.
+ * @param dbFilename the name of the database file to use (will be created if it doesn't exist)
+ */
 Storage::Storage(const std::string &dbFilename) :
         s(std::make_unique<_Storage>(dbFilename))
 {
@@ -22,6 +26,10 @@ Storage::Storage(const std::string &dbFilename) :
 Storage::~Storage() = default;
 
 
+/**
+ * Handles login request events by fetching user data from the database and publishing a login response.
+ * @param event the LoginAttemptEvent object with request payload
+ */
 void Storage::OnLoginAttempt(LoginAttemptEvent *event)
 {
     std::cout << "Login attempt -- ID: " << event->uid << ", Pass: " << event->password << std::endl;
@@ -30,6 +38,10 @@ void Storage::OnLoginAttempt(LoginAttemptEvent *event)
 }
 
 
+/**
+ * Get all users in the current database file.
+ * @return a vector of User records
+ */
 std::vector<User> Storage::GetAllUsers() noexcept
 {
     auto records = s->database.get_all<User>();
@@ -37,6 +49,11 @@ std::vector<User> Storage::GetAllUsers() noexcept
 }
 
 
+/**
+ * Get all accounts belonging to a particular user.
+ * @param userID the primary key of the user to filter by
+ * @return a vector of Account records
+ */
 std::vector<Account> Storage::GetAllAccountsByUserID(int userID) noexcept
 {
     using namespace sqlite_orm;
