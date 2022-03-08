@@ -9,10 +9,14 @@
 #include "data/Account.h"
 
 
+/**
+ * Signals a request to update an account.
+ */
 struct AccountUpdateEvent : public Event {
 
     explicit AccountUpdateEvent(Account rec) : record(std::move(rec)) { }
 
+    // The account record to be updated in the database
     Account record;
 
 };

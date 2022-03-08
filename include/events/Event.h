@@ -5,9 +5,13 @@
 #ifndef PROJECT_EVENT_H
 #define PROJECT_EVENT_H
 
+
+/**
+ * Virtual base class for all other event types
+ */
 class Event {
 protected:
-    virtual ~Event() { };
+    virtual ~Event() = default;
 };
 
 #endif //PROJECT_EVENT_H

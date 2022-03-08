@@ -8,10 +8,18 @@
 #include <httplib.h>
 
 
+/**
+ * Wraps the httplib server functionality and defines endpoints for the network API.
+ */
 class HTTPServer {
 
+    // The actual server instance for handling requests
     httplib::Server server;
+
+    // The hostname/IP to accept connections on
     std::string hostAddress;
+
+    // The port number on which to open a socket
     int hostPort;
 
 public:

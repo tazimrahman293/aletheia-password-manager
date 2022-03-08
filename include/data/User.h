@@ -9,6 +9,10 @@
 
 #include <json.h>
 
+
+/**
+ * Represents a user of the software (each user has multiple "Accounts" for different sites).
+ */
 struct User {
     enum class UserType {
         Normal = 1,
@@ -25,6 +29,7 @@ struct User {
     User() : pk(-1), typeID(UserType::Normal) { }
 };
 
+// Registers the User class for json deserialization
 NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(\
         User,\
         pk,\

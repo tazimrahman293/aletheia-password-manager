@@ -13,6 +13,12 @@
 #include <data/Account.h>
 #include <data/User.h>
 
+
+/**
+ * Sets up the database schema.
+ * @param dbFilename the name of the database file to be used
+ * @return a storage object for accessing the database
+ */
 inline auto createDatabase(const std::string &dbFilename) {
     using namespace sqlite_orm;
 
@@ -42,31 +48,41 @@ inline auto createDatabase(const std::string &dbFilename) {
     );
 }
 
+// Creates a type alias, otherwise the return type of createDatabase would be illegible
 using Database = decltype(createDatabase(""));
 
-/////////////////////////
-/* Basic DB Operations */
-/////////////////////////
 
 class Storage {
+
+    // Internal class for managing the Database type alias and schema
     class _Storage {
     public:
+        // Database handler
         Database database;
 
         explicit _Storage(const std::string &db_filename) :
                 database(createDatabase(db_filename)) {
+            // Important: must do this or else the in-memory schema here may not align with the
+            // persistent schema on disk
             database.sync_schema();
         }
     };
 
+    // Handle for the internal storage class instance
     std::unique_ptr<_Storage> s;
 
 public:
+
     explicit Storage(const std::string &dbFilename);
     ~Storage();
 
     void OnLoginAttempt(LoginAttemptEvent *event);
 
+    /**
+     * Performs a database INSERT of a record.
+     * @tparam T the record type
+     * @param record the record to be inserted
+     */
     template<class T>
     void Insert(T& record) noexcept
     {
@@ -74,18 +90,34 @@ public:
         record.pk = pk;
     }
 
+    /**
+     * Performs a database UPDATE of a record.
+     * @tparam T the record type
+     * @param record the record to be updated
+     */
     template<class T>
     void Update(T& record) noexcept
     {
         s->database.update(record);
     }
 
+    /**
+     * Performs a database REPLACE/UPSERT (if primary key exists, update, otherwise insert).
+     * @tparam T the record type
+     * @param record the record to be inserted or updated
+     */
     template<class T>
     void InsertOrUpdate(T& record) noexcept
     {
         s->database.replace(record);
     }
 
+    /**
+     * Performs a database SELECT using the primary key field.
+     * @tparam T the record type
+     * @param pk the primary key to be queried on
+     * @return a single record if a database entry exists with pk, otherwise nullptr
+     */
     template<class T>
     std::unique_ptr<T> GetByID(int pk) noexcept
     {
@@ -96,6 +128,11 @@ public:
         }
     }
 
+    /**
+     * Performs a database DELETE operation
+     * @tparam T the record type
+     * @param pk the primary key of the entry to be deleted
+     */
     template<class T>
     void Remove(int pk) noexcept
     {
