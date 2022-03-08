@@ -3,8 +3,8 @@
 // for random password generation).
 // Authors: Tyrel Kostyk
 
-#include <Random/PasswordGenerator.h>
-#include <Random/RandomNumberGenerator.h>
+#include <random/PasswordGenerator.h>
+#include <random/RandomNumberGenerator.h>
 
 
 /**
