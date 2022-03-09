@@ -6,10 +6,43 @@
 #include <test_5-1.h>
 
 
+/*******************************************************************************
+                             PRIVATE FUNCTION STUBS
+*******************************************************************************/
+
+static int test_5_1_RandomNumberGeneratorConstructor(void);
+static int test_5_1_RandomNumberGeneratorBounds(void);
+
+
+/*******************************************************************************
+                                   PUBLIC API
+*******************************************************************************/
+
+/**
+ * Run all of the individual test cases for User Story 5-1.
+ * @return The error count of the internal test cases that failed.
+ */
+int test_5_1_testAll(void)
+{
+	int errorCount = 0;
+
+	if (test_5_1_RandomNumberGeneratorConstructor() != TEST_SUCCESS)
+		errorCount++;
+
+	if (test_5_1_RandomNumberGeneratorBounds() != TEST_SUCCESS)
+		errorCount++;
+
+	return errorCount;
+}
+
+/*******************************************************************************
+                               PRIVATE FUNCTIONS
+*******************************************************************************/
+
 /**
  * Test that the RandomNumberGenerator object can construct correctly.
  */
-int test_5_1_RandomNumberGeneratorConstructor(void)
+static int test_5_1_RandomNumberGeneratorConstructor(void)
 {
 	// create a pointer to a RandomNumberGenerator object
 	RandomNumberGenerator *rng = nullptr;
@@ -31,7 +64,7 @@ int test_5_1_RandomNumberGeneratorConstructor(void)
 /**
  * Test that the RandomNumberGenerator can produce numbers within given bounds.
  */
-int test_5_1_RandomNumberGeneratorBounds(void)
+static int test_5_1_RandomNumberGeneratorBounds(void)
 {
 	// construct a RandomNumberGenerator object
 	RandomNumberGenerator *rng = new RandomNumberGenerator();

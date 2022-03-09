@@ -10,17 +10,11 @@
 int main(int argc, char *argv[])
 {
 	int errorCount = 0;
-	int success = TEST_SUCCESS;
 
 	/* TEST USER STORY 5-1 */
+	errorCount += test_5_1_testAll();
 
-	success = test_5_1_RandomNumberGeneratorConstructor();
-	if (success != TEST_SUCCESS)
-		errorCount++;
-
-	success = test_5_1_RandomNumberGeneratorBounds();
-	if (success != TEST_SUCCESS)
-		errorCount++;
+	/* TODO: TEST USER STORY 5-2 */
 
 	/* PRINT RESULTS */
 
