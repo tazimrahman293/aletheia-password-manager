@@ -1,0 +1,21 @@
+### Valid data
+POST {{protocol}}{{host}}:{{port}}/user-accounts
+Content-Type: application/json
+
+{
+  "pk": 1
+}
+
+### Invalid data (user with this pk doesn't exist)
+POST {{protocol}}{{host}}:{{port}}/user-accounts
+Content-Type: application/json
+
+{
+  "pk": 9999
+}
+
+### Missing field
+POST {{protocol}}{{host}}:{{port}}/user-accounts
+Content-Type: application/json
+
+{}

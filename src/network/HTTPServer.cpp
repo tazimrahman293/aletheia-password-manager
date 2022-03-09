@@ -113,6 +113,38 @@ void HTTPServer::Init(Storage *store)
                 // publishEvent<LogoutEvent>();
             });
 
+    // Get all accounts for a particular user
+    server.Post(
+            "/user-accounts",
+            [this](const Request& request, Response& response) -> void
+            {
+                auto data = json::parse(request.body);
+                int id;
+                try {
+                    id = data.at("pk").get<int>();
+                } catch (const json::exception& err) {
+                    response.status = 400;
+                    return;
+                }
+
+                // First check that the user exists
+                auto user = storage->GetByID<User>(id);
+                if (user == nullptr) {
+                    response.status = 404;
+                    return;
+                }
+
+                auto accounts = storage->GetAllAccountsByUserID(id);
+
+                json j = json::array();
+                for (auto& account : accounts) {
+                    j.emplace_back(account);
+                    j.back().erase("keyHash");  // Don't transmit key on this endpoint
+                }
+
+                response.set_content(j.dump(), "application/json");
+            });
+
     // Create new account
     server.Post(
             "/new-account",
@@ -158,6 +190,8 @@ void HTTPServer::Init(Storage *store)
 
                 if (account != nullptr) {
                     // Perform the update
+                    record.keyHash = account->keyHash;  // Use /edit-key endpoint for updating key
+                    // TODO update lastModified
                     storage->Update(record);
                 } else {
                     // Account with primary key given in request was not found
