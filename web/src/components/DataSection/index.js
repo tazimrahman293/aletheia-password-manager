@@ -1,6 +1,5 @@
 import React from 'react'
 import { ButtonComponent } from '../../ButtonElement'
-// import { ssvg1.svg } from '../../images/svg1.svg'
 import { DataContainer, DataWrapper, DataRow, Column1, Column2, TextWrapper, TopLine, Heading, Subtitle, BtnWrap, ImgWrap, Img } from './DataElements'
 
 const DataSection = ({ lightBg, id, imgStart, topLine, lightText, headline, darkText, description, buttonLabel, alt, img, primary, dark, dark2 }) => {
