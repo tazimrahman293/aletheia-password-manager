@@ -75,18 +75,18 @@ void HTTPServer::Init(Storage *store)
             [this](const Request& request, Response& response) -> void
             {
                 auto data = json::parse(request.body);
-                int uid;
+                int id;
                 std::string pass;
                 try {
-                    uid = data.at("uid").get<int>();
+                    id = data.at("pk").get<int>();
                     pass = data.at("pass").get<std::string>();
                 } catch (const json::exception& err) {
                     response.status = 400;
                     return;
                 }
 
-                // publishEvent<LoginAttemptEvent>(uid, pass);
-                auto user = storage->GetByID<User>(uid);
+                // publishEvent<LoginAttemptEvent>(id, pass);
+                auto user = storage->GetByID<User>(id);
 
                 if (user != nullptr) {
                     // TODO hash password/key to check if valid login
@@ -177,13 +177,16 @@ void HTTPServer::Init(Storage *store)
             [this](const Request& request, Response& response) -> void
             {
                 auto data = json::parse(request.body);
-                auto id = data["id"].get<int>();
+                int id;
+                try {
+                    id = data.at("pk").get<int>();
+                } catch (const json::exception& err) {
+                    response.status = 400;
+                    return;
+                }
                 // publishEvent<AccountDeleteEvent>(id);
 
                 storage->Remove<Account>(id);
-
-                response.status = 200;
-                response.set_content("OK", "text/plain");
             });
 
     // Fetch account key in plain text
@@ -192,7 +195,13 @@ void HTTPServer::Init(Storage *store)
             [this](const Request& request, Response& response) -> void
             {
                 auto data = json::parse(request.body);
-                auto id = data["id"].get<int>();
+                int id;
+                try {
+                    id = data["pk"].get<int>();
+                } catch (const json::exception& err) {
+                    response.status = 400;
+                    return;
+                }
 
                 auto account = storage->GetByID<Account>(id);
 
