@@ -13,11 +13,11 @@
 #include "network/EventBus.h"
 #include "network/HTTPServer.h"
 
-#include "events/LoginAttemptEvent.h"
-#include "events/LogoutEvent.h"
-#include "events/AccountCreateEvent.h"
-#include "events/AccountUpdateEvent.h"
-#include "events/AccountDeleteEvent.h"
+// #include "events/LoginAttemptEvent.h"
+// #include "events/LogoutEvent.h"
+// #include "events/AccountCreateEvent.h"
+// #include "events/AccountUpdateEvent.h"
+// #include "events/AccountDeleteEvent.h"
 
 
 /**
@@ -58,11 +58,11 @@ void HTTPServer::Init(Storage *store)
 
     this->storage = store;
 
-    using namespace httplib;
+    using httplib::Request, httplib::Response;
     using json = nlohmann::json;
 
     // For testing purposes
-    server.Get(
+    Get(
             "/hello",
             [](const Request& request, Response& response) -> void
             {
@@ -70,7 +70,7 @@ void HTTPServer::Init(Storage *store)
             });
 
     // User login attempt
-    server.Post(
+    Post(
             "/login",
             [this](const Request& request, Response& response) -> void
             {
@@ -85,7 +85,6 @@ void HTTPServer::Init(Storage *store)
                     return;
                 }
 
-                // publishEvent<LoginAttemptEvent>(id, pass);
                 auto user = storage->GetByID<User>(id);
 
                 if (user != nullptr) {
@@ -105,16 +104,15 @@ void HTTPServer::Init(Storage *store)
             });
 
     // User logout
-    server.Get(
+    Get(
             "/logout",
             [this](const Request& request, Response& response) -> void
             {
                 // TODO What happens here?
-                // publishEvent<LogoutEvent>();
             });
 
     // Get all accounts for a particular user
-    server.Post(
+    Post(
             "/user-accounts",
             [this](const Request& request, Response& response) -> void
             {
@@ -146,7 +144,7 @@ void HTTPServer::Init(Storage *store)
             });
 
     // Create new account
-    server.Post(
+    Post(
             "/new-account",
             [this](const Request& request, Response& response) -> void
             {
@@ -157,7 +155,6 @@ void HTTPServer::Init(Storage *store)
                     response.status = 400;
                     return;
                 }
-                // publishEvent<AccountCreateEvent>(record);
 
                 storage->Insert(record);
 
@@ -173,7 +170,7 @@ void HTTPServer::Init(Storage *store)
             });
 
     // Edit existing account
-    server.Post(
+    Post(
             "/edit-account",
             [this](const Request& request, Response& response) -> void
             {
@@ -184,7 +181,6 @@ void HTTPServer::Init(Storage *store)
                     response.status = 400;
                     return;
                 }
-                // publishEvent<AccountUpdateEvent>(record);
 
                 auto account = storage->GetByID<Account>(record.pk);
 
@@ -206,7 +202,7 @@ void HTTPServer::Init(Storage *store)
             });
 
     // Remove account
-    server.Post(
+    Post(
             "/remove-account",
             [this](const Request& request, Response& response) -> void
             {
@@ -218,13 +214,12 @@ void HTTPServer::Init(Storage *store)
                     response.status = 400;
                     return;
                 }
-                // publishEvent<AccountDeleteEvent>(id);
 
                 storage->Remove<Account>(id);
             });
 
     // Fetch account key in plain text
-    server.Post(
+    Post(
             "/account-key",
             [this](const Request& request, Response& response) -> void
             {
@@ -256,5 +251,5 @@ void HTTPServer::Init(Storage *store)
 void HTTPServer::Run()
 {
     std::cout << "HTTP server listening at " << hostAddress << " on port " << hostPort << "..." << std::endl;
-    server.listen(hostAddress.c_str(), hostPort, SOCK_STREAM);
+    listen(hostAddress.c_str(), hostPort, SOCK_STREAM);
 }
