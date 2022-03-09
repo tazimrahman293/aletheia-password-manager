@@ -6,6 +6,7 @@
 #define PROJECT_HTTPSERVER_H
 
 #include <httplib.h>
+#include "Storage.h"
 
 
 /**
@@ -22,6 +23,9 @@ class HTTPServer {
     // The port number on which to open a socket
     int hostPort;
 
+    // Handle for the storage instance (database)
+    Storage *storage = nullptr;
+
 public:
 
     HTTPServer(std::string address, int port) : hostAddress(std::move(address)), hostPort(port) { }
@@ -32,7 +36,7 @@ public:
     HTTPServer(HTTPServer& other) = delete;  // No copying
     void operator=(HTTPServer& other) = delete;  // No assignment
 
-    void Init();
+    void Init(Storage *store);
     void Run();
 
 };

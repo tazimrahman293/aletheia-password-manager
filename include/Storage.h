@@ -73,8 +73,11 @@ class Storage {
 
 public:
 
-    explicit Storage(const std::string &dbFilename);
-    ~Storage();
+    explicit Storage(const std::string& dbFilename);
+
+    Storage(Storage&) = delete;  // No copying
+    void operator=(const Storage&) = delete;  // No assignment
+    ~Storage() = default;
 
     void OnLoginAttempt(LoginAttemptEvent *event);
 

@@ -52,9 +52,11 @@ void publishEvent(ArgType... args)
 /**
  * Initializes the HTTP server instance by setting up all the available API endpoints.
  */
-void HTTPServer::Init()
+void HTTPServer::Init(Storage *store)
 {
     assert(hostPort > 1023 && hostPort <= 65535 && "Port must be between 1024 and 65535");
+
+    this->storage = store;
 
     using namespace httplib;
     using json = nlohmann::json;
@@ -70,53 +72,122 @@ void HTTPServer::Init()
     // User login attempt
     server.Post(
             "/login",
-            [](const Request& request, Response& response) -> void
+            [this](const Request& request, Response& response) -> void
             {
                 auto data = json::parse(request.body);
-                int uid = data["uid"].get<int>();
-                std::string pass = data["pass"].get<std::string>();
+                int uid;
+                std::string pass;
+                try {
+                    uid = data.at("uid").get<int>();
+                    pass = data.at("pass").get<std::string>();
+                } catch (const json::exception& err) {
+                    response.status = 400;
+                    return;
+                }
 
-                publishEvent<LoginAttemptEvent>(uid, pass);
+                // publishEvent<LoginAttemptEvent>(uid, pass);
+                auto user = storage->GetByID<User>(uid);
 
-                // TODO Respond after the login is validated (or invalidated)
-                response.set_content("TODO: Implement this!", "text/plain");
+                if (user != nullptr) {
+                    // TODO hash password/key to check if valid login
+                    if (pass.empty()) {  // TODO or other problems with the formation of the password, or if invalid
+                        response.status = 401;
+                        return;
+                    }
+
+                    json j = *user;
+                    j.erase("keyHash");  // Not really a threat to include this but best to be careful anyway
+
+                    response.set_content(j.dump(), "application/json");
+                } else {
+                    response.status = 401;
+                }
             });
 
     // User logout
     server.Get(
             "/logout",
-            [](const Request& request, Response& response) -> void
+            [this](const Request& request, Response& response) -> void
             {
-                publishEvent<LogoutEvent>();
+                // TODO What happens here?
+                // publishEvent<LogoutEvent>();
             });
 
     // Create new account
     server.Post(
             "/new-account",
-            [](const Request& request, Response& response) -> void
+            [this](const Request& request, Response& response) -> void
             {
                 auto record = parseRecordFromJSON<Account>(request.body);
-                publishEvent<AccountCreateEvent>(record);
+                // publishEvent<AccountCreateEvent>(record);
+
+                storage->Insert(record);
+
+                if (record.pk > 0) {
+                    json j = record;
+                    j.erase("keyHash");
+
+                    response.set_content(j.dump(), "application/json");
+                } else {
+                    response.status = 500;
+                    response.set_content("Unable to store new Account record.", "text/plain");
+                }
             });
 
     // Edit existing account
     server.Post(
             "/edit-account",
-            [](const Request& request, Response& response) -> void
+            [this](const Request& request, Response& response) -> void
             {
                 auto record = parseRecordFromJSON<Account>(request.body);
-                publishEvent<AccountUpdateEvent>(record);
+                // publishEvent<AccountUpdateEvent>(record);
+
+                storage->Update(record);
+
+                if (record.pk > 0) {
+                    json j = record;
+                    j.erase("keyHash");
+
+                    response.set_content(j.dump(), "application/json");
+                } else {
+                    response.status = 500;
+                    response.set_content("Unable to edit Account record.", "text/plain");
+                }
             });
 
     // Remove account
     server.Post(
             "/remove-account",
-            [](const Request& request, Response& response) -> void
+            [this](const Request& request, Response& response) -> void
             {
                 auto data = json::parse(request.body);
                 auto id = data["id"].get<int>();
-                publishEvent<AccountDeleteEvent>(id);
+                // publishEvent<AccountDeleteEvent>(id);
+
+                storage->Remove<Account>(id);
+
+                response.status = 200;
+                response.set_content("OK", "text/plain");
             });
+
+    // Fetch account key in plain text
+    server.Post(
+            "/account-key",
+            [this](const Request& request, Response& response) -> void
+            {
+                auto data = json::parse(request.body);
+                auto id = data["id"].get<int>();
+
+                auto account = storage->GetByID<Account>(id);
+
+                if (account != nullptr) {
+                    auto key = account->keyHash;  // TODO need to decrypt first
+                    response.set_content(key, "text/plain");
+                } else {
+                    response.status = 404;
+                }
+            }
+            );
 }
 
 

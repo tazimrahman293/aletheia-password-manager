@@ -23,9 +23,6 @@ Storage::Storage(const std::string &dbFilename) :
 }
 
 
-Storage::~Storage() = default;
-
-
 /**
  * Handles login request events by fetching user data from the database and publishing a login response.
  * @param event the LoginAttemptEvent object with request payload
