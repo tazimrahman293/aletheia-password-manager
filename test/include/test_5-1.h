@@ -5,5 +5,8 @@
 #include <random/RandomNumberGenerator.h>
 
 
-int test_5_1_RandomNumberGeneratorConstructor(void);
-int test_5_1_RandomNumberGeneratorBounds(void);
+/*******************************************************************************
+                                   PUBLIC API
+*******************************************************************************/
+
+int test_5_1_testAll(void);
