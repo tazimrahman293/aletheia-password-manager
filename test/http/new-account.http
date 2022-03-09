@@ -1,0 +1,49 @@
+### Valid data
+POST {{protocol}}{{host}}:{{port}}/new-account
+Content-Type: application/json
+
+{
+  "pk": -1,
+  "label": "blizzard",
+  "username": "jeremy",
+  "keyHash": "hunter2",
+  "url": "blizzard.com",
+  "created": 0,
+  "lastAccessed": 0,
+  "lastModified": 0,
+  "expiry": 0,
+  "userID": 1
+}
+
+### Missing fields
+POST {{protocol}}{{host}}:{{port}}/new-account
+Content-Type: application/json
+
+{
+  "label": "blizzard",
+  "username": "jeremy",
+  "keyHash": "hunter2",
+  "url": "blizzard.com",
+  "created": 0,
+  "lastAccessed": 0,
+  "lastModified": 0,
+  "expiry": 0,
+  "userID": 1
+}
+
+### Valid data, ensure that primay key is not applied to insertion
+POST {{protocol}}{{host}}:{{port}}/new-account
+Content-Type: application/json
+
+{
+  "pk": 1,
+  "label": "blizzard",
+  "username": "jeremy",
+  "keyHash": "hunter2",
+  "url": "blizzard.com",
+  "created": 0,
+  "lastAccessed": 0,
+  "lastModified": 0,
+  "expiry": 0,
+  "userID": 1
+}

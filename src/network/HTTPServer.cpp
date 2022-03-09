@@ -118,7 +118,13 @@ void HTTPServer::Init(Storage *store)
             "/new-account",
             [this](const Request& request, Response& response) -> void
             {
-                auto record = parseRecordFromJSON<Account>(request.body);
+                Account record;
+                try {
+                    record = parseRecordFromJSON<Account>(request.body);
+                } catch (const json::exception& err) {
+                    response.status = 400;
+                    return;
+                }
                 // publishEvent<AccountCreateEvent>(record);
 
                 storage->Insert(record);

@@ -1,11 +1,11 @@
 ### Missing JSON fields
-POST http://localhost:8089/login
+POST {{protocol}}{{host}}:{{port}}/login
 Content-Type: application/json
 
 {}
 
 ### Invalid UID
-POST http://localhost:8089/login
+POST {{protocol}}{{host}}:{{port}}/login
 Content-Type: application/json
 
 {
@@ -14,7 +14,7 @@ Content-Type: application/json
 }
 
 ### Valid UID, invalid password
-POST http://localhost:8089/login
+POST {{protocol}}{{host}}:{{port}}/login
 Content-Type: application/json
 
 {
@@ -23,7 +23,7 @@ Content-Type: application/json
 }
 
 ### Valid UID and password
-POST http://localhost:8089/login
+POST {{protocol}}{{host}}:{{port}}/login
 Content-Type: application/json
 
 {
