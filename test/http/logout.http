@@ -1,0 +1,4 @@
+### Attempt a logout
+GET http://localhost:8089/logout
+Accept: *
+
