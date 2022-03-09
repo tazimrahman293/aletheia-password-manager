@@ -1,0 +1,48 @@
+### Valid data
+POST {{protocol}}{{host}}:{{port}}/edit-account
+Content-Type: application/json
+
+{
+  "pk": 1,
+  "label": "steam",
+  "username": "jeremy",
+  "keyHash": "hunter2",
+  "url": "steampowered.com",
+  "created": 0,
+  "lastAccessed": 0,
+  "lastModified": 0,
+  "expiry": 0,
+  "userID": 1
+}
+
+### Invalid data (account with this pk doesn't exist)
+POST {{protocol}}{{host}}:{{port}}/edit-account
+Content-Type: application/json
+
+{
+  "pk": 9999,
+  "label": "steam",
+  "username": "jeremy",
+  "keyHash": "hunter2",
+  "url": "steampowered.com",
+  "created": 0,
+  "lastAccessed": 0,
+  "lastModified": 0,
+  "expiry": 0,
+  "userID": 1
+}
+
+### Missing fields
+POST {{protocol}}{{host}}:{{port}}/edit-account
+Content-Type: application/json
+
+{
+  "pk": 1,
+  "label": "steam",
+  "url": "steampowered.com",
+  "created": 0,
+  "lastAccessed": 0,
+  "lastModified": 0,
+  "expiry": 0,
+  "userID": 1
+}

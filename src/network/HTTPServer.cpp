@@ -145,20 +145,30 @@ void HTTPServer::Init(Storage *store)
             "/edit-account",
             [this](const Request& request, Response& response) -> void
             {
-                auto record = parseRecordFromJSON<Account>(request.body);
+                Account record;
+                try {
+                    record = parseRecordFromJSON<Account>(request.body);
+                } catch (const json::exception& err) {
+                    response.status = 400;
+                    return;
+                }
                 // publishEvent<AccountUpdateEvent>(record);
 
-                storage->Update(record);
+                auto account = storage->GetByID<Account>(record.pk);
 
-                if (record.pk > 0) {
-                    json j = record;
-                    j.erase("keyHash");
-
-                    response.set_content(j.dump(), "application/json");
+                if (account != nullptr) {
+                    // Perform the update
+                    storage->Update(record);
                 } else {
-                    response.status = 500;
-                    response.set_content("Unable to edit Account record.", "text/plain");
+                    // Account with primary key given in request was not found
+                    response.status = 404;
+                    return;
                 }
+
+                json j = record;
+                j.erase("keyHash");
+
+                response.set_content(j.dump(), "application/json");
             });
 
     // Remove account
