@@ -69,21 +69,6 @@ void HTTPServer::Init(Storage *store)
                 response.set_content("Hello, world!", "text/plain");
             });
 
-    // List all users in the current database
-    Get(
-            "/user",
-            [this](const Request& request, Response& response) -> void
-            {
-                auto users = storage->GetAllUsers();
-                json j = json::array();
-                for (auto& user : users) {
-                    j.emplace_back(user);
-                    j.back().erase("keyHash");  // Don't transmit key on this endpoint
-                }
-
-                response.set_content(j.dump(), "application/json");
-            });
-
     // User login attempt
     Post(
             "/login",
@@ -115,6 +100,8 @@ void HTTPServer::Init(Storage *store)
                 } else {
                     response.status = 401;
                 }
+
+                response.status = 204;
             });
 
     // User logout
@@ -123,6 +110,7 @@ void HTTPServer::Init(Storage *store)
             [this](const Request& request, Response& response) -> void
             {
                 // TODO end the session
+                response.status = 204;
             });
 
     // Create a new user profile
@@ -151,6 +139,21 @@ void HTTPServer::Init(Storage *store)
                 }
             });
 
+    // List all users in the current database
+    Get(
+            "/user",
+            [this](const Request& request, Response& response) -> void
+            {
+                auto users = storage->GetAllUsers();
+                json j = json::array();
+                for (auto& user : users) {
+                    j.emplace_back(user);
+                    j.back().erase("keyHash");  // Don't transmit key on this endpoint
+                }
+
+                response.set_content(j.dump(), "application/json");
+            });
+
     // Update a user profile
     Patch(
             "/user",
@@ -158,13 +161,11 @@ void HTTPServer::Init(Storage *store)
             {
                 json data;
                 try {
-                    data = request.body;
+                    data = json::parse(request.body);
                 } catch (const json::exception& err) {
                     response.status = 400;
                     return;
                 }
-
-                std::cout << data << std::endl;
 
                 std::unique_ptr<User> user;
                 try {
@@ -192,6 +193,56 @@ void HTTPServer::Init(Storage *store)
                     return;
                 }
 
+                response.status = 204;
+
+            });
+
+    // Remove user
+    Delete(
+            "/user",
+            [this](const Request& request, Response& response) -> void
+            {
+                json data = json::parse(request.body);
+                int id;
+                try {
+                    id = data.at("pk").get<int>();
+                } catch (const json::exception& err) {
+                    response.status = 400;
+                    return;
+                }
+
+                storage->Remove<User>(id);
+
+                response.status = 204;
+            });
+
+    // Create new account
+    Post(
+            "/account",
+            [this](const Request& request, Response& response) -> void
+            {
+                Account record;
+                try {
+                    record = parseRecordFromJSON<Account>(request.body);
+                } catch (const json::exception& err) {
+                    response.status = 400;
+                    return;
+                }
+
+                storage->Insert(record);
+
+                if (record.pk > 0) {
+                    json j;
+                    j["pk"] = record.pk;
+                    j["created"] = record.created;
+                    j["lastAccessed"] = record.lastAccessed;
+                    j["lastModified"] = record.lastModified;
+
+                    response.set_content(j.dump(), "application/json");
+                } else {
+                    response.status = 500;
+                    response.set_content("Unable to store new Account record.", "text/plain");
+                }
             });
 
     // Get all accounts for a particular user
@@ -225,35 +276,6 @@ void HTTPServer::Init(Storage *store)
                 response.set_content(j.dump(), "application/json");
             });
 
-    // Create new account
-    Post(
-            "/account",
-            [this](const Request& request, Response& response) -> void
-            {
-                Account record;
-                try {
-                    record = parseRecordFromJSON<Account>(request.body);
-                } catch (const json::exception& err) {
-                    response.status = 400;
-                    return;
-                }
-
-                storage->Insert(record);
-
-                if (record.pk > 0) {
-                    json j;
-                    j["pk"] = record.pk;
-                    j["created"] = record.created;
-                    j["lastAccessed"] = record.lastAccessed;
-                    j["lastModified"] = record.lastModified;
-
-                    response.set_content(j.dump(), "application/json");
-                } else {
-                    response.status = 500;
-                    response.set_content("Unable to store new Account record.", "text/plain");
-                }
-            });
-
     // Edit existing account
     Patch(
             "/account",
@@ -261,7 +283,7 @@ void HTTPServer::Init(Storage *store)
             {
                 json data;
                 try {
-                    data = request.body;
+                    data = json::parse(request.body);
                 } catch (const json::exception& err) {
                     response.status = 400;
                     return;
@@ -307,7 +329,7 @@ void HTTPServer::Init(Storage *store)
             "/account",
             [this](const Request& request, Response& response) -> void
             {
-                json data = request.body;
+                json data = json::parse(request.body);
                 int id;
                 try {
                     id = data.at("pk").get<int>();
@@ -317,6 +339,8 @@ void HTTPServer::Init(Storage *store)
                 }
 
                 storage->Remove<Account>(id);
+
+                response.status = 204;
             });
 
     // Fetch account key in plain text
