@@ -1,0 +1,33 @@
+### Valid data
+POST {{protocol}}{{host}}:{{port}}/edit-user
+Content-Type: application/json
+
+{
+  "pk": 1,
+  "firstName": "Tyrel",
+  "lastName": "Kostyk",
+  "keyHash": "calibrations",
+  "typeID": 1
+}
+
+### Invalid data (user with this pk doesn't exist)
+POST {{protocol}}{{host}}:{{port}}/edit-user
+Content-Type: application/json
+
+{
+  "pk": 9999,
+  "firstName": "Tyrel",
+  "lastName": "Kostyk",
+  "keyHash": "calibrations",
+  "typeID": 1
+}
+
+### Missing fields
+POST {{protocol}}{{host}}:{{port}}/edit-user
+Content-Type: application/json
+
+{
+  "pk": 1,
+  "firstName": "Tyrel",
+  "lastName": "Kostyk"
+}

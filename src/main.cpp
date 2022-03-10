@@ -73,7 +73,7 @@ int main(int argc, char *argv[])
 
         // Spin up server instance and run listen loop
         HTTPServer server(hostAddress, hostPort);
-        server.Init();
+        server.Init(&database);
         server.Run();
     }
 

@@ -1,0 +1,39 @@
+### Setup
+POST {{protocol}}{{host}}:{{port}}/new-account
+Content-Type: application/json
+# Creates a new account
+
+{
+  "pk": -1,
+  "label": "blizzard",
+  "username": "jeremy",
+  "keyHash": "hunter2",
+  "url": "blizzard.com",
+  "created": 0,
+  "lastAccessed": 0,
+  "lastModified": 0,
+  "expiry": 0,
+  "userID": 1
+}
+
+### Valid data
+POST {{protocol}}{{host}}:{{port}}/remove-account
+Content-Type: application/json
+
+{
+  "pk": 1
+}
+
+### Invalid data (account with this pk doesn't exist)
+POST {{protocol}}{{host}}:{{port}}/remove-account
+Content-Type: application/json
+
+{
+  "pk": 0
+}
+
+### Missing field
+POST {{protocol}}{{host}}:{{port}}/remove-account
+Content-Type: application/json
+
+{}

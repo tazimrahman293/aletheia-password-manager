@@ -1,0 +1,25 @@
+### Valid data
+POST {{protocol}}{{host}}:{{port}}/edit-key
+Content-Type: application/json
+
+{
+  "pk": 2,
+  "key": "hunter3"
+}
+
+### Invalid data (account with this pk doesn't exist)
+POST {{protocol}}{{host}}:{{port}}/edit-key
+Content-Type: application/json
+
+{
+  "pk": 9999,
+  "key": "hunter3"
+}
+
+### Missing field
+POST {{protocol}}{{host}}:{{port}}/edit-key
+Content-Type: application/json
+
+{
+  "key": "hunter3"
+}

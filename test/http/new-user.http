@@ -1,0 +1,22 @@
+### Valid data
+POST {{protocol}}{{host}}:{{port}}/new-user
+Content-Type: application/json
+
+{
+  "pk": -1,
+  "firstName": "Jeremy",
+  "lastName": "Rempel",
+  "keyHash": "calibrations",
+  "typeID": 1
+}
+
+### Missing field
+POST {{protocol}}{{host}}:{{port}}/new-user
+Content-Type: application/json
+
+{
+  "pk": -1,
+  "firstName": "Jeremy",
+  "lastName": "Rempel",
+  "keyHash": "calibrations"
+}
