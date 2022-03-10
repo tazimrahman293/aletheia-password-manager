@@ -1,5 +1,6 @@
 export const dataAbout = {
     id: 'about',
+    to: '/signIn',
     lightBg: true,
     lightText: false,
     lighttextDesc: false,
@@ -17,6 +18,7 @@ export const dataAbout = {
 
   export const dataTeam = {
     id: 'team',
+    to: '/signIn',
     lightBg: false,
     lightText: true,
     lighttextDesc: false,
