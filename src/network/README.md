@@ -2,263 +2,135 @@
 
 ---
 
-`/hello`
+##`/hello`
 
-**Description**
+### Used for testing connection to the server.
 
-Used for testing connection to the server.
-
-**Methods**
-
-`GET`
-
-**Request Params**
-
-N/A
-
-**Response**
-
-"Hello, world!" (plain/text)
-
----
-
-`/list-users`
-
-**Description**
-
-Lists all users in the current database.
-
-**Methods**
-
-`GET`
-
-**Request Params**
-
-N/A
-
-**Response**
-
-```json
-[
-  {
-    "pk": 1,
-    "firstName": "first",
-    "lastName": "last",
-    "typeID": 1
-  },
-  {
-    "pk": 2,
-    "firstName": "second",
-    "lastName": "last",
-    "typeID": 1
-  },
-  // ...
-]
-```
-
----
-
-`/login`
-
-**Description**
-
-Checks the validity of a master key given for a particular user.
-
-**Methods**
-
-`POST`
-
-**Request Body**
-
-```json
-{
-  "pk": 1,
-  // Key is sent in plain text for now
-  "pass": "example"
-}
-```
-
-**Response**
-
-```json
-{
-  "pk": 1,
-  "firstName": "first",
-  "lastName": "last",
-  "typeID": 1
-}
-```
-
----
-
-`/logout`
-
-**Description**
-
-Marks the active user session as ended.
-
-**Methods**
-
-`GET` (may change to POST in the future)
-
-**Request Params**
-
-N/A
-
-**Response**
-
-N/A
-
----
-
-`/new-user`
-
-**Description**
-
-Requests the creation of a new user profile and master key.
-
-**Methods**
-
-`POST`
-
-**Request Body**
-
-```json
-{
-  // PK doesn't matter here but it must be sent
-  "pk": -1,
-  "firstName": "first",
-  "lastName": "last",
-  // Send the key as plain text for now
-  "keyHash": "PLAIN-TEXT-KEY",
-  // Normal = 1, Admin = 2
-  "typeID": 1
-}
-```
-
-**Response**
-
-```json
-{
-  "pk": 1,
-  "firstName": "first",
-  "lastName": "last",
-  "typeID": 1
-}
-```
-
----
-
-`/edit-user`
-
-**Description**
-
-Updates all the fields of a given user (except PK)
-
-**Methods**
-
-`POST`
-
-**Request Body**
-
-```json
-{
-  "pk": 1,
-  "firstName": "first",
-  "lastName": "last",
-  // Key doesn't matter here but it must be included
-  "keyHash": "",
-  "typeID": 1
-}
-```
-
-**Response**
-
-```json
-{
-  "pk": 1,
-  "firstName": "first",
-  "lastName": "last",
-  "typeID": 1
-}
-```
-
----
-
-`/user-accounts`
-
-**Description**
-
-Gets all accounts for a given user.
-
-**Methods**
-
-`GET`
-
-**Request Params**
+**Request**
 
 ```http request
-GET /user-accounts?pk=1
+GET /hello HTTP/1.1
+```
+
+**Response**
+
+```text
+Hello, world!
+```
+
+---
+
+##`/login`
+
+### Check user credentials and, if valid, begin a new session.
+
+**Request**
+
+```http request
+POST /login HTTP/1.1
+Content-Type: application/json
+
+{
+  "pk": 1,
+  "key": "PLAIN-TEXT-KEY"
+}
+```
+
+**Response**
+
+```text
+200 - Successfully logged in
+401 - Invalid credentials
+```
+
+---
+
+##`/logout`
+
+### Mark the active user session as ended.
+
+**Request**
+
+```http request
+POST /logout HTTP/1.1
+# Note: this endpoint will change in the future
+```
+
+**Response**
+
+```text
+200 - Successfully ended session
+```
+
+---
+
+##`/user`
+
+### Create a new User
+
+**Request**
+
+```http request
+PUT /user HTTP/1.1
+Content-Type: application/json
+
+<User-JSON>
+```
+
+**Response**
+
+```json
+{
+  "pk": 1  // The pk of the newly created User
+}
+```
+
+### List all Users in current database
+
+**Request**
+
+```http request
+GET /user HTTP/1.1
 ```
 
 **Response**
 
 ```json
 [
-  {
-    "created": 0,
-    "expiry": 0,
-    "label": "my-account",
-    "lastAccessed": 0,
-    "lastModified": 0,
-    "pk": 1,
-    "url": "example.com",
-    "userID": 1,
-    "username": "username"
-  },
-  {
-    "created": 0,
-    "expiry": 0,
-    "label": "other-account",
-    "lastAccessed": 0,
-    "lastModified": 0,
-    "pk": 2,
-    "url": "test.com",
-    "userID": 5,
-    "username": "john.doe"
-  },
+  <User-JSON>,
+  <User-JSON>,
   // ...
 ]
 ```
 
+### Update an existing User
+
+**Request**
+
+```http request
+POST /user HTTP/1.1
+Content-Type: application/json
+
+<User-JSON updatable fields>
+```
+
+**Response**
+
+N/A
+
 ---
 
-`/new-account`
+##`/account`
 
-**Description**
+### Create a new Account
 
-Requests the creation of a new account under a given user.
+**Request**
 
-**Methods**
+```http request
+PUT /account HTTP/1.1
+Content-Type: application/json
 
-`POST`
-
-**Request Body**
-
-```json
-{
-  "created": 0,
-  "expiry": 0,
-  "keyHash": "PLAIN-TEXT-KEY",
-  "label": "some-account",
-  "lastAccessed": 0,
-  "lastModified": 0,
-  // pk doesn't matter here but must be included
-  "pk": -1,
-  "url": "example.com",
-  "userID": 9,
-  "username": "jane_92@gmail.com"
-}
+<Account-JSON>
 ```
 
 **Response**
@@ -266,77 +138,53 @@ Requests the creation of a new account under a given user.
 ```json
 {
   "created": 0,
-  "expiry": 0,
-  "label": "some-account",
   "lastAccessed": 0,
   "lastModified": 0,
-  "pk": 4,
-  "url": "example.com",
-  "userID": 9,
-  "username": "jane_92@gmail.com"
+  "pk": 4
 }
 ```
 
----
+### List all Accounts for a given User
 
-`/edit-account`
+**Request**
 
-**Description**
-
-Updates all the fields of an existing account.
-
-**Methods**
-
-`POST`
-
-**Request Body**
-
-```json
-{
-  "created": 0,
-  "expiry": 0,
-  "keyHash": "",
-  "label": "some-account",
-  "lastAccessed": 0,
-  "lastModified": 0,
-  "pk": 2,
-  "url": "example.com",
-  "userID": 9,
-  "username": "jane_92@gmail.com"
-}
+```http request
+GET /account?user=99 HTTP/1.1
 ```
 
 **Response**
 
 ```json
-{
-  "created": 0,
-  "expiry": 0,
-  "label": "some-account",
-  "lastAccessed": 0,
-  "lastModified": 0,
-  "pk": 4,
-  "url": "example.com",
-  "userID": 9,
-  "username": "jane_92@gmail.com"
-}
+[
+  <Account-JSON>,
+  <Account-JSON>,
+  // ...
+]
 ```
 
----
+### Update an existing Account
 
-`/remove-account`
+**Request**
 
-**Description**
+```http request
+POST /account HTTP/1.1
+Content-Type: application/json
 
-Deletes an existing account.
+<Account-JSON updatable fields>
+```
 
-**Methods**
+**Response**
 
-`POST`
+N/A
 
-**Request Body**
+### Delete an Account
 
-```json
+**Request**
+
+```http request
+DELETE /account HTTP/1.1
+Content-Type: application/json
+
 {
   "pk": 1
 }
@@ -348,48 +196,35 @@ N/A
 
 ---
 
-`/account-key`
+##`/account/key`
 
-**Description**
+### Fetch the plain-text key for an Account
 
-Fetches the plain-text key for an account.
-
-**Methods**
-
-`POST` (change to GET)
-
-**Request Params**
+**Request**
 
 ```http request
-GET /account-key?pk=1
+GET /account/key?pk=99 HTTP/1.1
 ```
 
 **Response**
 
 ```json
 {
-  "pk": 1,
+  "pk": 99,
   "key": "PLAIN-TEXT-KEY"
 }
 ```
 
----
+### Replace the key for an Account
 
-`/edit-key`
+**Request**
 
-**Description**
+```http request
+POST /account/key HTTP/1.1
+Content-Type: application/json
 
-Replaces the plain-text key for an account.
-
-**Methods**
-
-`POST`
-
-**Request Body**
-
-```json
 {
-  "pk": 1,
+  "pk": 99,
   "key": "PLAIN-TEXT-KEY"
 }
 ```
