@@ -137,6 +137,36 @@ void HTTPServer::Init(Storage *store)
                 }
             });
 
+    // Update a user profile
+    Post(
+            "/edit-user",
+            [this](const Request& request, Response& response) -> void
+            {
+                User record;
+                try {
+                    record = parseRecordFromJSON<User>(request.body);
+                } catch (const json::exception& err) {
+                    response.status = 400;
+                    return;
+                }
+
+                auto user = storage->GetByID<User>(record.pk);
+
+                if (user != nullptr) {
+                    // Perform the update
+                    record.keyHash = user->keyHash;  // Different endpoint for updating user key
+                    storage->Update(record);
+                } else {
+                    response.status = 404;
+                    return;
+                }
+
+                json j = record;
+                j.erase("keyHash");
+
+                response.set_content(j.dump(), "application/json");
+            });
+
     // Get all accounts for a particular user
     Post(
             "/user-accounts",
