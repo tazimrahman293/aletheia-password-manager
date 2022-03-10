@@ -1,5 +1,35 @@
 # Aletheia Network API
 
+## Definitions
+
+### `<User-JSON>` (* indicates updatable field)
+
+```json
+{
+  "pk": 1,
+  "firstName": "first"*,
+  "lastName": "last"*,
+  "keyHash": "KEY",
+  "typeID": 1*
+}
+```
+
+### `<Account-JSON>` (* indicates updatable field)
+
+```json
+{
+  "pk": 1,
+  "label": "steam"*,
+  "username": "john_doe"*,
+  "keyHash": "KEY",
+  "url": "steampowered.com"*,
+  "created": 3457345,
+  "lastAccessed": 32453576,
+  "lastModified": 32345667,
+  "expiry": 345678*,
+  "userID": 1
+}
+```
 ---
 
 ## `/hello`
