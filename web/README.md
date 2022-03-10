@@ -1,5 +1,5 @@
 # Directories
-In src\
+In src -\
     - Components contain styled components for different pages.\
     - Pages has the main index.js file
 

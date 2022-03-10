@@ -7,7 +7,7 @@ import {FeaturesContainer, FeaturesH1, FeaturesWrapper, FeaturesCard, FeaturesIc
 const Features = () => {
   return (
     <FeaturesContainer id='features'>
-      <FeaturesH1>Our services</FeaturesH1>
+      <FeaturesH1>Our Features</FeaturesH1>
       <FeaturesWrapper>
         <FeaturesCard>
           <FeaturesIcon src={Icon1}/>
