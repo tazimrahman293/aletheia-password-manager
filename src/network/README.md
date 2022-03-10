@@ -101,7 +101,7 @@ POST /logout HTTP/1.1
 **Request**
 
 ```http request
-PUT /user HTTP/1.1
+POST /user HTTP/1.1
 Content-Type: application/json
 
 <User-JSON>
@@ -138,7 +138,7 @@ GET /user HTTP/1.1
 **Request**
 
 ```http request
-POST /user HTTP/1.1
+PATCH /user HTTP/1.1
 Content-Type: application/json
 
 <User-JSON updatable fields>
@@ -157,7 +157,7 @@ N/A
 **Request**
 
 ```http request
-PUT /account HTTP/1.1
+POST /account HTTP/1.1
 Content-Type: application/json
 
 <Account-JSON>
@@ -197,7 +197,7 @@ GET /account?user=99 HTTP/1.1
 **Request**
 
 ```http request
-POST /account HTTP/1.1
+PATCH /account HTTP/1.1
 Content-Type: application/json
 
 <Account-JSON updatable fields>
@@ -233,7 +233,7 @@ N/A
 **Request**
 
 ```http request
-GET /account/key?pk=99 HTTP/1.1
+GET /account/key?account=99 HTTP/1.1
 ```
 
 **Response**
@@ -250,7 +250,7 @@ GET /account/key?pk=99 HTTP/1.1
 **Request**
 
 ```http request
-POST /account/key HTTP/1.1
+PUT /account/key HTTP/1.1
 Content-Type: application/json
 
 {
