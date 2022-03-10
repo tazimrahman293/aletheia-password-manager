@@ -69,6 +69,21 @@ void HTTPServer::Init(Storage *store)
                 response.set_content("Hello, world!", "text/plain");
             });
 
+    // List all users in the current database
+    Get(
+            "/list-users",
+            [this](const Request& request, Response& response) -> void
+            {
+                auto users = storage->GetAllUsers();
+                json j = json::array();
+                for (auto& user : users) {
+                    j.emplace_back(user);
+                    j.back().erase("keyHash");  // Don't transmit key on this endpoint
+                }
+
+                response.set_content(j.dump(), "application/json");
+            });
+
     // User login attempt
     Post(
             "/login",

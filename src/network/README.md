@@ -10,7 +10,7 @@ Used for testing connection to the server.
 
 **Methods**
 
-GET
+`GET`
 
 **Request Params**
 
@@ -22,6 +22,42 @@ N/A
 
 ---
 
+`/list-users`
+
+**Description**
+
+Lists all users in the current database.
+
+**Methods**
+
+`GET`
+
+**Request Params**
+
+N/A
+
+**Response**
+
+```json
+[
+  {
+    "pk": 1,
+    "firstName": "first",
+    "lastName": "last",
+    "typeID": 1
+  },
+  {
+    "pk": 2,
+    "firstName": "second",
+    "lastName": "last",
+    "typeID": 1
+  },
+  // ...
+]
+```
+
+---
+
 `/login`
 
 **Description**
@@ -30,7 +66,7 @@ Checks the validity of a master key given for a particular user.
 
 **Methods**
 
-POST
+`POST`
 
 **Request Body**
 
@@ -63,7 +99,7 @@ Marks the active user session as ended.
 
 **Methods**
 
-GET (may change to POST in the future)
+`GET` (may change to POST in the future)
 
 **Request Params**
 
@@ -83,7 +119,7 @@ Requests the creation of a new user profile and master key.
 
 **Methods**
 
-POST
+`POST`
 
 **Request Body**
 
@@ -121,7 +157,7 @@ Updates all the fields of a given user (except PK)
 
 **Methods**
 
-POST
+`POST`
 
 **Request Body**
 
@@ -157,7 +193,7 @@ Gets all accounts for a given user.
 
 **Methods**
 
-GET
+`GET`
 
 **Request Params**
 
@@ -205,7 +241,7 @@ Requests the creation of a new account under a given user.
 
 **Methods**
 
-POST
+`POST`
 
 **Request Body**
 
@@ -251,7 +287,7 @@ Updates all the fields of an existing account.
 
 **Methods**
 
-POST
+`POST`
 
 **Request Body**
 
@@ -296,7 +332,7 @@ Deletes an existing account.
 
 **Methods**
 
-POST
+`POST`
 
 **Request Body**
 
@@ -320,7 +356,7 @@ Fetches the plain-text key for an account.
 
 **Methods**
 
-POST (change to GET)
+`POST` (change to GET)
 
 **Request Params**
 
@@ -347,7 +383,7 @@ Replaces the plain-text key for an account.
 
 **Methods**
 
-POST
+`POST`
 
 **Request Body**
 
