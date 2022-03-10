@@ -1,6 +1,6 @@
 import styled from 'styled-components'
 
-export const FeaturesContainer = styled.div`
+export const TeamContainer = styled.div`
   height: 100vh;
   display: flex;
   flex-direction: column;
@@ -16,11 +16,11 @@ export const FeaturesContainer = styled.div`
     height: 1300px;
   }
  `
-export const FeaturesWrapper = styled.div`
+export const TeamWrapper = styled.div`
     max-width: 1000px;
     margin: 0 auto;
     display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
     align-items: center;
     grid-gap: 16px;
     padding: 0 50px;
@@ -34,7 +34,7 @@ export const FeaturesWrapper = styled.div`
       padding: 0 20px;
   }
 `
-export const FeaturesCard = styled.div`
+export const TeamCard = styled.div`
   background: #fff;
   display: flex;
   flex-direction: column;
@@ -52,13 +52,13 @@ export const FeaturesCard = styled.div`
     cursor:pointer;
   }
 `
-export const FeaturesIcon = styled.img`
+export const TeamIcon = styled.img`
   height: 160px;
   width: 160px;
   margin-bottom: 10px;
 
 `
-export const FeaturesH1 = styled.h1`
+export const TeamH1 = styled.h1`
   font-size: 2.5rem;
   color: #fff;
   margin-bottom: 64px;
@@ -67,12 +67,12 @@ export const FeaturesH1 = styled.h1`
     font-size: 2rem;
   }  
 `
-export const FeaturesH2 = styled.h2`
-  font-size: 1rem;
+export const TeamH2 = styled.h2`
+  font-size: 1.5rem;
   margin-bottom: 10px;
 `
 
-export const FeaturesP = styled.p`
+export const TeamP = styled.p`
   font-size: 1rem;
   text-align: center;
 `

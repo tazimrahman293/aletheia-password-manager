@@ -3,8 +3,8 @@ import HomeSection from '../components/HomeSection'
 import Navbar from '../components/Navbar'
 import Sidebar from '../components/Sidebar'
 import DataSection from '../components/DataSection'
-import { dataAbout, dataTeam } from '../components/DataSection/Data'
-import Features from '../components/Features'
+import { dataAbout, dataFeautures } from '../components/DataSection/Data'
+import Team from '../components/Team'
 
 const Home = () => {
   debugger
@@ -20,8 +20,8 @@ const Home = () => {
       <Navbar toggle={toggle}/>
       <HomeSection/>
       <DataSection {...dataAbout}/>
-      <Features/>
-      <DataSection {...dataTeam}/>
+      <DataSection {...dataFeautures}/>
+      <Team/>
     </>
   );
 }
