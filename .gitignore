@@ -11,3 +11,4 @@ tags
 
 # Dot-files
 .idea/
+.DS_Store
