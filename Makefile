@@ -1,7 +1,7 @@
 .PHONY: all build clean debug info run test
 
 CC      = gcc
-CFLAGS  = -std=c++17 -Wall -Werror
+CFLAGS  = -std=c++17 -Wall -Wextra
 
 ifeq ($(OS),Windows_NT)
 	LDFLAGS = -Llib/win32
