@@ -1,6 +1,6 @@
 export const dataAbout = {
     id: 'about',
-    to: '/signIn',
+    to: '/signUp',
     lightBg: true,
     lightText: false,
     lighttextDesc: false,
@@ -16,9 +16,9 @@ export const dataAbout = {
     darkText: true
   };
 
-  export const dataTeam = {
-    id: 'team',
-    to: '/signIn',
+  export const dataFeautures = {
+    id: 'features',
+    to: '/signUp',
     lightBg: false,
     lightText: true,
     lighttextDesc: false,

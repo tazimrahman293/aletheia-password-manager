@@ -98,6 +98,26 @@ export const NavLinks = styled(LinkScroll)`
     
 `;
 
+export const NavLinkRouter = styled(LinkRouter)`
+    color: #ffffff;    
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    font-size: 1.6rem;
+    padding: 0 1rem;
+    height: 100%;
+    cursor: pointer;
+    &.active {
+        border-bottom: 3px solid #F56300;
+    }
+
+    /* :hover, :focus{
+        border-bottom: 3px solid #02D48E;
+    } */
+   
+    
+`;
+
 export const NavButton = styled.nav`
     display: flex;
     align-items: center;

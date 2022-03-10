@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react';
 import { FaBars } from 'react-icons/fa';
-import { Nav, NavContainer, NavLogo, IconMobile, NavMenu, NavItems, NavLinks, NavButton, NavButtonLink } from './NavbarElements';
+import { Nav, NavContainer, NavLogo, IconMobile, NavMenu, NavItems, NavLinks, NavButton, NavButtonLink, NavLinkRouter } from './NavbarElements';
 import { animateScroll as scroll } from 'react-scroll';
 
 const Navbar = ({ toggle }) => {
@@ -41,6 +41,9 @@ const Navbar = ({ toggle }) => {
                         </NavItems>
                         <NavItems>
                             <NavLinks to='team' smooth={true} duration={500} spy={true} exact='true' offset={-80}>Team</NavLinks>
+                        </NavItems>
+                        <NavItems>
+                            <NavLinkRouter to='/signUp'>Sign Up</NavLinkRouter>
                         </NavItems>
                     </NavMenu>
                     <NavButton>
