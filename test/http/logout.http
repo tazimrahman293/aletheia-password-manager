@@ -1,4 +1,4 @@
 ### Attempt a logout
-GET {{protocol}}{{host}}:{{port}}/logout
+GET {{protocol}}{{host}}{{port}}/logout
 Accept: *
 

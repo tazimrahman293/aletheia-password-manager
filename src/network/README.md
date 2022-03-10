@@ -69,7 +69,7 @@ Content-Type: application/json
 **Response**
 
 ```text
-200 - Successfully logged in
+204 - Successfully logged in
 401 - Invalid credentials
 ```
 
@@ -83,13 +83,13 @@ Content-Type: application/json
 
 ```http request
 POST /logout HTTP/1.1
-# Note: this endpoint will change in the future
+# Note: The details of this endpoint will change in the future
 ```
 
 **Response**
 
 ```text
-200 - Successfully ended session
+204 - Successfully ended session
 ```
 
 ---
@@ -101,7 +101,7 @@ POST /logout HTTP/1.1
 **Request**
 
 ```http request
-PUT /user HTTP/1.1
+POST /user HTTP/1.1
 Content-Type: application/json
 
 <User-JSON>
@@ -138,7 +138,7 @@ GET /user HTTP/1.1
 **Request**
 
 ```http request
-POST /user HTTP/1.1
+PATCH /user HTTP/1.1
 Content-Type: application/json
 
 <User-JSON updatable fields>
@@ -146,7 +146,31 @@ Content-Type: application/json
 
 **Response**
 
-N/A
+```text
+204 - Successfully updated user details
+400 - Missing primary key field
+404 - User with the given primary key was not found
+```
+
+### Delete a User
+
+**Request**
+
+```http request
+DELETE /user HTTP/1.1
+Content-Type: application/json
+
+{
+  "pk": 99
+}
+```
+
+**Response**
+
+```text
+204 - Delete request was carried out (note: doesn't mean anything was deleted)
+400 - Missing primary key field
+```
 
 ---
 
@@ -157,7 +181,7 @@ N/A
 **Request**
 
 ```http request
-PUT /account HTTP/1.1
+POST /account HTTP/1.1
 Content-Type: application/json
 
 <Account-JSON>
@@ -197,7 +221,7 @@ GET /account?user=99 HTTP/1.1
 **Request**
 
 ```http request
-POST /account HTTP/1.1
+PATCH /account HTTP/1.1
 Content-Type: application/json
 
 <Account-JSON updatable fields>
@@ -205,7 +229,11 @@ Content-Type: application/json
 
 **Response**
 
-N/A
+```text
+204 - Successfully updated account details
+400 - Missing primary key field
+404 - Account with the given primary key was not found
+```
 
 ### Delete an Account
 
@@ -222,7 +250,10 @@ Content-Type: application/json
 
 **Response**
 
-N/A
+```text
+204 - Delete request was carried out (note: doesn't mean anything was deleted)
+400 - Missing primary key field
+```
 
 ---
 
@@ -233,7 +264,7 @@ N/A
 **Request**
 
 ```http request
-GET /account/key?pk=99 HTTP/1.1
+GET /account/key?account=99 HTTP/1.1
 ```
 
 **Response**
@@ -250,7 +281,7 @@ GET /account/key?pk=99 HTTP/1.1
 **Request**
 
 ```http request
-POST /account/key HTTP/1.1
+PUT /account/key HTTP/1.1
 Content-Type: application/json
 
 {
@@ -261,4 +292,8 @@ Content-Type: application/json
 
 **Response**
 
-N/A
+```text
+204 - The key replacement request was carried out successfully
+400 - Missing primary key field
+404 - Account with the given primary key was not found
+```

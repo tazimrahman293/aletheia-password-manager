@@ -1,32 +1,32 @@
 ### Missing JSON fields
-POST {{protocol}}{{host}}:{{port}}/login
+POST {{protocol}}{{host}}{{port}}/login
 Content-Type: application/json
 
 {}
 
 ### Invalid UID
-POST {{protocol}}{{host}}:{{port}}/login
+POST {{protocol}}{{host}}{{port}}/login
 Content-Type: application/json
 
 {
   "pk": 9999,
-  "pass": ""
+  "key": ""
 }
 
 ### Valid UID, invalid password
-POST {{protocol}}{{host}}:{{port}}/login
+POST {{protocol}}{{host}}{{port}}/login
 Content-Type: application/json
 
 {
   "pk": 1,
-  "pass": ""
+  "key": ""
 }
 
 ### Valid UID and password
-POST {{protocol}}{{host}}:{{port}}/login
+POST {{protocol}}{{host}}{{port}}/login
 Content-Type: application/json
 
 {
   "pk": 1,
-  "pass": "hunter2"
+  "key": "hunter2"
 }

@@ -69,21 +69,6 @@ void HTTPServer::Init(Storage *store)
                 response.set_content("Hello, world!", "text/plain");
             });
 
-    // List all users in the current database
-    Get(
-            "/list-users",
-            [this](const Request& request, Response& response) -> void
-            {
-                auto users = storage->GetAllUsers();
-                json j = json::array();
-                for (auto& user : users) {
-                    j.emplace_back(user);
-                    j.back().erase("keyHash");  // Don't transmit key on this endpoint
-                }
-
-                response.set_content(j.dump(), "application/json");
-            });
-
     // User login attempt
     Post(
             "/login",
@@ -108,9 +93,15 @@ void HTTPServer::Init(Storage *store)
                         response.status = 401;
                         return;
                     }
+                    if (pass == user->keyHash) {
+                        // TODO obviously we need to hash the sent password and compare with the keyHash
+                        // TODO create a new session (token in a cookie maybe)
+                    }
                 } else {
                     response.status = 401;
                 }
+
+                response.status = 204;
             });
 
     // User logout
@@ -118,11 +109,12 @@ void HTTPServer::Init(Storage *store)
             "/logout",
             [this](const Request& request, Response& response) -> void
             {
-                // TODO What happens here?
+                // TODO end the session
+                response.status = 204;
             });
 
     // Create a new user profile
-    Put(
+    Post(
             "/user",
             [this](const Request& request, Response& response) -> void
             {
@@ -147,34 +139,110 @@ void HTTPServer::Init(Storage *store)
                 }
             });
 
-    // Update a user profile
-    Post(
+    // List all users in the current database
+    Get(
             "/user",
             [this](const Request& request, Response& response) -> void
             {
-                User record;
+                auto users = storage->GetAllUsers();
+                json j = json::array();
+                for (auto& user : users) {
+                    j.emplace_back(user);
+                    j.back().erase("keyHash");  // Don't transmit key on this endpoint
+                }
+
+                response.set_content(j.dump(), "application/json");
+            });
+
+    // Update a user profile
+    Patch(
+            "/user",
+            [this](const Request& request, Response& response) -> void
+            {
+                json data;
                 try {
-                    record = parseRecordFromJSON<User>(request.body);
+                    data = json::parse(request.body);
                 } catch (const json::exception& err) {
                     response.status = 400;
                     return;
                 }
 
-                auto user = storage->GetByID<User>(record.pk);
+                std::unique_ptr<User> user;
+                try {
+                    user = storage->GetByID<User>(data.at("pk").get<int>());
+                } catch (const json::exception& err) {
+                    response.status = 400;
+                }
 
                 if (user != nullptr) {
                     // Perform the update
-                    record.keyHash = user->keyHash;  // Different endpoint for updating user key
-                    storage->Update(record);
+
+                    if (data.contains("firstName"))
+                        user->firstName = data.at("firstName").get<std::string>();
+
+                    if (data.contains("lastName"))
+                        user->lastName = data.at("lastName").get<std::string>();
+
+                    if (data.contains("typeID"))
+                        user->typeID = data.at("typeID").get<User::UserType>();
+
+                    storage->Update(*user);
+
                 } else {
                     response.status = 404;
                     return;
                 }
 
-                json j = record;
-                j.erase("keyHash");
+                response.status = 204;
 
-                response.set_content(j.dump(), "application/json");
+            });
+
+    // Remove user
+    Delete(
+            "/user",
+            [this](const Request& request, Response& response) -> void
+            {
+                json data = json::parse(request.body);
+                int id;
+                try {
+                    id = data.at("pk").get<int>();
+                } catch (const json::exception& err) {
+                    response.status = 400;
+                    return;
+                }
+
+                storage->Remove<User>(id);
+
+                response.status = 204;
+            });
+
+    // Create new account
+    Post(
+            "/account",
+            [this](const Request& request, Response& response) -> void
+            {
+                Account record;
+                try {
+                    record = parseRecordFromJSON<Account>(request.body);
+                } catch (const json::exception& err) {
+                    response.status = 400;
+                    return;
+                }
+
+                storage->Insert(record);
+
+                if (record.pk > 0) {
+                    json j;
+                    j["pk"] = record.pk;
+                    j["created"] = record.created;
+                    j["lastAccessed"] = record.lastAccessed;
+                    j["lastModified"] = record.lastModified;
+
+                    response.set_content(j.dump(), "application/json");
+                } else {
+                    response.status = 500;
+                    response.set_content("Unable to store new Account record.", "text/plain");
+                }
             });
 
     // Get all accounts for a particular user
@@ -182,11 +250,10 @@ void HTTPServer::Init(Storage *store)
             "/account",
             [this](const Request& request, Response& response) -> void
             {
-                auto data = json::parse(request.body);
                 int id;
-                try {
-                    id = data.at("pk").get<int>();
-                } catch (const json::exception& err) {
+                if (request.has_param("user")) {
+                    id = std::stoi(request.get_param_value("user"));
+                } else {
                     response.status = 400;
                     return;
                 }
@@ -209,62 +276,52 @@ void HTTPServer::Init(Storage *store)
                 response.set_content(j.dump(), "application/json");
             });
 
-    // Create new account
-    Put(
-            "/account",
-            [this](const Request& request, Response& response) -> void
-            {
-                Account record;
-                try {
-                    record = parseRecordFromJSON<Account>(request.body);
-                } catch (const json::exception& err) {
-                    response.status = 400;
-                    return;
-                }
-
-                storage->Insert(record);
-
-                if (record.pk > 0) {
-                    json j = record;
-                    j.erase("keyHash");
-
-                    response.set_content(j.dump(), "application/json");
-                } else {
-                    response.status = 500;
-                    response.set_content("Unable to store new Account record.", "text/plain");
-                }
-            });
-
     // Edit existing account
-    Post(
+    Patch(
             "/account",
             [this](const Request& request, Response& response) -> void
             {
-                Account record;
+                json data;
                 try {
-                    record = parseRecordFromJSON<Account>(request.body);
+                    data = json::parse(request.body);
                 } catch (const json::exception& err) {
                     response.status = 400;
                     return;
                 }
 
-                auto account = storage->GetByID<Account>(record.pk);
+                std::unique_ptr<Account> account;
+                try {
+                    account = storage->GetByID<Account>(data.at("pk").get<int>());
+                } catch (json::exception& err) {
+                    response.status = 400;
+                    return;
+                }
 
                 if (account != nullptr) {
                     // Perform the update
-                    record.keyHash = account->keyHash;  // Use /edit-key endpoint for updating key
-                    // TODO update lastModified
-                    storage->Update(record);
+
+                    if (data.contains("label"))
+                        account->label = data.at("label").get<std::string>();
+
+                    if (data.contains("username"))
+                        account->username = data.at("username").get<std::string>();
+
+                    if (data.contains("url"))
+                        account->url = data.at("url").get<std::string>();
+
+                    if (data.contains("expiry"))
+                        account->expiry = data.at("expiry").get<long>();
+
+                    // TODO update lastModified (now)
+
+                    storage->Update(*account);
+
                 } else {
                     // Account with primary key given in request was not found
                     response.status = 404;
                     return;
                 }
 
-                json j = record;
-                j.erase("keyHash");
-
-                response.set_content(j.dump(), "application/json");
             });
 
     // Remove account
@@ -272,7 +329,7 @@ void HTTPServer::Init(Storage *store)
             "/account",
             [this](const Request& request, Response& response) -> void
             {
-                auto data = json::parse(request.body);
+                json data = json::parse(request.body);
                 int id;
                 try {
                     id = data.at("pk").get<int>();
@@ -282,6 +339,8 @@ void HTTPServer::Init(Storage *store)
                 }
 
                 storage->Remove<Account>(id);
+
+                response.status = 204;
             });
 
     // Fetch account key in plain text
@@ -289,11 +348,10 @@ void HTTPServer::Init(Storage *store)
             "/account/key",
             [this](const Request& request, Response& response) -> void
             {
-                auto data = json::parse(request.body);
                 int id;
-                try {
-                    id = data.at("pk").get<int>();
-                } catch (const json::exception& err) {
+                if (request.has_param("account")) {
+                    id = std::stoi(request.get_param_value("account"));
+                } else {
                     response.status = 400;
                     return;
                 }
@@ -301,8 +359,10 @@ void HTTPServer::Init(Storage *store)
                 auto account = storage->GetByID<Account>(id);
 
                 if (account != nullptr) {
-                    auto key = account->keyHash;  // TODO need to decrypt first
-                    response.set_content(key, "text/plain");
+                    json j;
+                    j["pk"] = account->pk;
+                    j["key"] = account->keyHash;  // TODO need to decrypt first
+                    response.set_content(j.dump(), "application/json");
                 } else {
                     response.status = 404;
                 }
@@ -310,7 +370,7 @@ void HTTPServer::Init(Storage *store)
             );
 
     // Update account key
-    Post(
+    Put(
             "/account/key",
             [this](const Request& request, Response& response) -> void
             {
