@@ -1,8 +1,8 @@
-#Aletheia Network API
+# Aletheia Network API
 
 ---
 
-##`/hello`
+## `/hello`
 
 ### Used for testing connection to the server.
 
@@ -20,7 +20,7 @@ Hello, world!
 
 ---
 
-##`/login`
+## `/login`
 
 ### Check user credentials and, if valid, begin a new session.
 
@@ -45,7 +45,7 @@ Content-Type: application/json
 
 ---
 
-##`/logout`
+## `/logout`
 
 ### Mark the active user session as ended.
 
@@ -64,7 +64,7 @@ POST /logout HTTP/1.1
 
 ---
 
-##`/user`
+## `/user`
 
 ### Create a new User
 
@@ -120,7 +120,7 @@ N/A
 
 ---
 
-##`/account`
+## `/account`
 
 ### Create a new Account
 
@@ -196,7 +196,7 @@ N/A
 
 ---
 
-##`/account/key`
+## `/account/key`
 
 ### Fetch the plain-text key for an Account
 
