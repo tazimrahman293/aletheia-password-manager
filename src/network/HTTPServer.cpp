@@ -69,6 +69,21 @@ void HTTPServer::Init(Storage *store)
                 response.set_content("Hello, world!", "text/plain");
             });
 
+    // List all users in the current database
+    Get(
+            "/list-users",
+            [this](const Request& request, Response& response) -> void
+            {
+                auto users = storage->GetAllUsers();
+                json j = json::array();
+                for (auto& user : users) {
+                    j.emplace_back(user);
+                    j.back().erase("keyHash");  // Don't transmit key on this endpoint
+                }
+
+                response.set_content(j.dump(), "application/json");
+            });
+
     // User login attempt
     Post(
             "/login",
@@ -79,7 +94,7 @@ void HTTPServer::Init(Storage *store)
                 std::string pass;
                 try {
                     id = data.at("pk").get<int>();
-                    pass = data.at("pass").get<std::string>();
+                    pass = data.at("key").get<std::string>();
                 } catch (const json::exception& err) {
                     response.status = 400;
                     return;
@@ -93,18 +108,13 @@ void HTTPServer::Init(Storage *store)
                         response.status = 401;
                         return;
                     }
-
-                    json j = *user;
-                    j.erase("keyHash");  // Not really a threat to include this but best to be careful anyway
-
-                    response.set_content(j.dump(), "application/json");
                 } else {
                     response.status = 401;
                 }
             });
 
     // User logout
-    Get(
+    Post(
             "/logout",
             [this](const Request& request, Response& response) -> void
             {
@@ -112,8 +122,8 @@ void HTTPServer::Init(Storage *store)
             });
 
     // Create a new user profile
-    Post(
-            "/new-user",
+    Put(
+            "/user",
             [this](const Request& request, Response& response) -> void
             {
                 User record;
@@ -127,9 +137,9 @@ void HTTPServer::Init(Storage *store)
                 storage->Insert(record);
 
                 if (record.pk > 0) {
-                    json j = record;
-                    j.erase("keyHash");
+                    json j = {{"pk", record.pk}};
 
+                    response.status = 201;
                     response.set_content(j.dump(), "application/json");
                 } else {
                     response.status = 500;
@@ -139,7 +149,7 @@ void HTTPServer::Init(Storage *store)
 
     // Update a user profile
     Post(
-            "/edit-user",
+            "/user",
             [this](const Request& request, Response& response) -> void
             {
                 User record;
@@ -168,8 +178,8 @@ void HTTPServer::Init(Storage *store)
             });
 
     // Get all accounts for a particular user
-    Post(
-            "/user-accounts",
+    Get(
+            "/account",
             [this](const Request& request, Response& response) -> void
             {
                 auto data = json::parse(request.body);
@@ -200,8 +210,8 @@ void HTTPServer::Init(Storage *store)
             });
 
     // Create new account
-    Post(
-            "/new-account",
+    Put(
+            "/account",
             [this](const Request& request, Response& response) -> void
             {
                 Account record;
@@ -227,7 +237,7 @@ void HTTPServer::Init(Storage *store)
 
     // Edit existing account
     Post(
-            "/edit-account",
+            "/account",
             [this](const Request& request, Response& response) -> void
             {
                 Account record;
@@ -258,8 +268,8 @@ void HTTPServer::Init(Storage *store)
             });
 
     // Remove account
-    Post(
-            "/remove-account",
+    Delete(
+            "/account",
             [this](const Request& request, Response& response) -> void
             {
                 auto data = json::parse(request.body);
@@ -275,8 +285,8 @@ void HTTPServer::Init(Storage *store)
             });
 
     // Fetch account key in plain text
-    Post(
-            "/account-key",
+    Get(
+            "/account/key",
             [this](const Request& request, Response& response) -> void
             {
                 auto data = json::parse(request.body);
@@ -301,7 +311,7 @@ void HTTPServer::Init(Storage *store)
 
     // Update account key
     Post(
-            "/edit-key",
+            "/account/key",
             [this](const Request& request, Response& response) -> void
             {
                 auto data = json::parse(request.body);
