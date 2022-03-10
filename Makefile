@@ -12,7 +12,7 @@ else
 		LDFLAGS = -Llib/linux
 		TARGET_SUFFIX = -linux
 	else
-		LDFLAGS = -llib/darwin
+		LDFLAGS = -Llib/darwin
 		TARGET_SUFFIX = -osx
 	endif
 endif
