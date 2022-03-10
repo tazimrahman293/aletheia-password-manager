@@ -1,8 +1,22 @@
-.PHONY: all build clean debug info test
+.PHONY: all build clean debug info run test
 
 CC      = gcc
 CFLAGS  = -std=c++17 -Wall -Werror
-LDFLAGS = -Llib -lstdc++ -lsqlite3 -lpthread -ldl
+
+ifeq ($(OS),Windows_NT)
+	LDFLAGS = -Llib/win32
+	TARGET_SUFFIX = -win
+else
+	UNAME_S := $(shell uname -s)
+	ifeq ($(UNAME_S),Linux)
+		LDFLAGS = -Llib/linux
+		TARGET_SUFFIX = -linux
+	else
+		LDFLAGS = -llib/darwin
+		TARGET_SUFFIX = -osx
+	endif
+endif
+LDFLAGS += -lstdc++ -lsqlite3 -lpthread -ldl
 INCLUDE = -Iinclude/
 
 BUILD   = ./build
@@ -12,7 +26,7 @@ SRC     = $(wildcard src/*.cpp) \
 		  $(wildcard src/**/*.cpp)
 
 OBJECTS = $(SRC:%.cpp=$(OBJ_DIR)/%.o)
-TARGET  = aletheia
+TARGET  = aletheia$(TARGET_SUFFIX)
 
 TEST_SRC = $(wildcard test/*.cpp) \
 		   $(wildcard test/**/*.cpp) \
@@ -21,7 +35,18 @@ TEST_SRC = $(wildcard test/*.cpp) \
 TEST_OBJECTS = $(TEST_SRC:%.cpp=$(OBJ_DIR)/%.o)
 TEST_TARGET = $(TARGET)_test
 
+# Defined at runtime in command-line
+ARGS=
+
 all: build $(APP_DIR)/$(TARGET)
+
+run: all
+run:
+	@./$(APP_DIR)/$(TARGET) $(ARGS)
+
+server-run: all
+server-run: ARGS += -S
+server-run: run
 
 $(OBJ_DIR)/%.o: %.cpp
 	@mkdir -p $(@D)
