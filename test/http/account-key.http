@@ -1,0 +1,11 @@
+### Get Account Key
+GET {{protocol}}{{host}}{{port}}/account/key?account=1
+
+### Replace Account Key
+PUT {{protocol}}{{host}}{{port}}/account/key
+Content-Type: application/json
+
+{
+  "pk": 1,
+  "key": "hunter2"
+}

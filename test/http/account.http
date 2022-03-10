@@ -1,0 +1,37 @@
+### Create New Account
+POST {{protocol}}{{host}}{{port}}/account
+Content-Type: application/json
+
+{
+  "pk": -1,
+  "label": "steam",
+  "url": "steampowered.com",
+  "username": "john_smith_123",
+  "keyHash": "password",
+  "expiry": 0,
+  "created": 0,
+  "lastAccessed": 0,
+  "lastModified": 0,
+  "userID": 1
+}
+
+### Get All Accounts for User 1
+GET {{protocol}}{{host}}{{port}}/account?user=1
+
+### Update Existing Account
+PATCH {{protocol}}{{host}}{{port}}/account
+Content-Type: application/json
+
+{
+  "pk": 1,
+  "expiry": 1,
+  "label": "Steam"
+}
+
+### Delete Account 2
+DELETE {{protocol}}{{host}}{{port}}/account
+Content-Type: application/json
+
+{
+  "pk": 2
+}
