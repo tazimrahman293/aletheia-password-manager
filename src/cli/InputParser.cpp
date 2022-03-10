@@ -1,25 +1,26 @@
 //
 // Created by Tazim Rahman on 2022-03-10.
 //
+#include <algorithm>
 #include <string>
 #include <vector>
 
-#include "include/cli/InputParsher.h"
+#include "cli/InputParser.h"
 
-InputParser(int& argc, char **argv) {
+InputParser::InputParser(int argc, char **argv) {
     for (int i = 1; i < argc; ++i)
-        InputTokens.emplace_back(std::string(argv[i]));
+        inputTokens.emplace_back(std::string(argv[i]));
 }
 
-bool CommandExists(const std::string& Command) const {
-    return std::find(InputTokens.begin(), InputTokens.end(), Command) != InputTokens.end();
+bool InputParser::CommandExists(const std::string& command) const {
+    return std::find(inputTokens.begin(), inputTokens.end(), command) != inputTokens.end();
 }
 
-const std::string& GetOption(const std::string& Command) const {
-    std::vector<std::string>::const_iterator InputIterator;
-    InputIterator = std::find(InputTokens.begin(), InputTokens.end(), Command);
-    if (InputIterator != InputTokens.end() && ++InputIterator != InputTokensend())
-        return *InputIterator;
+const std::string& InputParser::GetOption(const std::string& command) const {
+    std::vector<std::string>::const_iterator inputIterator;
+    inputIterator = std::find(inputTokens.begin(), inputTokens.end(), command);
+    if (inputIterator != inputTokens.end() && ++inputIterator != inputTokens.end())
+        return *inputIterator;
     static const std::string empty_str;
     return empty_str;
 }

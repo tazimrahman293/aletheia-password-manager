@@ -11,10 +11,11 @@
 
 class InputParser{
 private:
-    std::vector <std::string> InputTokens;
+    std::vector <std::string> inputTokens;
 
 public:
-    const std::string& GetOption(const std::string &Command) const;
-    bool CommandExists(const std::string &Command) const;
+    InputParser(int argc, char **argv);
+    const std::string& GetOption(const std::string &command) const;
+    bool CommandExists(const std::string &command) const;
 };
 #endif //INPUTPARSER_H
