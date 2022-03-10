@@ -393,6 +393,8 @@ void HTTPServer::Init(Storage *store)
                 } else {
                     response.status = 404;
                 }
+
+                response.status = 204;
             }
             );
 }
