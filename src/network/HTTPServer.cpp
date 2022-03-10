@@ -71,7 +71,7 @@ void HTTPServer::Init(Storage *store)
 
     // List all users in the current database
     Get(
-            "/list-users",
+            "/user",
             [this](const Request& request, Response& response) -> void
             {
                 auto users = storage->GetAllUsers();
@@ -163,6 +163,8 @@ void HTTPServer::Init(Storage *store)
                     response.status = 400;
                     return;
                 }
+
+                std::cout << data << std::endl;
 
                 std::unique_ptr<User> user;
                 try {

@@ -1,0 +1,32 @@
+### Create New User
+POST {{protocol}}{{host}}{{port}}/user
+Content-Type: application/json
+
+{
+  "pk": -1,
+  "firstName": "John",
+  "lastName": "Smith",
+  "keyHash": "cornucopia",
+  "typeID": 1
+}
+
+### Get List of All Users
+GET {{protocol}}{{host}}{{port}}/user
+
+### Update Existing User
+PATCH {{protocol}}{{host}}{{port}}/user
+Content-Type: application/json
+
+{
+  "pk": 1,
+  "firstName": "Jane",
+  "lastName": "Doe"
+}
+
+### Delete User 2
+DELETE {{protocol}}{{host}}{{port}}/user
+Content-Type: application/json
+
+{
+  "pk": 2
+}
