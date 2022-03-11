@@ -9,4 +9,9 @@
                                    PUBLIC API
 *******************************************************************************/
 
+#ifndef TEST_5_1_H
+#define TEST_5_1_H
+
 int test_5_1_testAll(void);
+
+#endif  // TEST_5_1_H
