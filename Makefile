@@ -16,7 +16,7 @@ else
 		TARGET_SUFFIX = -osx
 	endif
 endif
-LDFLAGS += -lstdc++ -lsqlite3 -lpthread -ldl
+LDFLAGS += -lstdc++ -lsqlite3 -lpthread -ldl -lm
 INCLUDE = -Iinclude/
 
 BUILD   = ./build
