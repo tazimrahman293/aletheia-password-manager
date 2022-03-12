@@ -2,6 +2,11 @@ import React, {useState} from 'react'
 import Video from '../../videos/bg2.mp4'
 import { HomeContainer, HomeBg, VideoBg, HomeContent, HomeH1, HomeP, HomeBtnWrapper, ArrowForward, ArrowRight } from './HomeElements'
 import { ButtonComponent } from '../../ButtonElement'
+
+/**
+ * 
+ * @returns HomeSection page
+ */
 const HomeSection = () => {
   const [hover, setHover] = useState(false);
 

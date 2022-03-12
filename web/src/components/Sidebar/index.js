@@ -2,8 +2,16 @@ import React from 'react'
 import { SidebarContainer, Icon, CrossIcon, SideBarWrapper, SidebarMenu, SidebarLink, SidebarButton, SidebarButtonRouter} from './SidebarElements'
 import { animateScroll as scroll } from 'react-scroll';
 
+/**
+ * 
+ * @param {isOpen, toggle} function used to keep track of clickEvents on Sidebar and HomeButton
+ * @returns Sidebar
+ */
 const Sidebar = ({isOpen, toggle}) => {
 
+    /**
+     * Function to scroll to top of window onClickEvent
+     */
     const toggleHome = () => {
         scroll.scrollToTop()
         toggle()

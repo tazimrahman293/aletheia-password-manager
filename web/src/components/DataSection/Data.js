@@ -1,3 +1,6 @@
+/**
+ * This file contains JSON objects used to build DataSection pages
+ */
 export const dataAbout = {
     id: 'about',
     to: '/signUp',

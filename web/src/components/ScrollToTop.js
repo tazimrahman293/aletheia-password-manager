@@ -1,6 +1,10 @@
 import {useEffect} from 'react'
 import {useLocation} from 'react-router-dom'
 
+/**
+ * 
+ * @returns this function scrolls the window to the top
+ */
 export default function ScrollToTop() {
   const {pathname} = useLocation()
 

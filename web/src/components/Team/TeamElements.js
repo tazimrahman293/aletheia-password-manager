@@ -1,3 +1,6 @@
+/**
+ * CSS for Team Page
+ */
 import styled from 'styled-components'
 
 export const TeamContainer = styled.div`

@@ -4,6 +4,10 @@ import Home from './pages';
 import SignInPage from './pages/signIn';
 import SignUpPage from './pages/signUp';
 
+/**
+ * 
+ * Sets up routes for all the pages in the app
+ */
 function App() {
   return (
     <Router>

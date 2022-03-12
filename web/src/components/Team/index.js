@@ -4,6 +4,10 @@ import Icon2 from '../../images/svg2.svg'
 import Icon3 from '../../images/svg3.svg'
 import {TeamContainer, TeamH1, TeamWrapper, TeamCard, TeamIcon, TeamH2, TeamP} from './TeamElements'
 
+/**
+ * 
+ * @returns Team page
+ */
 const Team = () => {
   return (
     <TeamContainer id='team'>

@@ -3,6 +3,10 @@ import { Icon, FormContent, Form, FormInput, FormH1, FormLabel, FormButton, Text
 import { DataContainer, DataWrapper, DataRow, Column1, Column2, TextWrapper, ImgWrap, Img } from './../DataSection/DataElements'
 import { Nav, NavContainer } from '../Navbar/NavbarElements'
 
+/**
+ * 
+ * @returns SignIn Page
+ */
 const SignIn = () => {
     return (
         <>
