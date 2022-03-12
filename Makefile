@@ -16,7 +16,7 @@ else
 		TARGET_SUFFIX = -osx
 	endif
 endif
-LDFLAGS += -lstdc++ -lsqlite3 -lpthread -ldl
+LDFLAGS += -lstdc++ -lsqlite3 -lpthread -ldl -lm
 INCLUDE = -Iinclude/
 
 BUILD   = ./build
@@ -66,7 +66,7 @@ build:
 test: CFLAGS += -DTEST
 test: INCLUDE += -Itest/include/
 test: build $(APP_DIR)/$(TEST_TARGET)
-	@./$(APP_DIR)/$(TEST_TARGET)
+	@./$(APP_DIR)/$(TEST_TARGET) -ltc
 
 $(APP_DIR)/$(TEST_TARGET): $(TEST_OBJECTS)
 	@mkdir -p $(@D)

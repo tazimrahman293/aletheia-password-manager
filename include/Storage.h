@@ -79,8 +79,6 @@ public:
     void operator=(const Storage&) = delete;  // No assignment
     ~Storage() = default;
 
-    void OnLoginAttempt(LoginAttemptEvent *event);
-
     /**
      * Performs a database INSERT of a record.
      * @tparam T the record type
@@ -102,17 +100,6 @@ public:
     void Update(T& record) noexcept
     {
         s->database.update(record);
-    }
-
-    /**
-     * Performs a database REPLACE/UPSERT (if primary key exists, update, otherwise insert).
-     * @tparam T the record type
-     * @param record the record to be inserted or updated
-     */
-    template<class T>
-    void InsertOrUpdate(T& record) noexcept
-    {
-        s->database.replace(record);
     }
 
     /**
