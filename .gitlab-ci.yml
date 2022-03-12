@@ -21,10 +21,13 @@ build:
     - make all
   artifacts:
     paths:
-      - $(make print-target)
+      - build/apps/aletheia-linux
   cache:
     paths:
-      - $(make print-objs)
+      - build/objects/src/*.o
+      - build/objects/src/**/*.o
+      - build/objects/src/*.d
+      - build/objects/src/**/*.d
 
 # run tests using the binary built before
 test:
@@ -33,3 +36,9 @@ test:
     - merge_requests
   script:
     - make test
+  cache:
+    paths:
+      - build/objects/test/*.o
+      - build/objects/test/**/*.o
+      - build/objects/test/*.d
+      - build/objects/test/**/*.d
