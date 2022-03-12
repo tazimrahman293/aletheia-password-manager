@@ -21,10 +21,10 @@ build:
     - make all
   artifacts:
     paths:
-      - make print-target
+      - $(make print-target)
   cache:
     paths:
-      - make print-objs
+      - $(make print-objs)
 
 # run tests using the binary built before
 test:
