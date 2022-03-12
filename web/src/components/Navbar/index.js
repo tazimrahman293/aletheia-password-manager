@@ -3,7 +3,16 @@ import { FaBars } from 'react-icons/fa';
 import { Nav, NavContainer, NavLogo, IconMobile, NavMenu, NavItems, NavLinks, NavButton, NavButtonLink, NavLinkRouter } from './NavbarElements';
 import { animateScroll as scroll } from 'react-scroll';
 
+/**
+ * 
+ * @param {toggle} function used to keep track of clickEvents on Aletheia logo
+ * @returns NavBar
+ */
 const Navbar = ({ toggle }) => {
+
+    /**
+     * Function to implement smooth scroll on to Navbar
+     */
     const [scrollNav, setScrollNav] = useState(false)
 
     const changeNav = () => {

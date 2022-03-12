@@ -2,6 +2,9 @@ import styled from "styled-components";
 import { Link as LinkScroll } from "react-scroll";
 import { Link as LinkRouter } from "react-router-dom";
 
+/**
+ * Reusable Button component
+ */
 export const ButtonComponent = styled(LinkScroll)`
     border-radius: 50px;
     /* background: ${({primary}) => (primary ? '#01bF71' : '#010606')}; */

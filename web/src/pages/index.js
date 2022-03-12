@@ -6,8 +6,12 @@ import DataSection from '../components/DataSection'
 import { dataAbout, dataFeautures } from '../components/DataSection/Data'
 import Team from '../components/Team'
 
+/**
+ * This is the main page which uses all the components and renders the App
+ * @returns 
+ */
 const Home = () => {
-  debugger
+  // debugger
     const [isOpen, setIsOpen] = useState(false)
 
     const toggle = () => {

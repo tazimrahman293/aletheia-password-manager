@@ -1,3 +1,6 @@
+/**
+ * CSS for DataSection
+ */
 import styled from 'styled-components';
 
 export const DataContainer = styled.div`

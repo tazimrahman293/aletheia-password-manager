@@ -2,6 +2,11 @@ import React from 'react'
 import { ButtonComponentRouter } from '../../ButtonElement'
 import { DataContainer, DataWrapper, DataRow, Column1, Column2, TextWrapper, TopLine, Heading, Subtitle, BtnWrap, ImgWrap, Img } from './DataElements'
 
+/**
+ * 
+ * @param {*}: values taken from the JSON objects in Data.js 
+ * @returns: DataSection pages 
+ */
 const DataSection = ({ lightBg, id, to, imgStart, topLine, lightText, headline, darkText, description, buttonLabel, alt, img, primary, dark, dark2 }) => {
     return (
         <>

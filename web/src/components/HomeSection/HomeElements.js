@@ -1,3 +1,6 @@
+/**
+ * CSS for HomeSection
+ */
 import styled from 'styled-components';
 import { MdArrowForward, MdKeyboardArrowRight } from 'react-icons/md'
 
