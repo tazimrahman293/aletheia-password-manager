@@ -9,6 +9,7 @@
 #include "doctest.h"
 
 #include <cstdio>
+#include <iostream>
 #include <memory>
 #include <string>
 
@@ -36,29 +37,29 @@ TEST_SUITE_BEGIN("storage");
 
 const std::string dbFilename = "test/test.sqlite3";
 
-TEST_CASE("constructor") {
+TEST_CASE("storage constructor") {
 
     // Remove the existing db to get a fresh start
     remove(dbFilename.c_str());
 
-    SUBCASE("memory database") {
+    SUBCASE("construct memory database") {
         Storage storage(":memory:");
         REQUIRE_NE(&storage, nullptr);
     }
 
-    SUBCASE("file database") {
+    SUBCASE("construct file database") {
         Storage storage(dbFilename);
         REQUIRE_NE(&storage, nullptr);
     }
 
 }
 
-TEST_CASE("insert") {
+TEST_CASE("storage insert") {
 
     remove(dbFilename.c_str());
     Storage storage(dbFilename);
 
-    SUBCASE("users") {
+    SUBCASE("insert users") {
         User user = createTestUser();
         CHECK_EQ(user.pk, -1);
 
@@ -66,7 +67,7 @@ TEST_CASE("insert") {
         REQUIRE_GT(user.pk, 0);
     }
 
-    SUBCASE("accounts") {
+    SUBCASE("insert accounts") {
         User user = createTestUser();
         storage.Insert(user);
         WARN_GT(user.pk, 0);
@@ -81,12 +82,12 @@ TEST_CASE("insert") {
     }
 }
 
-TEST_CASE("get by ID") {
+TEST_CASE("storage get by ID") {
 
     remove(dbFilename.c_str());
     Storage storage(dbFilename);
 
-    SUBCASE("users") {
+    SUBCASE("get users by id") {
         User user = createTestUser();
         storage.Insert(user);
         WARN_GT(user.pk, 0);
@@ -99,7 +100,7 @@ TEST_CASE("get by ID") {
         REQUIRE_EQ(record->typeID, user.typeID);
     }
 
-    SUBCASE("accounts") {
+    SUBCASE("get accounts by id") {
         User user = createTestUser();
         storage.Insert(user);
         WARN_GT(user.pk, 0);
@@ -123,12 +124,12 @@ TEST_CASE("get by ID") {
     }
 }
 
-TEST_CASE("update") {
+TEST_CASE("storage update") {
 
-remove(dbFilename.c_str());
+    remove(dbFilename.c_str());
     Storage storage(dbFilename);
 
-    SUBCASE("users") {
+    SUBCASE("update users") {
         User user = createTestUser();
         storage.Insert(user);
         WARN_GT(user.pk, 0);
@@ -141,15 +142,15 @@ remove(dbFilename.c_str());
         REQUIRE_EQ(record->firstName, user.firstName);
     }
 
-    SUBCASE("accounts") {
+    SUBCASE("update accounts") {
         User user = createTestUser();
         storage.Insert(user);
-        CHECK_GT(user.pk, 0);
+        WARN_GT(user.pk, 0);
 
         Account account = createTestAccount();
         account.userID = user.pk;
         storage.Insert(account);
-        CHECK_GT(account.pk, 0);
+        WARN_GT(account.pk, 0);
 
         account.username = "changed";
         storage.Update(account);
@@ -160,20 +161,92 @@ remove(dbFilename.c_str());
     }
 }
 
-TEST_CASE("insert or update") {
+TEST_CASE("storage remove") {
 
+    remove(dbFilename.c_str());
+    Storage storage(dbFilename);
+
+    SUBCASE("remove users") {
+        User user = createTestUser();
+        storage.Insert(user);
+        WARN_GT(user.pk, 0);
+
+        storage.Remove<User>(user.pk);
+
+        auto record = storage.GetByID<User>(user.pk);
+        REQUIRE_EQ(record, nullptr);
+    }
+
+    SUBCASE("remove accounts") {
+        User user = createTestUser();
+        storage.Insert(user);
+        WARN_GT(user.pk, 0);
+
+        Account account = createTestAccount();
+        account.userID = user.pk;
+        storage.Insert(account);
+        WARN_GT(account.pk, 0);
+
+        storage.Remove<Account>(account.pk);
+
+        auto record = storage.GetByID<Account>(account.pk);
+        REQUIRE_EQ(record, nullptr);
+    }
 }
 
-TEST_CASE("remove") {
+TEST_CASE("storage get all users") {
 
+    remove(dbFilename.c_str());
+    Storage storage(dbFilename);
+    int maxUsers;
+
+    SUBCASE("1 user") { maxUsers = 1; }
+    SUBCASE("10 users") { maxUsers = 10; }
+    SUBCASE("100 users") { maxUsers = 100; }
+    SUBCASE("1000 users") { maxUsers = 1000; }
+
+    for (int i = 0; i < maxUsers; i++) {
+        User user = createTestUser();
+        user.firstName += std::to_string(i);
+        storage.Insert(user);
+        WARN_GT(user.pk, 0);
+    }
+    auto allUsers = storage.GetAllUsers();
+    REQUIRE_EQ(allUsers.size(), maxUsers);
+
+    for (auto& user : allUsers) {
+        REQUIRE_GT(user.pk, 0);
+    }
 }
 
-TEST_CASE("get all users") {
+TEST_CASE("storage get all accounts by user ID") {
 
-}
+    remove(dbFilename.c_str());
+    Storage storage(dbFilename);
+    int maxAccounts;
 
-TEST_CASE("get all accounts by user ID") {
+    SUBCASE("1 account") { maxAccounts = 1; }
+    SUBCASE("10 accounts") { maxAccounts = 10; }
+    SUBCASE("100 accounts") { maxAccounts = 100; }
+    SUBCASE("1000 accounts") { maxAccounts = 1000; }
 
+    User user = createTestUser();
+    storage.Insert(user);
+    WARN_GT(user.pk, 0);
+
+    for (int i = 0; i < maxAccounts; i++) {
+        Account account = createTestAccount();
+        account.username += std::to_string(i);
+        account.userID = user.pk;
+        storage.Insert(account);
+        WARN_GT(account.pk, 0);
+    }
+    auto allAccounts = storage.GetAllAccountsByUserID(user.pk);
+    REQUIRE_EQ(allAccounts.size(), maxAccounts);
+
+    for (auto& account : allAccounts) {
+        REQUIRE_GT(account.pk, 0);
+    }
 }
 
 TEST_SUITE_END();
