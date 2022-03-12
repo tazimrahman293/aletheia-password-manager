@@ -34,6 +34,7 @@ test:
   stage: test
   only:
     - merge_requests
+  allow_failure: false
   script:
     - make test
   cache:
