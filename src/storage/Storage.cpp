@@ -16,23 +16,7 @@
  * @param dbFilename the name of the database file to use (will be created if it doesn't exist)
  */
 Storage::Storage(const std::string &dbFilename) :
-        s(std::make_unique<_Storage>(dbFilename))
-{
-    EventBus *eventBus = EventBus::GetInstance();
-    eventBus->Subscribe(this, &Storage::OnLoginAttempt);
-}
-
-
-/**
- * Handles login request events by fetching user data from the database and publishing a login response.
- * @param event the LoginAttemptEvent object with request payload
- */
-void Storage::OnLoginAttempt(LoginAttemptEvent *event)
-{
-    std::cout << "Login attempt -- ID: " << event->uid << ", Pass: " << event->password << std::endl;
-    auto user = GetByID<User>(event->uid);
-    std::cout << "Found user " << user->firstName << " (" << user->pk << ")" << std::endl;
-}
+        s(std::make_unique<_Storage>(dbFilename)) { }
 
 
 /**
