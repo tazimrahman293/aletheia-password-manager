@@ -12,9 +12,9 @@ image: gcc
 
 build:
   stage: build
-  only:
-    - pushes
-    - merge_requests
+  rules:
+    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
+    - if: $CI_PIPELINE_SOURCE == 'push'
   before_script:
     - apt update && apt -y install make autoconf
   script:
@@ -32,8 +32,8 @@ build:
 # run tests using the binary built before
 test:
   stage: test
-  only:
-    - merge_requests
+  rules:
+    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
   allow_failure: false
   script:
     - make test
