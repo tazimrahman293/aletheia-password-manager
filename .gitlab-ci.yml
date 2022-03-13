@@ -13,9 +13,13 @@ image: gcc
 build:
   stage: build
   rules:
+    - changes:
+        - web/*
+      when: never
     - if: $CI_PIPELINE_SOURCE == 'push' || $CI_PIPELINE_SOURCE == 'merge_request_event'
   before_script:
     - apt update && apt -y install make autoconf
+  allow_failure: false
   script:
     - make all
   artifacts:
@@ -32,6 +36,9 @@ build:
 test:
   stage: test
   rules:
+    - changes:
+      - web/*
+      when: never
     - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
   allow_failure: false
   script:
