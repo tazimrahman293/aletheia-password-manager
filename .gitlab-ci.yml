@@ -13,8 +13,7 @@ image: gcc
 build:
   stage: build
   rules:
-    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
-    - if: $CI_PIPELINE_SOURCE == 'push'
+    - if: $CI_PIPELINE_SOURCE == 'push' || $CI_PIPELINE_SOURCE == 'merge_request_event'
   before_script:
     - apt update && apt -y install make autoconf
   script:
