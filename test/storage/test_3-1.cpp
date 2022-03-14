@@ -203,7 +203,6 @@ TEST_CASE("storage get all users") {
     SUBCASE("1 user") { maxUsers = 1; }
     SUBCASE("10 users") { maxUsers = 10; }
     SUBCASE("100 users") { maxUsers = 100; }
-    SUBCASE("1000 users") { maxUsers = 1000; }
 
     for (int i = 0; i < maxUsers; i++) {
         User user = createTestUser();
@@ -228,7 +227,6 @@ TEST_CASE("storage get all accounts by user ID") {
     SUBCASE("1 account") { maxAccounts = 1; }
     SUBCASE("10 accounts") { maxAccounts = 10; }
     SUBCASE("100 accounts") { maxAccounts = 100; }
-    SUBCASE("1000 accounts") { maxAccounts = 1000; }
 
     User user = createTestUser();
     storage.Insert(user);

@@ -1,4 +1,15 @@
-.PHONY: all build clean debug info run test
+.PHONY: all \
+		build \
+		clean \
+	    coverage \
+	    debug \
+	    info \
+	    print-coverage \
+	    print-objs \
+	    print-target \
+	    run \
+	    server-run \
+	    test
 
 CC      = gcc
 CFLAGS  = -std=c++17 -Wall -Wextra
@@ -19,11 +30,16 @@ endif
 LDFLAGS += -lstdc++ -lsqlite3 -lpthread -ldl -lm
 INCLUDE = -Iinclude/
 
+PROJ_DIR = $(shell pwd)
 BUILD   = ./build
 OBJ_DIR = $(BUILD)/objects
 APP_DIR = $(BUILD)/apps
 SRC     = $(wildcard src/*.cpp) \
 		  $(wildcard src/**/*.cpp)
+
+HDR     = $(wildcard include/**/*.h) \
+		  include/Crypto.h \
+		  include/Storage.h
 
 OBJECTS = $(SRC:%.cpp=$(OBJ_DIR)/%.o)
 TARGET  = aletheia$(TARGET_SUFFIX)
@@ -35,13 +51,29 @@ TEST_SRC = $(wildcard test/*.cpp) \
 TEST_OBJECTS = $(TEST_SRC:%.cpp=$(OBJ_DIR)/%.o)
 TEST_TARGET = $(TARGET)_test
 
+COV_DIR  = $(BUILD)/coverage
+COV_INFO = $(COV_DIR)/coverage.info
+COV_HTML = $(COV_DIR)/html
+COV_EXCL = '/usr*' \
+		   '${PROJ_DIR}/include/httplib.h' \
+		   '${PROJ_DIR}/include/json.h' \
+		   '${PROJ_DIR}/include/sqlite_orm.h' \
+		   '${PROJ_DIR}/test/include/doctest.h'
+
 # Defined at runtime in command-line
 ARGS=
 
-print-target: @echo "${APP_DIR}/${TARGET}"
-print-objs: @echo "${OBJECTS}"
-
 all: build $(APP_DIR)/$(TARGET)
+
+coverage: CFLAGS += --coverage
+coverage: build test $(OBJECTS) $(TEST_OBJECTS)
+	@./$(APP_DIR)/$(TEST_TARGET) $(ARGS)
+	@gcov $(OBJECTS)
+	# @lcov -z -d .
+	@lcov -c -d . -o $(COV_INFO)
+	@lcov -r $(COV_INFO) $(COV_EXCL) -o $(COV_INFO)
+	@genhtml $(COV_INFO) -o $(COV_HTML)
+	@mv -f *.gcov $(COV_DIR)
 
 run: all
 run:
@@ -62,6 +94,7 @@ $(APP_DIR)/$(TARGET): $(OBJECTS)
 build:
 	@mkdir -p $(APP_DIR)
 	@mkdir -p $(OBJ_DIR)
+	@mkdir -p $(COV_DIR)
 
 test: CFLAGS += -DTEST
 test: INCLUDE += -Itest/include/
@@ -75,9 +108,19 @@ $(APP_DIR)/$(TEST_TARGET): $(TEST_OBJECTS)
 debug: CFLAGS += -DDEBUG -g
 debug: all
 
+print-coverage:
+	@lcov --list $(COV_INFO)
+
+print-target:
+	@echo "${APP_DIR}/${TARGET}"
+
+print-objs:
+	@echo "${OBJECTS}"
+
 clean:
 	-@rm -rvf $(OBJ_DIR)/*
 	-@rm -rvf $(APP_DIR)/*
+	-@rm -rvf $(COV_DIR)/*
 
 info:
 	@echo "Object dir:   ${OBJ_DIR}"
