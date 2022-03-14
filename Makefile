@@ -70,6 +70,9 @@ coverage: CFLAGS += --coverage
 coverage: build test $(OBJECTS) $(TEST_OBJECTS)
 	@./$(APP_DIR)/$(TEST_TARGET) $(ARGS)
 	@export GCOV_PREFIX=$(PROJ_DIR) && echo $$GCOV_PREFIX && gcov $(OBJECTS)
+	ls .
+	ls -R $(OBJ_DIR)
+	ls $(COV_DIR)
 	@lcov -c -d . -o $(COV_INFO)
 	@lcov -r $(COV_INFO) $(COV_EXCL) -o $(COV_INFO)
 	@genhtml $(COV_INFO) -o $(COV_HTML)
