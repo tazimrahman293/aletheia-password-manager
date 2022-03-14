@@ -67,7 +67,7 @@ ARGS=
 all: build $(APP_DIR)/$(TARGET)
 
 coverage: CFLAGS += --coverage
-coverage: build test $(OBJECTS) $(TEST_OBJECTS)
+coverage: build all test $(OBJECTS) $(TEST_OBJECTS)
 	@./$(APP_DIR)/$(TEST_TARGET) $(ARGS)
 	@export GCOV_PREFIX=$(PROJ_DIR) && echo $$GCOV_PREFIX && gcov $(OBJECTS)
 	ls .
