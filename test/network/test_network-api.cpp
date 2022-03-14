@@ -3,6 +3,7 @@
 //
 
 #include "network/HTTPServer.h"
+#include "Storage.h"
 
 #include "doctest.h"
 
@@ -14,7 +15,7 @@ TEST_SUITE_BEGIN("network");
 TEST_CASE("network-constructor") {
 
     SUBCASE("network-constructor-default") {
-        HTTPServer server();
+        HTTPServer server;
         REQUIRE_NE(&server, nullptr);
     }
 
@@ -37,6 +38,14 @@ TEST_CASE("network-constructor") {
             REQUIRE_NE(&server, nullptr);
         }
     }
+}
+
+TEST_CASE("network-init") {
+
+    HTTPServer server;
+    Storage storage("test/test.sqlite3");
+    REQUIRE_NOTHROW(server.Init(&storage));
+
 }
 
 TEST_SUITE_END();  // network
