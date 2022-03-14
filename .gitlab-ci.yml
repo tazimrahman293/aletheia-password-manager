@@ -48,6 +48,9 @@ test:
     - make print-coverage
   cache:
     paths:
+      - build/**/*.gcov
+      - build/**/*.gcda
+      - build/**/*.gcno
       - build/objects/test/*.o
       - build/objects/test/**/*.o
       - build/objects/test/*.d
