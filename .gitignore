@@ -7,6 +7,9 @@ build/
 *.pdf
 *.tar
 *.xml
+*.gcda
+*.gcno
+*.gcov
 tags
 
 # Dot-files
