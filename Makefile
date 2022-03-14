@@ -4,6 +4,7 @@
 	    coverage \
 	    debug \
 	    info \
+	    print-coverage \
 	    print-objs \
 	    print-target \
 	    run \
@@ -106,6 +107,9 @@ $(APP_DIR)/$(TEST_TARGET): $(TEST_OBJECTS)
 
 debug: CFLAGS += -DDEBUG -g
 debug: all
+
+print-coverage:
+	@lcov --list $(COV_INFO)
 
 print-target:
 	@echo "${APP_DIR}/${TARGET}"
