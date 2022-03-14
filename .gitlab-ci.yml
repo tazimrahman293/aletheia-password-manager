@@ -46,6 +46,9 @@ test:
   script:
     - make -j coverage
     - make print-coverage
+  artifacts:
+    paths:
+      - build/coverage/
   cache:
     paths:
       - build/objects/test/*.o
