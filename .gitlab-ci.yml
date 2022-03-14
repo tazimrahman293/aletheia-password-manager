@@ -40,9 +40,13 @@ test:
       - web/*
       when: never
     - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
+  before_script:
+    - apt update && apt -y install lcov
   allow_failure: false
   script:
     - make test
+    - make coverage
+    - make print-coverage
   cache:
     paths:
       - build/objects/test/*.o
