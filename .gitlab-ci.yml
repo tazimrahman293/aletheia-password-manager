@@ -44,8 +44,7 @@ test:
     - apt update && apt -y install lcov
   allow_failure: false
   script:
-    - make coverage
-    - make print-coverage
+    - make test
   cache:
     paths:
       - build/objects/test/*.o
