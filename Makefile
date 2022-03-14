@@ -1,4 +1,7 @@
-.PHONY: all build clean debug info run test
+.PHONY: all build clean \
+	    coverage debug info \
+	    print-objs print-target run \
+	    server-run test
 
 CC      = gcc
 CFLAGS  = -std=c++17 -Wall -Wextra
@@ -42,6 +45,10 @@ print-target: @echo "${APP_DIR}/${TARGET}"
 print-objs: @echo "${OBJECTS}"
 
 all: build $(APP_DIR)/$(TARGET)
+
+coverage: CFLAGS += -fprofile-arcs -ftest-coverage
+coverage: LDFLAGS += -lgcov
+coverage: test
 
 run: all
 run:
