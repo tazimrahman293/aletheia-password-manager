@@ -4,7 +4,7 @@
 
 #include <random/RandomNumberGenerator.h>
 
-#include <exceptions>
+#include <stdexcept>
 #include <stdlib.h>
 #include <time.h>
 
@@ -28,8 +28,9 @@ RandomNumberGenerator::RandomNumberGenerator()
  */
 int RandomNumberGenerator::GetNew(int minValue, int maxValue)
 {
-    if (minValue == maxValue)
+    if (minValue == maxValue) {
         return maxValue;
+    }
 
 	// seed the randomizer
 	Seed();

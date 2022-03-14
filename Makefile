@@ -51,6 +51,7 @@ TEST_SRC = $(wildcard test/*.cpp) \
 TEST_OBJECTS = $(TEST_SRC:%.cpp=$(OBJ_DIR)/%.o)
 TEST_TARGET = $(TARGET)_test
 
+COV_PREF = $(PROJ_DIR)
 COV_DIR  = $(BUILD)/coverage
 COV_INFO = $(COV_DIR)/coverage.info
 COV_HTML = $(COV_DIR)/html
@@ -69,7 +70,6 @@ coverage: CFLAGS += --coverage
 coverage: build test $(OBJECTS) $(TEST_OBJECTS)
 	@./$(APP_DIR)/$(TEST_TARGET) $(ARGS)
 	@gcov $(OBJECTS)
-	# @lcov -z -d .
 	@lcov -c -d . -o $(COV_INFO)
 	@lcov -r $(COV_INFO) $(COV_EXCL) -o $(COV_INFO)
 	@genhtml $(COV_INFO) -o $(COV_HTML)
