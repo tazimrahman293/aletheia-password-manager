@@ -51,3 +51,4 @@ test:
       - build/objects/test/**/*.o
       - build/objects/test/*.d
       - build/objects/test/**/*.d
+  coverage: '/Total:\|(\d+\.?\d+\%)/'
