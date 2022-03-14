@@ -23,6 +23,7 @@ build:
   script:
     - make -j all
   artifacts:
+    name: aletheia
     paths:
       - build/apps/aletheia-linux
   cache:
@@ -68,6 +69,7 @@ cover:
     - make -j coverage
     - make print-coverage
   artifacts:
+    name: coverage_static
     paths:
       - build/coverage/
   coverage: /Total:\|(\d+\.?\d+\%)/
