@@ -59,7 +59,7 @@ COV_EXCL = '/usr*' \
 		   '${PROJ_DIR}/include/httplib.h' \
 		   '${PROJ_DIR}/include/json.h' \
 		   '${PROJ_DIR}/include/sqlite_orm.h' \
-		   '${PROJ_DIR}/test/include/doctest.h'
+		   '${PROJ_DIR}/test/*'
 
 # Defined at runtime in command-line
 ARGS=
