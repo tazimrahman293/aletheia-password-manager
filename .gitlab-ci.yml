@@ -16,7 +16,7 @@ build:
     - changes:
         - web/*
       when: never
-    - if: $CI_PIPELINE_SOURCE == 'push' || $CI_PIPELINE_SOURCE == 'merge_request_event'
+    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
   before_script:
     - apt update && apt -y install make autoconf
   allow_failure: false
