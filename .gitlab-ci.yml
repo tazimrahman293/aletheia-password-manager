@@ -21,7 +21,7 @@ build:
     - apt update && apt -y install make autoconf
   allow_failure: false
   script:
-    - make all
+    - make -j all
   artifacts:
     paths:
       - build/apps/aletheia-linux
@@ -44,7 +44,8 @@ test:
     - apt update && apt -y install lcov
   allow_failure: false
   script:
-    - make test
+    - make -j coverage
+    - make print-coverage
   cache:
     paths:
       - build/objects/test/*.o
