@@ -102,6 +102,7 @@ build:
 test: CFLAGS += -DTEST
 test: INCLUDE += -Itest/include/
 test: build $(APP_DIR)/$(TEST_TARGET)
+	@echo "Testing..."
 	@./$(APP_DIR)/$(TEST_TARGET) -ltc
 
 $(APP_DIR)/$(TEST_TARGET): $(TEST_OBJECTS)
