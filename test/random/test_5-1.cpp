@@ -9,7 +9,7 @@
 
 TEST_SUITE_BEGIN("random");
 
-TEST_CASE("constructor") {
+TEST_CASE("random-constructor") {
     RandomNumberGenerator *rng = nullptr;
     CHECK_EQ(rng, nullptr);
 
@@ -17,24 +17,24 @@ TEST_CASE("constructor") {
     REQUIRE_NE(rng, nullptr);
 }
 
-TEST_CASE("bounds") {
+TEST_CASE("random-bounds") {
     RandomNumberGenerator *rng = new RandomNumberGenerator();
     int minBound, maxBound;
     int newValue;
 
-    SUBCASE("0-10") {
+    SUBCASE("random-bounds-0-10") {
         minBound = 0; maxBound = 10;
     }
 
-    SUBCASE("1-1") {
+    SUBCASE("random-bounds-1-1") {
         minBound = maxBound = 1;
     }
 
-    SUBCASE("-10-0") {
+    SUBCASE("random-bounds-n10-0") {
         minBound = -10; maxBound = 0;
     }
 
-    SUBCASE("10-0") {
+    SUBCASE("random-bounds-10-0") {
         minBound = 10; maxBound = 0;
     }
 
