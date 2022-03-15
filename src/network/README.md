@@ -7,10 +7,10 @@
 ```json
 {
   "pk": 1,
+  "username": "abc123"*,
   "firstName": "first"*,
   "lastName": "last"*,
-  "keyHash": "KEY",
-  "typeID": 1*
+  "keyHash": "KEY"
 }
 ```
 

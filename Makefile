@@ -148,6 +148,11 @@ clean:
 	-@rm -rvf $(APP_DIR)/*
 	-@rm -rvf $(COV_DIR)/*
 
+# Performs a normal clean and deletes ALL .sqlite3 files in the current folder
+superclean: clean
+superclean:
+	-@rm -vf *.sqlite3
+
 # Provides info on important directories and files for this project
 info:
 	@echo "Object dir:   ${OBJ_DIR}"

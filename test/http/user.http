@@ -4,6 +4,7 @@ Content-Type: application/json
 
 {
   "pk": -1,
+  "username": "jsmith1",
   "firstName": "John",
   "lastName": "Smith",
   "keyHash": "cornucopia",

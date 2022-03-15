@@ -16,6 +16,7 @@
 
 User createTestUser() {
     User user;
+    user.username = "abc123";
     user.firstName = "First";
     user.lastName = "Last";
     user.keyHash = "pass";
@@ -94,10 +95,10 @@ TEST_CASE("storage-get-by-id") {
 
         auto record = storage.GetByID<User>(user.pk);
         REQUIRE_EQ(record->pk, user.pk);
+        REQUIRE_EQ(record->username, user.username);
         REQUIRE_EQ(record->firstName, user.firstName);
         REQUIRE_EQ(record->lastName, user.lastName);
         REQUIRE_EQ(record->keyHash, user.keyHash);
-        REQUIRE_EQ(record->typeID, user.typeID);
     }
 
     SUBCASE("storage-get-by-id-account") {
