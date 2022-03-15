@@ -16,13 +16,14 @@ build:
     - changes:
         - web/*
       when: never
-    - if: $CI_PIPELINE_SOURCE == 'push' || $CI_PIPELINE_SOURCE == 'merge_request_event'
+    - if: $CI_PIPELINE_SOURCE == 'merge_request_event' || $CI_PIPELINE_SOURCE == 'push'
   before_script:
     - apt update && apt -y install make autoconf
   allow_failure: false
   script:
-    - make all
+    - make -j all
   artifacts:
+    name: aletheia
     paths:
       - build/apps/aletheia-linux
   cache:
@@ -39,11 +40,44 @@ test:
     - changes:
       - web/*
       when: never
-    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
+    - if: $CI_PIPELINE_SOURCE == 'merge_request_event' || $CI_PIPELINE_SOURCE == 'push'
   allow_failure: false
   script:
-    - make test
+    - make -j test
+  artifacts:
+    reports:
+      junit: build/coverage/test_results.xml
   cache:
+    key: $CI_COMMIT_REF_SLUG
+    paths:
+      - build/objects/test/*.o
+      - build/objects/test/**/*.o
+      - build/objects/test/*.d
+      - build/objects/test/**/*.d
+
+cover:
+  stage: test
+  needs:
+    - job: test
+      artifacts: true
+  rules:
+    - changes:
+      - web/*
+      when: never
+    - if: $CI_PIPELINE_SOURCE == 'push' && $CI_COMMIT_REF_NAME == 'main'
+  before_script:
+    - apt update && apt -y install lcov
+  allow_failure: true
+  script:
+    - make -j coverage
+    - make print-coverage
+  artifacts:
+    name: coverage_static
+    paths:
+      - build/coverage/
+  coverage: /Total:\|(\d+\.?\d+\%)/
+  cache:
+    key: $CI_COMMIT_REF_SLUG
     paths:
       - build/objects/test/*.o
       - build/objects/test/**/*.o

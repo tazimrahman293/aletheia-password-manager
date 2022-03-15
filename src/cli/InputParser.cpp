@@ -12,15 +12,24 @@ InputParser::InputParser(int argc, char **argv) {
         inputTokens.emplace_back(std::string(argv[i]));
 }
 
-bool InputParser::CommandExists(const std::string& command) const {
+bool InputParser::InputExists(const std::string& command) {
     return std::find(inputTokens.begin(), inputTokens.end(), command) != inputTokens.end();
 }
 
-const std::string& InputParser::GetOption(const std::string& command) const {
+const std::string& InputParser::GetOption(const std::string& command) {
     std::vector<std::string>::const_iterator inputIterator;
     inputIterator = std::find(inputTokens.begin(), inputTokens.end(), command);
     if (inputIterator != inputTokens.end() && ++inputIterator != inputTokens.end())
         return *inputIterator;
     static const std::string empty_str;
     return empty_str;
+}
+
+const std::string& InputParser::GetTokenAtPosition(int position)
+{
+    static const std::string empty_str;
+    if (position >= (int)inputTokens.size()) {
+        return empty_str;
+    }
+    return inputTokens.at(position);
 }

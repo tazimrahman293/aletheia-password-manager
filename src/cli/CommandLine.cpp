@@ -15,58 +15,48 @@
 #include "cli/InputParser.h"
 #include "network/EventBus.h"
 #include "events/LoginAttemptEvent.h"
+#include "Storage.h"
 #include "network/HTTPServer.h"
 #include "events/AccountCreateEvent.h"
 #include "events/AccountUpdateEvent.h"
 #include "Storage.h"
 
 
-void CommandLine::HandleCommand() {
+void CommandLine::HandleCommands() {
+    //while (true) {
+        std::cout << "CLI has been entered. Welcome!" << std::endl;
+        if  (CountTokens() >= 5 && InputExists("login") && IsTokenAtPosition("login", 1)) {  // Login command
 
-    if (CommandExists("login")){ // Login command
-        // jeremy: I foresee a potential problem here with this, what if the user enters "aletheia garbage login"
-        // should we not do something about the garbage input and tell the user about it?
-        // int userId = std::stoi();
-        // std::vector<Account> userAccount = Storage::GetAllAccountsByUserID(userId);
+            std::cout << "Executing Login Command" << std::endl;
 
-        // jeremy: The pk attribute belongs to one individual Account, not a vector of them
-        // if (userAccount->pk == InputArg[2]){
-        //     UpdateOutput("Login successful from user");
-        // }
+            // Storing user inputs
+            std::string firstName = GetTokenAtPosition(2);
+            std::string lastName = GetTokenAtPosition(3);
+            // std::string Input_password = GetTokenAtPosition(4);
 
-        // jeremy: look into C++ streams, they're much nicer for what you're doing here
-        ClearOutput();
-        UpdateOutput("Login working????? ");
-        PrintOutput();
-    }
-    // jeremy: should this be else if? probably don't want to both log in and create a new account and edit an account
-    // in the same command
-    if (CommandExists("--new-account")){
-        UpdateOutput("Registration working????? ");
-        PrintOutput();
-    }
+            std::vector<User> allUsers = database->GetAllUsers();
 
-    // jeremy: same comment as above
-    if (CommandExists("--edit-account")){
-        UpdateOutput("Updating account working????? ");
-        PrintOutput();
-    }
+            for (User &user : allUsers) {
+                if ((user.firstName == firstName) &&
+                    (user.lastName == lastName)) {
+                    // std::cout << "Login successful. Welcome " << *Database_ID->firstName <<" " << *Database_ID->lastName << std::endl;
+                    std::cout << "Access to structure successful" << std::endl;
+                    break;
+                }
+            }
+
+            std::cout << "Login command finished being executed" << std::endl;
+
+        } else if (InputExists("new-account") && IsTokenAtPosition("new-account", 1)) {  // Create account
+
+            std::cout << "Registration command working" << std::endl;
+
+        } else if (InputExists("edit-account") && IsTokenAtPosition("edit-account", 1)) {  // Edit account
+
+            std::cout << "Updating account command working" << std::endl;
+
+        }
+    //}
 }
 
-// jeremy: as I said above, look into C++ streams, they're much nicer for doing what you're trying to do here
-// also, are you ever going to be needing another class to update the output? because if not you can just directly
-// update the output variable since it belongs to this class
-void CommandLine::UpdateOutput(const std::string& Output) {
-    output += Output;
-}
-
-// jeremy: same comments as above
-void CommandLine::ClearOutput(){
-    output = "";
-}
-
-// jeremy: same comments as above
-void CommandLine::PrintOutput() {
-    std::cout << output << std::endl;
-}
 
