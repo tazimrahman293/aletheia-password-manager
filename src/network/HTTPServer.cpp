@@ -187,9 +187,6 @@ void HTTPServer::Init(Storage *store)
                     if (data.contains("lastName"))
                         user->lastName = data.at("lastName").get<std::string>();
 
-                    if (data.contains("typeID"))
-                        user->typeID = data.at("typeID").get<User::UserType>();
-
                     storage->Update(*user);
 
                 } else {
