@@ -55,6 +55,7 @@ void publishEvent(ArgType... args)
 void HTTPServer::Init(Storage *store)
 {
     assert(hostPort > 1023 && hostPort <= 65535 && "Port must be between 1024 and 65535");
+    assert(store != nullptr && "Storage cannot be nullptr!");
 
     this->storage = store;
 
