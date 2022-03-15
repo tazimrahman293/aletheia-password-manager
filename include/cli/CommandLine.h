@@ -22,18 +22,20 @@ class CommandLine : public InputParser {
     std::string output;
     std::string command;
 
-public:
-    CommandLine(int argc, char **argv) : InputParser(argc, argv) { }
+    Storage* database;
 
-    void HandleCommand(); // Handling of every Event and Command
+public:
+
+    CommandLine(int argc, char **argv, Storage *db) : InputParser(argc, argv) {
+        database = db;
+    }
+
+    void HandleCommands(); // Handling of every Event and Command
 
     // Grabbing and updating respective variables
     [[nodiscard]] std::string GetInput() const { return input; };
     [[nodiscard]] std::string GetCommand() const { return command; };
     [[nodiscard]] std::string GetOutput() const { return output; };
-    void ClearOutput();
-    void UpdateOutput(const std::string& Output);
-    virtual void PrintOutput() = 0;
 
 };
 #endif //CLI_COMMANDHANDLER_H
