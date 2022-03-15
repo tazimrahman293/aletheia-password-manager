@@ -7,12 +7,12 @@
 
 #include "cli/InputParser.h"
 
-InputParser::InputParser(int argc, char **argv) {
+InputParser::InputParser(int argc, char **argv, Storage* Database) {
     for (int i = 1; i < argc; ++i)
         inputTokens.emplace_back(std::string(argv[i]));
 }
 
-bool InputParser::CommandExists(const std::string& command) const {
+bool InputParser::InputExists(const std::string& command) const {
     return std::find(inputTokens.begin(), inputTokens.end(), command) != inputTokens.end();
 }
 

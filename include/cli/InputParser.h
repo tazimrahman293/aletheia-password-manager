@@ -4,18 +4,18 @@
 
 #include <string>
 #include <vector>
-
+#include "Storage.h"
 
 #ifndef INPUTPARSER_H
 #define INPUTPARSER_H
 
 class InputParser{
-private:
-    std::vector <std::string> inputTokens;
+
 
 public:
-    InputParser(int argc, char **argv);
+    std::vector <std::string> inputTokens;
+    InputParser(int argc, char **argv, Storage* Database);
     const std::string& GetOption(const std::string &command) const;
-    bool CommandExists(const std::string &command) const;
+    bool InputExists(const std::string &command) const;
 };
 #endif //INPUTPARSER_H

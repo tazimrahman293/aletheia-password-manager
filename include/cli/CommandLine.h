@@ -21,9 +21,14 @@ class CommandLine : public InputParser {
     std::string input;
     std::string output;
     std::string command;
+    std::vector<std::string> UserInputs;
+    Storage* UserDatabase;
 
 public:
-    CommandLine(int argc, char **argv) : InputParser(argc, argv) { }
+    CommandLine(int argc, char **argv, Storage* Database) : InputParser(argc, argv, Database) {
+        UserDatabase = Database;
+        UserInputs = inputTokens;
+    }
 
     void HandleCommand(); // Handling of every Event and Command
 
@@ -31,9 +36,6 @@ public:
     [[nodiscard]] std::string GetInput() const { return input; };
     [[nodiscard]] std::string GetCommand() const { return command; };
     [[nodiscard]] std::string GetOutput() const { return output; };
-    void ClearOutput();
-    void UpdateOutput(const std::string& Output);
-    virtual void PrintOutput() = 0;
 
 };
 #endif //CLI_COMMANDHANDLER_H
