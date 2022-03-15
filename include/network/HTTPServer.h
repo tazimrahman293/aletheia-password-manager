@@ -23,6 +23,11 @@ class HTTPServer : private httplib::Server {
     // Handle for the storage instance (database)
     Storage *storage = nullptr;
 
+    httplib::Headers defaultHeaders = {
+            {"Access-Control-Allow-Origin", "*"},
+            {"Access-Control-Allow-Headers", "*"}
+    };
+
 public:
 
     HTTPServer(std::string address, int port) :

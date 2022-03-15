@@ -62,12 +62,7 @@ void HTTPServer::Init(Storage *store)
     using httplib::Request, httplib::Response;
     using json = nlohmann::json;
 
-    Options(
-            R"(\*)",
-            [](const Request &request, Response &response) -> void
-            {
-                response.set_header("Access-Control-Allow-Origin", "*");
-            });
+    set_default_headers(defaultHeaders);
 
     // For testing purposes
     Get(
@@ -405,6 +400,12 @@ void HTTPServer::Init(Storage *store)
                 response.status = 204;
             }
             );
+
+    Options(
+            R"(.*)",
+            [](const Request &request, Response &response) -> void {}
+            );
+
 }
 
 
