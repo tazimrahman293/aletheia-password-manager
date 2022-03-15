@@ -59,6 +59,8 @@ COV_EXCL = '/usr*' \
 		   '${PROJ_DIR}/include/httplib.h' \
 		   '${PROJ_DIR}/include/json.h' \
 		   '${PROJ_DIR}/include/sqlite_orm.h' \
+		   '${PROJ_DIR}/include/network/HTTPServer.h' \
+		   '${PROJ_DIR}/src/network/HTTPServer.cpp' \
 		   '${PROJ_DIR}/test/*'
 
 # Defined at runtime in command-line
@@ -99,7 +101,6 @@ build:
 test: CFLAGS += -DTEST
 test: INCLUDE += -Itest/include/
 test: build $(APP_DIR)/$(TEST_TARGET)
-	@echo "Testing..."
 	@./$(APP_DIR)/$(TEST_TARGET) -ltc
 
 $(APP_DIR)/$(TEST_TARGET): $(TEST_OBJECTS)
