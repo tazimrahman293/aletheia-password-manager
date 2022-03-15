@@ -21,6 +21,7 @@ struct User {
     };
 
     int pk;
+    std::string username;
     std::string firstName;
     std::string lastName;
     std::string keyHash;
@@ -33,6 +34,7 @@ struct User {
 NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(\
         User,\
         pk,\
+        username,\
         firstName,\
         lastName,\
         keyHash,\

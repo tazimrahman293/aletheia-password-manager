@@ -178,6 +178,9 @@ void HTTPServer::Init(Storage *store)
                 if (user != nullptr) {
                     // Perform the update
 
+                    if (data.contains("username"))
+                        user->username = data.at("username").get<std::string>();
+
                     if (data.contains("firstName"))
                         user->firstName = data.at("firstName").get<std::string>();
 
