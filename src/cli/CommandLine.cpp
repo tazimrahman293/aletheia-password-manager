@@ -23,18 +23,18 @@
 
 
 void CommandLine::HandleCommand() {
-    while (true) {
-        if (InputExists("login") &&
-            (UserInputs[1] == "login")) {  // Login command
+    //while (true) {
+        std::cout << "CLI has been entered. Welcome!" << std::endl;
+        if (InputExists("login") && (UserInputs[1] == "login")) {  // Login command
             // jeremy: I foresee a potential problem here with this, what if the user enters "aletheia garbage login" should we not do something about the garbage input and tell the user about it? int userId = std::stoi(); std::vector<Account> userAccount = Storage::GetAllAccountsByUserID(userId);
 
             // jeremy: The pk attribute belongs to one individual Account, not a vector of them if (userAccount->pk == InputArg[2]){
             //     UpdateOutput("Login successful from user");
             // }
-
+            std::cout << "Executing Login Command" << std::endl;
             // Storing user inputs
-            std::string FirstName = UserInputs[2];
-            std::string LastName = UserInputs[3];
+            std::string FirstName = UserInputs[3];
+            std::string LastName = UserInputs[4];
             // std::string Input_password = UserInputs[4];
 
             std::vector<User> ExtractedUserVector =
@@ -57,18 +57,16 @@ void CommandLine::HandleCommand() {
 
         }
         // jeremy: should this be else if? probably don't want to both log in and create a new account and edit an account in the same command
-        else if (InputExists("--new-account") &&
-                 (UserInputs[1] == "--new-account")) {  // Create account
+        else if (InputExists("--new-account") &&  (UserInputs[1] == "--new-account")) {  // Create account
 
             std::cout << "Registration command working" << std::endl;
         }
 
         // jeremy: same comment as above
-        else if (InputExists("--edit-account") &&
-                 (UserInputs[1] == "--edit-account")) {
+        else if (InputExists("--edit-account") && (UserInputs[1] == "--edit-account")) {
             std::cout << "Updating account command working" << std::endl;
         }
-    }
+    //}
 }
 
 
