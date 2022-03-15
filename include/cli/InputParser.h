@@ -11,11 +11,15 @@
 
 class InputParser{
 
+    std::vector <std::string> inputTokens;
 
 public:
-    std::vector <std::string> inputTokens;
-    InputParser(int argc, char **argv, Storage* Database);
-    const std::string& GetOption(const std::string &command) const;
-    bool InputExists(const std::string &command) const;
+    InputParser(int argc, char **argv);
+
+    int CountTokens() { return (int)inputTokens.size(); }
+    const std::string& GetOption(const std::string &command);
+    bool InputExists(const std::string &command);
+    bool IsTokenAtPosition(const std::string &input, int position) { return inputTokens.at(position) == input; }
+    const std::string& GetTokenAtPosition(int position);
 };
 #endif //INPUTPARSER_H

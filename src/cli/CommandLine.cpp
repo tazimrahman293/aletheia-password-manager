@@ -22,49 +22,39 @@
 #include "Storage.h"
 
 
-void CommandLine::HandleCommand() {
+void CommandLine::HandleCommands() {
     //while (true) {
         std::cout << "CLI has been entered. Welcome!" << std::endl;
-        if  ((UserInputs.size() >= 5) && InputExists("login") && (UserInputs[1] == "login")) {  // Login command
-            // jeremy: I foresee a potential problem here with this, what if the user enters "aletheia garbage login" should we not do something about the garbage input and tell the user about it? int userId = std::stoi(); std::vector<Account> userAccount = Storage::GetAllAccountsByUserID(userId);
+        if  (CountTokens() >= 5 && InputExists("login") && IsTokenAtPosition("login", 1)) {  // Login command
 
-            // jeremy: The pk attribute belongs to one individual Account, not a vector of them if (userAccount->pk == InputArg[2]){
-            //     UpdateOutput("Login successful from user");
-            // }
             std::cout << "Executing Login Command" << std::endl;
+
             // Storing user inputs
-            std::string FirstName = UserInputs[3];
-            std::string LastName = UserInputs[4];
-            // std::string Input_password = UserInputs[4];
+            std::string firstName = GetTokenAtPosition(2);
+            std::string lastName = GetTokenAtPosition(3);
+            // std::string Input_password = GetTokenAtPosition(4);
 
-            std::vector<User> ExtractedUserVector =
-                UserDatabase->GetAllUsers();  // Grab database of all users
-            // Don't know if that's the correct way of grabbing the storage, but it's the implementation for now
+            std::vector<User> allUsers = database->GetAllUsers();
 
-            for (User user : ExtractedUserVector) {
-                if ((user.firstName == FirstName) &&
-                    (user.lastName ==
-                     LastName)) {  // If password exists and matches user input, login is successful
+            for (User &user : allUsers) {
+                if ((user.firstName == firstName) &&
+                    (user.lastName == lastName)) {
                     // std::cout << "Login successful. Welcome " << *Database_ID->firstName <<" " << *Database_ID->lastName << std::endl;
                     std::cout << "Access to structure successful" << std::endl;
                     break;
-                } else {
-                    std::cout << "Invalid login input" << std::endl;
                 }
             }
 
             std::cout << "Login command finished being executed" << std::endl;
 
-        }
-        // jeremy: should this be else if? probably don't want to both log in and create a new account and edit an account in the same command
-        else if (InputExists("--new-account") &&  (UserInputs[1] == "--new-account")) {  // Create account
+        } else if (InputExists("new-account") && IsTokenAtPosition("new-account", 1)) {  // Create account
 
             std::cout << "Registration command working" << std::endl;
-        }
 
-        // jeremy: same comment as above
-        else if (InputExists("--edit-account") && (UserInputs[1] == "--edit-account")) {
+        } else if (InputExists("edit-account") && IsTokenAtPosition("edit-account", 1)) {  // Edit account
+
             std::cout << "Updating account command working" << std::endl;
+
         }
     //}
 }

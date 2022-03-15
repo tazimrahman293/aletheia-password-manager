@@ -48,39 +48,36 @@
  */
 int main(int argc, char *argv[])
 {
-    InputParser cmdParser(argc, argv, nullptr); // nullptr since InputParser takes database input
+    CommandLine cli(argc, argv, nullptr);
 
     // Set database filename (either using -d value or default to db.sqlite3)
     std::string dbFilename;
-    if (cmdParser.InputExists("-d"))
-        dbFilename = cmdParser.GetOption("-d");
+    if (cli.InputExists("-d"))
+        dbFilename = cli.GetOption("-d");
     else
         dbFilename = "db.sqlite3";
     // Instantiate storage with filename
     Storage database(dbFilename);
 
-    // Start in CLI if -CLI is given
-    if (cmdParser.InputExists("-CLI")) {
-        CommandLine CLI(argc, argv, &database);
-        CLI.HandleCommand();
-    }
     // Start in Server mode if -S given (no stdin, request come through HTTP)
-    if (cmdParser.InputExists("-S")) {
+    if (cli.InputExists("-S")) {
 
         // Host address/name (from -H value, defaults to 0.0.0.0)
         std::string hostAddress = "0.0.0.0";
-        if (cmdParser.InputExists("-H"))
-            hostAddress = cmdParser.GetOption("-H");
+        if (cli.InputExists("-H"))
+            hostAddress = cli.GetOption("-H");
 
         // Host port (from -P value, defaults to 8089)
         int hostPort = 8089;
-        if (cmdParser.InputExists("-P"))
-            hostPort = std::stoi(cmdParser.GetOption("-P"));
+        if (cli.InputExists("-P"))
+            hostPort = std::stoi(cli.GetOption("-P"));
 
         // Spin up server instance and run listen loop
         HTTPServer server(hostAddress, hostPort);
         server.Init(&database);
         server.Run();
+    } else {
+        cli.HandleCommands();
     }
 
     return 0;

@@ -21,16 +21,16 @@ class CommandLine : public InputParser {
     std::string input;
     std::string output;
     std::string command;
-    std::vector<std::string> UserInputs;
-    Storage* UserDatabase;
+
+    Storage* database;
 
 public:
-    CommandLine(int argc, char **argv, Storage* Database) : InputParser(argc, argv, Database) {
-        UserDatabase = Database;
-        UserInputs = inputTokens;
+
+    CommandLine(int argc, char **argv, Storage *db) : InputParser(argc, argv) {
+        database = db;
     }
 
-    void HandleCommand(); // Handling of every Event and Command
+    void HandleCommands(); // Handling of every Event and Command
 
     // Grabbing and updating respective variables
     [[nodiscard]] std::string GetInput() const { return input; };
