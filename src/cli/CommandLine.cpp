@@ -25,7 +25,7 @@
 void CommandLine::HandleCommand() {
     //while (true) {
         std::cout << "CLI has been entered. Welcome!" << std::endl;
-        if (InputExists("login") && (UserInputs[1] == "login")) {  // Login command
+        if  ((UserInputs.size() >= 5) && InputExists("login") && (UserInputs[1] == "login")) {  // Login command
             // jeremy: I foresee a potential problem here with this, what if the user enters "aletheia garbage login" should we not do something about the garbage input and tell the user about it? int userId = std::stoi(); std::vector<Account> userAccount = Storage::GetAllAccountsByUserID(userId);
 
             // jeremy: The pk attribute belongs to one individual Account, not a vector of them if (userAccount->pk == InputArg[2]){
