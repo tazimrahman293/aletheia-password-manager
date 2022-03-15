@@ -16,6 +16,7 @@
 
 User createTestUser() {
     User user;
+    user.username = "abc123";
     user.firstName = "First";
     user.lastName = "Last";
     user.keyHash = "pass";
