@@ -44,6 +44,9 @@ test:
   allow_failure: false
   script:
     - make -j test
+  artifacts:
+    reports:
+      junit: build/coverage/test_results.xml
   cache:
     key: $CI_COMMIT_REF_SLUG
     paths:
