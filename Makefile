@@ -38,9 +38,6 @@ TEST_TARGET = $(TARGET)_test
 # Defined at runtime in command-line
 ARGS=
 
-print-target: @echo "${APP_DIR}/${TARGET}"
-print-objs: @echo "${OBJECTS}"
-
 all: build $(APP_DIR)/$(TARGET)
 
 run: all
@@ -78,6 +75,12 @@ debug: all
 clean:
 	-@rm -rvf $(OBJ_DIR)/*
 	-@rm -rvf $(APP_DIR)/*
+
+print-target:
+	@echo "${APP_DIR}/${TARGET}"
+
+print-objs:
+	@echo "${OBJECTS}"
 
 info:
 	@echo "Object dir:   ${OBJ_DIR}"
