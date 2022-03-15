@@ -14,20 +14,13 @@
  * Represents a user of the software (each user has multiple "Accounts" for different sites).
  */
 struct User {
-    enum class UserType {
-        Normal = 1,
-        Admin = 2,
-        SuperAdmin = 3
-    };
-
     int pk;
     std::string username;
     std::string firstName;
     std::string lastName;
     std::string keyHash;
-    UserType typeID;
 
-    User() : pk(-1), typeID(UserType::Normal) { }
+    User() : pk(-1) { }
 };
 
 // Registers the User class for json deserialization
@@ -37,8 +30,7 @@ NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(\
         username,\
         firstName,\
         lastName,\
-        keyHash,\
-        typeID\
+        keyHash\
         )
 
 #endif  // USER_RECORD_H
