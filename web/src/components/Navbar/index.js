@@ -25,7 +25,7 @@ const Navbar = ({ toggle }) => {
 
     useEffect(() => {
         window.addEventListener('scroll', changeNav)
-    }, [])
+    }, []);
 
     const toggleHome = () => {
         scroll.scrollToTop()
@@ -35,7 +35,7 @@ const Navbar = ({ toggle }) => {
         <>
             <Nav scrollNav={scrollNav}>
                 <NavContainer>
-                    <NavLogo to='/' onClick={toggleHome}>
+                    <NavLogo to='/' id='homePage' onClick={toggleHome}>
                         Aletheia
                     </NavLogo>
                     <IconMobile onClick={toggle}>
