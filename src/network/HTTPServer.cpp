@@ -8,6 +8,7 @@
 
 #include <httplib.h>
 #include <json.h>
+#include <jwt/jwt.hpp>
 
 #include "data/Account.h"
 #include "network/EventBus.h"

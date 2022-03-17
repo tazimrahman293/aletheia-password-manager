@@ -18,7 +18,7 @@ build:
       when: never
     - if: $CI_PIPELINE_SOURCE == 'merge_request_event' || $CI_PIPELINE_SOURCE == 'push'
   before_script:
-    - apt update && apt -y install make autoconf
+    - apt update && apt -y install make autoconf libssl-dev
   allow_failure: false
   script:
     - make -j all
