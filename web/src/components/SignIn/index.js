@@ -1,12 +1,12 @@
 import React from 'react'
-import { Icon } from './SigninElements'
 import { DataContainer, DataWrapper, DataRow, Column1, Column2, TextWrapper, ImgWrap, Img } from './../DataSection/DataElements'
-import { Nav, NavContainer } from '../Navbar/NavbarElements'
 import { useFormik } from 'formik';
 import * as yup from "yup";
 import axios from './../../api/axios';
 import { Box, Button, Container, TextField, Typography } from '@mui/material';
 import { Link as LinkRouter } from 'react-router-dom';
+import { Nav, NavContainer } from '../Navbar/NavbarElements';
+import { Icon } from './../SignIn/SigninElements';
 
 // URL for user requests
 const userUrl = '/login';
@@ -44,7 +44,7 @@ const SignIn = () => {
                 )
                 .then(response => { console.log(response.data) })
                 .catch(error => { console.log(error.data) });
-                console.log(JSON.stringify(values, null, 2))
+            console.log(JSON.stringify(values, null, 2))
         }
     });
 

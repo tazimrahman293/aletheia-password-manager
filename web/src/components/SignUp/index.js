@@ -1,13 +1,13 @@
 import React from 'react';
-import { Icon } from './../SignIn/SigninElements';
 import { DataContainer, DataWrapper, DataRow, Column1, Column2, TextWrapper, ImgWrap, Img } from './../DataSection/DataElements';
-import { Nav, NavContainer } from '../Navbar/NavbarElements';
 import * as yup from "yup";
 import { Link as LinkRouter } from 'react-router-dom';
 import YupPassword from 'yup-password';
 import axios from './../../api/axios';
 import { useFormik } from 'formik';
 import { Box, Button, Container, TextField, Typography } from '@mui/material';
+import { Nav, NavContainer } from '../Navbar/NavbarElements'
+import { Icon } from './../SignIn/SigninElements'
 YupPassword(yup)
 
 
@@ -73,7 +73,7 @@ const SignUp = () => {
                     'firstName': values.firstName,
                     'lastName': values.lastName,
                     'keyHash': values.password
-                }),
+                }),// TODO shift headers into AXIOS api
                     { headers: { 'Content-Type': 'application/json', crossDomain: true } }
                 )
                 .then(response => { console.log(response.data) })
@@ -98,7 +98,7 @@ const SignUp = () => {
                 </NavContainer>
             </Nav>
 
-            <DataContainer lightBg='true' id='form'>
+            <DataContainer lightBg={true} id='form'>
                 <DataWrapper>
                     <DataRow imgStart='true'>
                         <Column1>
