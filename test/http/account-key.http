@@ -1,7 +1,21 @@
+### Generate Account Key (Random)
+PUT {{protocol}}{{host}}{{port}}/account/key
+Content-Type: application/json
+
+{
+  "pk": 1,
+  "random": true,
+  "length": 16,
+  "lowers": true,
+  "uppers": false,
+  "numbers": false,
+  "specials": false
+}
+
 ### Get Account Key
 GET {{protocol}}{{host}}{{port}}/account/key?account=1
 
-### Replace Account Key
+### Replace Account Key (User-Provided Plain Text)
 PUT {{protocol}}{{host}}{{port}}/account/key
 Content-Type: application/json
 

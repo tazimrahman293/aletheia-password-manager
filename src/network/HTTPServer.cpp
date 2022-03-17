@@ -12,6 +12,7 @@
 #include "data/Account.h"
 #include "network/EventBus.h"
 #include "network/HTTPServer.h"
+#include "random/PasswordGenerator.h"
 
 // #include "events/LoginAttemptEvent.h"
 // #include "events/LogoutEvent.h"
@@ -383,6 +384,52 @@ void HTTPServer::Init(Storage *store)
                 response.status = 204;
             });
 
+    // Generate new account key
+    Put(
+            "/account/key",
+            [this](const Request &request, Response &response) -> void
+            {
+                int id;
+                bool random;
+                std::string key;
+                int length;
+                bool lowers, uppers, numbers, specials;
+                try {
+                    auto data = json::parse(request.body);
+                    id = data.at("pk").get<int>();
+                    random = data.at("random").get<bool>();
+                    if (!random) {
+                        key = data.at("key").get<std::string>();
+                    } else {
+                        length = data.at("length").get<int>();
+                        lowers = data.at("lowers").get<bool>();
+                        uppers = data.at("uppers").get<bool>();
+                        numbers = data.at("numbers").get<bool>();
+                        specials = data.at("specials").get<bool>();
+                    }
+                } catch (const json::exception &err) {
+                    response.status = 400;
+                    return;
+                }
+
+                auto account = storage->GetByID<Account>(id);
+
+                if (account == nullptr) {
+                    response.status = 404;
+                    return;
+                }
+
+                if (!random) {
+                    account->keyHash = key;
+                } else {
+                    PasswordGenerator generator;
+                    account->keyHash = generator.NewPassword(length);
+                }
+
+                storage->Update(*account);
+                response.status = 201;
+            });
+
     // Fetch account key in plain text
     Get(
             "/account/key",
@@ -406,37 +453,8 @@ void HTTPServer::Init(Storage *store)
                 } else {
                     response.status = 404;
                 }
-            }
-            );
+            });
 
-    // Update account key
-    Put(
-            "/account/key",
-            [this](const Request& request, Response& response) -> void
-            {
-                auto data = json::parse(request.body);
-                int id;
-                std::string key;
-                try {
-                    id = data.at("pk").get<int>();
-                    key = data.at("key").get<std::string>();
-                } catch (const json::exception& err) {
-                    response.status = 400;
-                    return;
-                }
-
-                auto account = storage->GetByID<Account>(id);
-
-                if (account != nullptr) {
-                    account->keyHash = key;
-                    storage->Update(*account);
-                } else {
-                    response.status = 404;
-                }
-
-                response.status = 204;
-            }
-            );
 }
 
 
