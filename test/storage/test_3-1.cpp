@@ -219,6 +219,29 @@ TEST_CASE("storage-get-all-users") {
     }
 }
 
+TEST_CASE("storage-get-user-by-username") {
+
+    remove(dbFilename.c_str());
+    Storage storage(dbFilename);
+    int maxUsers;
+    std::string testUsername = "abc";
+
+    SUBCASE("storage-get-user-by-username-2-users") { maxUsers = 2; }
+    SUBCASE("storage-get-user-by-username-20-users") { maxUsers = 20; }
+
+    for (int i = 0; i < maxUsers; i++) {
+        User user = createTestUser();
+        user.username = testUsername + std::to_string(i % 2);
+        storage.Insert(user);
+        WARN_GT(user.pk, 0);
+    }
+
+    auto withName = storage.GetUserByUsername(testUsername + "0");
+    REQUIRE_NE(withName, nullptr);
+    REQUIRE_GT(withName->pk, 0);
+    REQUIRE_EQ(withName->username, testUsername + "0");
+}
+
 TEST_CASE("storage-get-all-accounts-by-user-id") {
 
     remove(dbFilename.c_str());

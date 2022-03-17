@@ -83,33 +83,38 @@ void HTTPServer::Init(Storage *store)
             [this](const Request& request, Response& response) -> void
             {
                 auto data = json::parse(request.body);
-                int id;
+                std::string username;
                 std::string pass;
                 try {
-                    id = data.at("pk").get<int>();
+                    username = data.at("username").get<std::string>();
                     pass = data.at("key").get<std::string>();
                 } catch (const json::exception& err) {
                     response.status = 400;
                     return;
                 }
 
-                auto user = storage->GetByID<User>(id);
-
-                if (user != nullptr) {
-                    // TODO hash password/key to check if valid login
-                    if (pass.empty()) {  // TODO or other problems with the formation of the password, or if invalid
-                        response.status = 401;
-                        return;
-                    }
-                    if (pass == user->keyHash) {
-                        // TODO obviously we need to hash the sent password and compare with the keyHash
-                        // TODO create a new session (token in a cookie maybe)
-                    }
-                } else {
+                // Short-circuit this whole callback if there was no password sent
+                if (pass.empty()) {  // TODO or other problems with the formation of the password, or if invalid
                     response.status = 401;
+                    return;
                 }
 
-                response.status = 204;
+                auto user = storage->GetUserByUsername(username);
+
+                if (user == nullptr) {
+                    response.status = 401;
+                    return;
+                }
+
+                // TODO hash password/key to check if valid login
+                if (pass == user->keyHash) {
+                    // TODO obviously we need to hash the sent password and compare with the keyHash
+                    // TODO create a new session (token in a cookie maybe)
+                    json j = *user;
+                    response.set_content(j.dump(), "application/json");
+                }
+
+                response.status = 200;
             });
 
     // User logout
