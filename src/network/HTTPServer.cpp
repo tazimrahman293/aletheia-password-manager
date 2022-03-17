@@ -12,6 +12,7 @@
 #include "data/Account.h"
 #include "network/EventBus.h"
 #include "network/HTTPServer.h"
+#include "random/PasswordGenerator.h"
 
 // #include "events/LoginAttemptEvent.h"
 // #include "events/LogoutEvent.h"
@@ -62,6 +63,13 @@ void HTTPServer::Init(Storage *store)
     using httplib::Request, httplib::Response;
     using json = nlohmann::json;
 
+    Options(
+            R"(\*)",
+            [](const Request &request, Response &response) -> void
+            {
+                response.set_header("Access-Control-Allow-Origin", "*");
+            });
+
     // For testing purposes
     Get(
             "/hello",
@@ -76,33 +84,38 @@ void HTTPServer::Init(Storage *store)
             [this](const Request& request, Response& response) -> void
             {
                 auto data = json::parse(request.body);
-                int id;
+                std::string username;
                 std::string pass;
                 try {
-                    id = data.at("pk").get<int>();
+                    username = data.at("username").get<std::string>();
                     pass = data.at("key").get<std::string>();
                 } catch (const json::exception& err) {
                     response.status = 400;
                     return;
                 }
 
-                auto user = storage->GetByID<User>(id);
-
-                if (user != nullptr) {
-                    // TODO hash password/key to check if valid login
-                    if (pass.empty()) {  // TODO or other problems with the formation of the password, or if invalid
-                        response.status = 401;
-                        return;
-                    }
-                    if (pass == user->keyHash) {
-                        // TODO obviously we need to hash the sent password and compare with the keyHash
-                        // TODO create a new session (token in a cookie maybe)
-                    }
-                } else {
+                // Short-circuit this whole callback if there was no password sent
+                if (pass.empty()) {  // TODO or other problems with the formation of the password, or if invalid
                     response.status = 401;
+                    return;
                 }
 
-                response.status = 204;
+                auto user = storage->GetUserByUsername(username);
+
+                if (user == nullptr) {
+                    response.status = 401;
+                    return;
+                }
+
+                // TODO hash password/key to check if valid login
+                if (pass == user->keyHash) {
+                    // TODO obviously we need to hash the sent password and compare with the keyHash
+                    // TODO create a new session (token in a cookie maybe)
+                    json j = *user;
+                    response.set_content(j.dump(), "application/json");
+                }
+
+                response.status = 200;
             });
 
     // User logout
@@ -130,8 +143,8 @@ void HTTPServer::Init(Storage *store)
                 storage->Insert(record);
 
                 if (record.pk > 0) {
-                    json j = {{"pk", record.pk}};
-
+                    json j = record;
+                    j.erase("keyHash");
                     response.status = 201;
                     response.set_content(j.dump(), "application/json");
                 } else {
@@ -140,9 +153,37 @@ void HTTPServer::Init(Storage *store)
                 }
             });
 
-    // List all users in the current database
+    // Get a single user by primary key or username
     Get(
             "/user",
+            [this](const Request &request, Response &response) -> void
+            {
+                std::unique_ptr<User> user;
+                if (request.has_param("pk")) {
+                    int id = std::stoi(request.get_param_value("pk"));
+                    user = storage->GetByID<User>(id);
+                } else if (request.has_param("username")) {
+                    std::string username = request.get_param_value("username");
+                    user = storage->GetUserByUsername(username);
+                } else {
+                    response.status = 400;
+                    return;
+                }
+
+                if (user == nullptr) {
+                    response.status = 404;
+                    return;
+                }
+
+                json j = *user;
+                j.erase("keyHash");
+                response.set_content(j.dump(), "application/json");
+                response.status = 200;
+            });
+
+    // List all users in the current database
+    Get(
+            "/users",
             [this](const Request& request, Response& response) -> void
             {
                 auto users = storage->GetAllUsers();
@@ -194,8 +235,10 @@ void HTTPServer::Init(Storage *store)
                     return;
                 }
 
+                json j = *user;
+                j.erase("keyHash");
+                response.set_content(j.dump(), "application/json");
                 response.status = 204;
-
             });
 
     // Remove user
@@ -233,12 +276,9 @@ void HTTPServer::Init(Storage *store)
                 storage->Insert(record);
 
                 if (record.pk > 0) {
-                    json j;
-                    j["pk"] = record.pk;
-                    j["created"] = record.created;
-                    j["lastAccessed"] = record.lastAccessed;
-                    j["lastModified"] = record.lastModified;
-
+                    json j = record;
+                    j.erase("keyHash");
+                    response.status = 201;
                     response.set_content(j.dump(), "application/json");
                 } else {
                     response.status = 500;
@@ -298,31 +338,34 @@ void HTTPServer::Init(Storage *store)
                     return;
                 }
 
-                if (account != nullptr) {
-                    // Perform the update
-
-                    if (data.contains("label"))
-                        account->label = data.at("label").get<std::string>();
-
-                    if (data.contains("username"))
-                        account->username = data.at("username").get<std::string>();
-
-                    if (data.contains("url"))
-                        account->url = data.at("url").get<std::string>();
-
-                    if (data.contains("expiry"))
-                        account->expiry = data.at("expiry").get<long>();
-
-                    // TODO update lastModified (now)
-
-                    storage->Update(*account);
-
-                } else {
+                if (account == nullptr) {
                     // Account with primary key given in request was not found
                     response.status = 404;
                     return;
+
                 }
 
+                // Perform the update
+                if (data.contains("label"))
+                    account->label = data.at("label").get<std::string>();
+
+                if (data.contains("username"))
+                    account->username = data.at("username").get<std::string>();
+
+                if (data.contains("url"))
+                    account->url = data.at("url").get<std::string>();
+
+                if (data.contains("expiry"))
+                    account->expiry = data.at("expiry").get<long>();
+
+                // TODO update lastModified (now)
+
+                storage->Update(*account);
+
+                json j = *account;
+                j.erase("keyHash");
+                response.set_content(j.dump(), "application/json");
+                response.status = 200;
             });
 
     // Remove account
@@ -342,6 +385,52 @@ void HTTPServer::Init(Storage *store)
                 storage->Remove<Account>(id);
 
                 response.status = 204;
+            });
+
+    // Generate new account key
+    Put(
+            "/account/key",
+            [this](const Request &request, Response &response) -> void
+            {
+                int id;
+                bool random;
+                std::string key;
+                int length;
+                bool lowers, uppers, numbers, specials;
+                try {
+                    auto data = json::parse(request.body);
+                    id = data.at("pk").get<int>();
+                    random = data.at("random").get<bool>();
+                    if (!random) {
+                        key = data.at("key").get<std::string>();
+                    } else {
+                        length = data.at("length").get<int>();
+                        lowers = data.at("lowers").get<bool>();
+                        uppers = data.at("uppers").get<bool>();
+                        numbers = data.at("numbers").get<bool>();
+                        specials = data.at("specials").get<bool>();
+                    }
+                } catch (const json::exception &err) {
+                    response.status = 400;
+                    return;
+                }
+
+                auto account = storage->GetByID<Account>(id);
+
+                if (account == nullptr) {
+                    response.status = 404;
+                    return;
+                }
+
+                if (!random) {
+                    account->keyHash = key;
+                } else {
+                    PasswordGenerator generator;
+                    account->keyHash = generator.NewPassword(length);
+                }
+
+                storage->Update(*account);
+                response.status = 200;
             });
 
     // Fetch account key in plain text
@@ -367,37 +456,8 @@ void HTTPServer::Init(Storage *store)
                 } else {
                     response.status = 404;
                 }
-            }
-            );
+            });
 
-    // Update account key
-    Put(
-            "/account/key",
-            [this](const Request& request, Response& response) -> void
-            {
-                auto data = json::parse(request.body);
-                int id;
-                std::string key;
-                try {
-                    id = data.at("pk").get<int>();
-                    key = data.at("key").get<std::string>();
-                } catch (const json::exception& err) {
-                    response.status = 400;
-                    return;
-                }
-
-                auto account = storage->GetByID<Account>(id);
-
-                if (account != nullptr) {
-                    account->keyHash = key;
-                    storage->Update(*account);
-                } else {
-                    response.status = 404;
-                }
-
-                response.status = 204;
-            }
-            );
 }
 
 

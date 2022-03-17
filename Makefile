@@ -120,6 +120,7 @@ test: CFLAGS += -DTEST
 test: INCLUDE += -Itest/include/
 test: build $(APP_DIR)/$(TEST_TARGET)
 	@./$(APP_DIR)/$(TEST_TARGET) -r=junit -o=$(TEST_RESULT)
+	@cat $(TEST_RESULT)
 
 # Links object files and external libs into the test target binary
 $(APP_DIR)/$(TEST_TARGET): $(TEST_OBJECTS)

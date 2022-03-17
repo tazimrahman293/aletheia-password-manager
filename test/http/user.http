@@ -12,7 +12,16 @@ Content-Type: application/json
 }
 
 ### Get List of All Users
-GET {{protocol}}{{host}}{{port}}/user
+GET {{protocol}}{{host}}{{port}}/users
+
+### Get Single User (1)
+GET {{protocol}}{{host}}{{port}}/user?pk=1
+
+### Get Single User (jsmith1)
+GET {{protocol}}{{host}}{{port}}/user?username=jsmith1
+
+### Get Single User, pass both params
+GET {{protocol}}{{host}}{{port}}/user?username=jsmith1&pk=2
 
 ### Update Existing User
 PATCH {{protocol}}{{host}}{{port}}/user
