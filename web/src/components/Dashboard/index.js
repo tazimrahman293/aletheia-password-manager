@@ -2,7 +2,7 @@
 
 import * as React from 'react';
 import { DataGrid } from '@mui/x-data-grid';
-import { Grid, Typography } from '@mui/material';
+import { Typography } from '@mui/material';
 import { Box } from '@mui/system';
 
 const columns = [
