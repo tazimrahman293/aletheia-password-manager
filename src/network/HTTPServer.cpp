@@ -152,9 +152,36 @@ void HTTPServer::Init(Storage *store)
                 }
             });
 
-    // List all users in the current database
+    // Get a single user by primary key or username
     Get(
             "/user",
+            [this](const Request &request, Response &response) -> void
+            {
+                std::unique_ptr<User> user;
+                if (request.has_param("pk")) {
+                    int id = std::stoi(request.get_param_value("pk"));
+                    user = storage->GetByID<User>(id);
+                } else if (request.has_param("username")) {
+                    std::string username = request.get_param_value("username");
+                    user = storage->GetUserByUsername(username);
+                } else {
+                    response.status = 400;
+                    return;
+                }
+
+                if (user == nullptr) {
+                    response.status = 404;
+                    return;
+                }
+
+                json j = *user;
+                response.set_content(j.dump(), "application/json");
+                response.status = 200;
+            });
+
+    // List all users in the current database
+    Get(
+            "/users",
             [this](const Request& request, Response& response) -> void
             {
                 auto users = storage->GetAllUsers();
