@@ -143,8 +143,8 @@ void HTTPServer::Init(Storage *store)
                 storage->Insert(record);
 
                 if (record.pk > 0) {
-                    json j = {{"pk", record.pk}};
-
+                    json j = record;
+                    j.erase("keyHash");
                     response.status = 201;
                     response.set_content(j.dump(), "application/json");
                 } else {
@@ -176,6 +176,7 @@ void HTTPServer::Init(Storage *store)
                 }
 
                 json j = *user;
+                j.erase("keyHash");
                 response.set_content(j.dump(), "application/json");
                 response.status = 200;
             });
@@ -234,8 +235,10 @@ void HTTPServer::Init(Storage *store)
                     return;
                 }
 
+                json j = *user;
+                j.erase("keyHash");
+                response.set_content(j.dump(), "application/json");
                 response.status = 204;
-
             });
 
     // Remove user
@@ -273,12 +276,9 @@ void HTTPServer::Init(Storage *store)
                 storage->Insert(record);
 
                 if (record.pk > 0) {
-                    json j;
-                    j["pk"] = record.pk;
-                    j["created"] = record.created;
-                    j["lastAccessed"] = record.lastAccessed;
-                    j["lastModified"] = record.lastModified;
-
+                    json j = record;
+                    j.erase("keyHash");
+                    response.status = 201;
                     response.set_content(j.dump(), "application/json");
                 } else {
                     response.status = 500;
@@ -338,31 +338,34 @@ void HTTPServer::Init(Storage *store)
                     return;
                 }
 
-                if (account != nullptr) {
-                    // Perform the update
-
-                    if (data.contains("label"))
-                        account->label = data.at("label").get<std::string>();
-
-                    if (data.contains("username"))
-                        account->username = data.at("username").get<std::string>();
-
-                    if (data.contains("url"))
-                        account->url = data.at("url").get<std::string>();
-
-                    if (data.contains("expiry"))
-                        account->expiry = data.at("expiry").get<long>();
-
-                    // TODO update lastModified (now)
-
-                    storage->Update(*account);
-
-                } else {
+                if (account == nullptr) {
                     // Account with primary key given in request was not found
                     response.status = 404;
                     return;
+
                 }
 
+                // Perform the update
+                if (data.contains("label"))
+                    account->label = data.at("label").get<std::string>();
+
+                if (data.contains("username"))
+                    account->username = data.at("username").get<std::string>();
+
+                if (data.contains("url"))
+                    account->url = data.at("url").get<std::string>();
+
+                if (data.contains("expiry"))
+                    account->expiry = data.at("expiry").get<long>();
+
+                // TODO update lastModified (now)
+
+                storage->Update(*account);
+
+                json j = *account;
+                j.erase("keyHash");
+                response.set_content(j.dump(), "application/json");
+                response.status = 200;
             });
 
     // Remove account
@@ -427,7 +430,7 @@ void HTTPServer::Init(Storage *store)
                 }
 
                 storage->Update(*account);
-                response.status = 201;
+                response.status = 200;
             });
 
     // Fetch account key in plain text
