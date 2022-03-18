@@ -115,7 +115,7 @@ build:
 
 # Performs a full build and run of the test target binary and outputs a test report
 # Report format is JUnit XML
-test: CFLAGS += -DTEST
+test: CFLAGS += -DTEST -g
 test: INCLUDE += -Itest/include/
 test: build $(APP_DIR)/$(TEST_TARGET)
 	@./$(APP_DIR)/$(TEST_TARGET) $(TEST_FLAGS)
