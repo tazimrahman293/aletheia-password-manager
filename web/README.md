@@ -1,5 +1,5 @@
 # Remote deployment link/status
-[![Netlify Status](https://api.netlify.com/api/v1/badges/f083611f-d01e-48ba-989e-6f22a0fb6053/deploy-status)](https://app.netlify.com/sites/unruffled-shaw-a393de/deploys)
+[![Netlify Status](https://api.netlify.com/api/v1/badges/f083611f-d01e-48ba-989e-6f22a0fb6053/deploy-status)](https://aletheia-pm.netlify.app)
 
 # Directories
 In src -\
