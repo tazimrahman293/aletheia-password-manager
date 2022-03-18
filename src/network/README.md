@@ -61,7 +61,7 @@ POST /login HTTP/1.1
 Content-Type: application/json
 
 {
-  "pk": 1,
+  "username": "name",
   "key": "PLAIN-TEXT-KEY"
 }
 ```
@@ -69,8 +69,7 @@ Content-Type: application/json
 **Response**
 
 ```text
-204 - Successfully logged in
-401 - Invalid credentials
+<User-JSON>
 ```
 
 ---
@@ -115,22 +114,23 @@ Content-Type: application/json
 }
 ```
 
-### List all Users in current database
+### Get a single user by either primary key or username
 
 **Request**
 
 ```http request
-GET /user HTTP/1.1
+GET /user?pk=1 HTTP/1.1
 ```
+```http request
+GET /user?username=name HTTP/1.1
+```
+
+*Note: If both username and pk are provided as params, only pk will be used.*
 
 **Response**
 
-```json
-[
+```text
   <User-JSON>,
-  <User-JSON>,
-  // ...
-]
 ```
 
 ### Update an existing User
@@ -170,6 +170,28 @@ Content-Type: application/json
 ```text
 204 - Delete request was carried out (note: doesn't mean anything was deleted)
 400 - Missing primary key field
+```
+
+---
+
+## `/users`
+
+### List all users
+
+**Request**
+
+```http request
+GET /users HTTP/1.1
+```
+
+**Response**
+
+```json
+[
+  <User-JSON>,
+  <User-JSON>,
+  // ...
+]
 ```
 
 ---
@@ -276,7 +298,7 @@ GET /account/key?account=99 HTTP/1.1
 }
 ```
 
-### Replace the key for an Account
+### Replace or generate the key for an Account
 
 **Request**
 
@@ -286,14 +308,22 @@ Content-Type: application/json
 
 {
   "pk": 99,
-  "key": "PLAIN-TEXT-KEY"
+  "random": false,
+  // if NOT random:
+  "key": "PLAIN-TEXT-KEY",
+  // if random:
+  "length": 8,
+  "lowers": true,
+  "uppers": true,
+  "numbers": false,
+  "specials": false
 }
 ```
 
 **Response**
 
 ```text
-204 - The key replacement request was carried out successfully
-400 - Missing primary key field
+204 - The key generation request was carried out successfully
+400 - Missing field
 404 - Account with the given primary key was not found
 ```

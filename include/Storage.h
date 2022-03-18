@@ -131,6 +131,7 @@ public:
     }
 
     std::vector<User> GetAllUsers() noexcept;
+    std::unique_ptr<User> GetUserByUsername(const std::string &username) noexcept;
     std::vector<Account> GetAllAccountsByUserID(int userID) noexcept;
 
 };

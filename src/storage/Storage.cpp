@@ -3,8 +3,10 @@
 // for the TBD password manager project.
 // Authors: Jeremy Rempel
 
+#include <algorithm>
 #include <memory>
 #include <iostream>
+#include <tuple>
 
 #include <aletheia.h>
 #include <Storage.h>
@@ -27,6 +29,30 @@ std::vector<User> Storage::GetAllUsers() noexcept
 {
     auto records = s->database.get_all<User>();
     return records;
+}
+
+
+std::unique_ptr<User> Storage::GetUserByUsername(const std::string &username) noexcept
+{
+    using namespace sqlite_orm;
+    auto records = s->database.select(
+            asterisk<User>(),
+                    where(c(&User::username) == username)
+                    );
+
+    std::unique_ptr<User> user = std::make_unique<User>();
+
+    if (records.empty()) {
+        user->pk = -1;
+        return user;
+    }
+
+    auto first = records.at(0);
+    user->pk = std::get<0>(first);
+    user->username = std::get<1>(first);
+    user->firstName = std::get<2>(first);
+    user->lastName = std::get<3>(first);
+    return user;
 }
 
 
