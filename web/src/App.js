@@ -6,6 +6,7 @@ import SignUpPage from './pages/signUp';
 import User from './pages/user';
 import SettingsPage from './pages/settings';
 import DashboardPage from './pages/dashboard';
+import CreateAccountPage from './pages/createAccount';
 
 /**
  * 
@@ -21,6 +22,7 @@ function App() {
         <Route path='/user' element={<User/>}/>
         <Route path='/settings' element={<SettingsPage/>}/>
         <Route path='/dashboard' element={<DashboardPage/>}/>
+        <Route path='/createAccount' element={<CreateAccountPage/>}/>
       </Routes>
     </Router>
   );
