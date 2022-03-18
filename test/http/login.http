@@ -9,7 +9,7 @@ POST {{protocol}}{{host}}{{port}}/login
 Content-Type: application/json
 
 {
-  "pk": 9999,
+  "username": 9999,
   "key": ""
 }
 
@@ -18,7 +18,7 @@ POST {{protocol}}{{host}}{{port}}/login
 Content-Type: application/json
 
 {
-  "pk": 1,
+  "username": 1,
   "key": ""
 }
 
@@ -27,6 +27,6 @@ POST {{protocol}}{{host}}{{port}}/login
 Content-Type: application/json
 
 {
-  "pk": 1,
-  "key": "hunter2"
+  "username": "jsmith1",
+  "key": "cornucopia"
 }

@@ -28,7 +28,7 @@ else
 		TARGET_SUFFIX = -osx
 	endif
 endif
-LDFLAGS += -lstdc++ -lsqlite3 -lpthread -ldl -lm
+LDFLAGS += -lstdc++ -lsqlite3 -lpthread -ldl -lm -lcrypto
 INCLUDE = -Iinclude/
 
 PROJ_DIR = $(shell pwd)

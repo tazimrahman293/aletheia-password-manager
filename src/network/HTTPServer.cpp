@@ -3,6 +3,7 @@
 //
 
 #include <cassert>
+#include <chrono>
 #include <iostream>
 #include <string>
 
@@ -108,15 +109,40 @@ void HTTPServer::Init(Storage *store)
                     return;
                 }
 
-                // TODO hash password/key to check if valid login
-                if (pass == user->keyHash) {
-                    // TODO obviously we need to hash the sent password and compare with the keyHash
-                    // TODO create a new session (token in a cookie maybe)
-                    json j = *user;
-                    response.set_content(j.dump(), "application/json");
+                if (pass != user->keyHash) {
+                    response.status = 401;
+                    return;
                 }
 
+                // TODO hash password/key to check if valid login
+                // TODO obviously we need to hash the sent password and compare with the keyHash
+                // TODO create a new session (accessToken in a cookie maybe)
+                jwt::jwt_object access{
+                    jwt::params::algorithm("HS256"),
+                    jwt::params::secret("secret")
+                };
+                access.add_claim("id", user->pk);
+                access.add_claim("username", user->username);
+                access.add_claim("exp", std::chrono::system_clock::now() + std::chrono::minutes{10});
+                std::error_code ec;
+                auto accessToken = access.signature(ec);
+
+                jwt::jwt_object refresh{
+                    jwt::params::algorithm("HS256"),
+                    jwt::params::secret("secret")
+                };
+                refresh.add_claim("id", user->pk);
+                refresh.add_claim("username", user->username);
+                refresh.add_claim("exp", std::chrono::system_clock::now() + std::chrono::hours{2});
+                auto refreshToken = refresh.signature(ec);
+
+                json j;
+                j["access"] = accessToken;
+                j["refresh"] = refreshToken;
+
+                response.set_content(j.dump(), "application/json");
                 response.status = 200;
+
             });
 
     // User logout
