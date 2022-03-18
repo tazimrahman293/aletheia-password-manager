@@ -35,6 +35,8 @@ public:
 
     void Init(Storage *store);
     void Run();
+    bool IsRunning() { return is_running(); }
+    void Stop() { stop(); }
 
 };
 

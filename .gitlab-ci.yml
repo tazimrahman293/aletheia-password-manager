@@ -43,7 +43,7 @@ test:
     - if: $CI_PIPELINE_SOURCE == 'merge_request_event' || $CI_PIPELINE_SOURCE == 'push'
   allow_failure: false
   script:
-    - make -j test
+    - make -j auto-test
   artifacts:
     reports:
       junit: build/coverage/test_results.xml
