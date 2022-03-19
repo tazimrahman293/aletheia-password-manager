@@ -464,8 +464,9 @@ void HTTPServer::Init(Storage *store)
 /**
  * Runs the main listen loop for the HTTP server.
  */
-void HTTPServer::Run()
+void HTTPServer::Run(bool quiet)
 {
-    std::cout << "HTTP server listening at " << hostAddress << " on port " << hostPort << "..." << std::endl;
+    if (!quiet)
+        std::cout << "HTTP server listening at " << hostAddress << " on port " << hostPort << "..." << std::endl;
     listen(hostAddress.c_str(), hostPort, SOCK_STREAM);
 }
