@@ -43,8 +43,7 @@ std::unique_ptr<User> Storage::GetUserByUsername(const std::string &username) no
     std::unique_ptr<User> user = std::make_unique<User>();
 
     if (records.empty()) {
-        user->pk = -1;
-        return user;
+        return nullptr;
     }
 
     auto first = records.at(0);

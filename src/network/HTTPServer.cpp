@@ -211,14 +211,20 @@ void HTTPServer::Init(Storage *store)
 
                 std::unique_ptr<User> user;
                 try {
-                    user = storage->GetByID<User>(data.at("pk").get<int>());
+                    int id = data.at("pk").get<int>();
+                    user = storage->GetByID<User>(id);
                 } catch (const json::exception& err) {
                     response.status = 400;
+                    return;
                 }
 
-                if (user != nullptr) {
-                    // Perform the update
+                if (user == nullptr) {
+                    response.status = 404;
+                    return;
+                }
 
+                // Perform the update
+                try {
                     if (data.contains("username"))
                         user->username = data.at("username").get<std::string>();
 
@@ -229,16 +235,15 @@ void HTTPServer::Init(Storage *store)
                         user->lastName = data.at("lastName").get<std::string>();
 
                     storage->Update(*user);
-
-                } else {
-                    response.status = 404;
+                } catch (const json::exception &err) {
+                    response.status = 400;
                     return;
                 }
 
                 json j = *user;
                 j.erase("keyHash");
+                response.status = 200;
                 response.set_content(j.dump(), "application/json");
-                response.status = 204;
             });
 
     // Remove user
@@ -346,21 +351,26 @@ void HTTPServer::Init(Storage *store)
                 }
 
                 // Perform the update
-                if (data.contains("label"))
-                    account->label = data.at("label").get<std::string>();
+                try {
+                    if (data.contains("label"))
+                        account->label = data.at("label").get<std::string>();
 
-                if (data.contains("username"))
-                    account->username = data.at("username").get<std::string>();
+                    if (data.contains("username"))
+                        account->username = data.at("username").get<std::string>();
 
-                if (data.contains("url"))
-                    account->url = data.at("url").get<std::string>();
+                    if (data.contains("url"))
+                        account->url = data.at("url").get<std::string>();
 
-                if (data.contains("expiry"))
-                    account->expiry = data.at("expiry").get<long>();
+                    if (data.contains("expiry"))
+                        account->expiry = data.at("expiry").get<long>();
 
-                // TODO update lastModified (now)
+                    // TODO update lastModified (now)
 
-                storage->Update(*account);
+                    storage->Update(*account);
+                } catch (const json::exception &err) {
+                    response.status = 400;
+                    return;
+                }
 
                 json j = *account;
                 j.erase("keyHash");
