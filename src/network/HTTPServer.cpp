@@ -113,9 +113,12 @@ void HTTPServer::Init(Storage *store)
                     // TODO create a new session (token in a cookie maybe)
                     json j = *user;
                     response.set_content(j.dump(), "application/json");
+                    response.status = 200;
+                    return;
                 }
 
-                response.status = 200;
+                response.status = 401;
+
             });
 
     // User logout

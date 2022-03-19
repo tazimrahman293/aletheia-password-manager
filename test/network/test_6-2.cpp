@@ -715,6 +715,7 @@ TEST_CASE("api-login") {
     std::string clientConnString = "http://127.0.0.1:8089";
     HTTPServer srv;
     std::string dbFilename = "test/test.sqlite3";
+    remove(dbFilename.c_str());
     Storage storage(dbFilename);
     srv.Init(&storage);
     auto runThread = std::thread([&](){
@@ -726,8 +727,39 @@ TEST_CASE("api-login") {
     httplib::Client client(clientConnString);
     // END SETUP
 
+    int id = insertTestUser(storage, 0);
+    auto user = storage.GetByID<User>(id);
+    json j{{"username", user->username}, {"key", "password"}};
 
-    // TEARDOWN
+    SUBCASE("success") {
+        auto response = client.Post("/login", j.dump(), "application/json");
+        REQUIRE_EQ(response->status, 200);
+        REQUIRE_EQ(response->get_header_value("Content-Type"), "application/json");
+
+        auto loggedInUser = parseFromResponseBody<User>(response->body);
+        REQUIRE_EQ(loggedInUser.pk, id);
+        REQUIRE_EQ(loggedInUser.username, user->username);
+    }
+
+    SUBCASE("unauthorized") {
+        j.at("key") = "hunter2";
+        auto response = client.Post("/login", j.dump(), "application/json");
+        REQUIRE_EQ(response->status, 401);
+    }
+
+    SUBCASE("no-password") {
+        j.at("key") = "";
+        auto response = client.Post("/login", j.dump(), "application/json");
+        REQUIRE_EQ(response->status, 401);
+    }
+
+    SUBCASE("bad-types") {
+        j.at("username") = 1;
+        auto response = client.Post("/login", j.dump(), "application/json");
+        REQUIRE_EQ(response->status, 400);
+    }
+
+// TEARDOWN
     srv.Stop();
     runThread.join();
     // END TEARDOWN
@@ -749,6 +781,8 @@ TEST_CASE("api-logout") {
     httplib::Client client(clientConnString);
     // END SETUP
 
+    auto response = client.Post("/logout");
+    REQUIRE_EQ(response->status, 204);
 
     // TEARDOWN
     srv.Stop();
