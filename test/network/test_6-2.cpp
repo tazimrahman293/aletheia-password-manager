@@ -473,6 +473,7 @@ TEST_CASE("api-update-account") {
     std::string clientConnString = "http://127.0.0.1:8089";
     HTTPServer srv;
     std::string dbFilename = "test/test.sqlite3";
+    remove(dbFilename.c_str());
     Storage storage(dbFilename);
     srv.Init(&storage);
     auto runThread = std::thread([&](){
@@ -484,6 +485,48 @@ TEST_CASE("api-update-account") {
     httplib::Client client(clientConnString);
     // END SETUP
 
+    int userID = insertTestUser(storage, 0);
+    int accountID = insertTestAccount(storage, userID, 0);
+    auto account = storage.GetByID<Account>(accountID);
+
+    SUBCASE("valid") {
+        account->username = "xyz";
+        account->label = "test";
+        account->url = "test.com";
+        account->expiry = 1;
+
+        json j = *account;
+        auto response = client.Patch("/account", j.dump(), "application/json");
+        REQUIRE_EQ(response->status, 200);
+        REQUIRE_EQ(response->get_header_value("Content-Type"), "application/json");
+
+        auto patchedAccount = parseFromResponseBody<Account>(response->body);
+        REQUIRE_EQ(patchedAccount.pk, account->pk);
+        REQUIRE_EQ(patchedAccount.username, account->username);
+        REQUIRE_EQ(patchedAccount.label, account->label);
+        REQUIRE_EQ(patchedAccount.url, account->url);
+        REQUIRE_EQ(patchedAccount.expiry, account->expiry);
+    }
+
+    SUBCASE("invalid") {
+        SUBCASE("bad-types") {
+            json j{
+                    {"pk", account->pk},
+                    {"username", 1},
+                    {"label", 3.14},
+                    {"url", true},
+                    {"expiry", "never"}
+            };
+            auto response = client.Patch("/account", j.dump(), "application/json");
+            REQUIRE_EQ(response->status, 400);
+        }
+        SUBCASE("bad-pk") {
+            account->pk = 9999;
+            json j = *account;
+            auto response = client.Patch("/account", j.dump(), "application/json");
+            REQUIRE_EQ(response->status, 404);
+        }
+    }
 
     // TEARDOWN
     srv.Stop();
@@ -496,6 +539,7 @@ TEST_CASE("api-delete-account") {
     std::string clientConnString = "http://127.0.0.1:8089";
     HTTPServer srv;
     std::string dbFilename = "test/test.sqlite3";
+    remove(dbFilename.c_str());
     Storage storage(dbFilename);
     srv.Init(&storage);
     auto runThread = std::thread([&](){
@@ -507,6 +551,27 @@ TEST_CASE("api-delete-account") {
     httplib::Client client(clientConnString);
     // END SETUP
 
+    int userID = insertTestUser(storage, 0);
+    int accountID = insertTestAccount(storage, userID, 0);
+
+    SUBCASE("valid") {
+        json j{{"pk", accountID}};
+        auto response = client.Delete("/account", j.dump(), "application/json");
+        REQUIRE_EQ(response->status, 204);
+    }
+
+    SUBCASE("invalid") {
+        SUBCASE("bad-pk") {
+            json j{{"pk", 9999}};
+            auto response = client.Delete("/account", j.dump(), "application/json");
+            REQUIRE_EQ(response->status, 204);  // 204 even if resource doesn't exist and couldn't be deleted
+        }
+        SUBCASE("bad-types") {
+            json j{{"pk", "1"}};
+            auto response = client.Delete("/account", j.dump(), "application/json");
+            REQUIRE_EQ(response->status, 400);
+        }
+    }
 
     // TEARDOWN
     srv.Stop();

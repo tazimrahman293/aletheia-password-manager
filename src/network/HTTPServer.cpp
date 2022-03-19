@@ -142,15 +142,10 @@ void HTTPServer::Init(Storage *store)
 
                 storage->Insert(record);
 
-                if (record.pk > 0) {
-                    json j = record;
-                    j.erase("keyHash");
-                    response.status = 201;
-                    response.set_content(j.dump(), "application/json");
-                } else {
-                    response.status = 500;
-                    response.set_content("Unable to store new User record.", "text/plain");
-                }
+                json j = record;
+                j.erase("keyHash");
+                response.status = 201;
+                response.set_content(j.dump(), "application/json");
             });
 
     // Get a single user by primary key or username
