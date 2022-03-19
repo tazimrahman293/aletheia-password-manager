@@ -4,6 +4,7 @@
 
 #include "network/HTTPServer.h"
 #include "Storage.h"
+#include "data/Account.h"
 #include "data/User.h"
 
 #include "doctest.h"
@@ -48,6 +49,24 @@ int insertTestUser(Storage &storage, int suffix)
     storage.Insert(user);
     WARN_GT(user.pk, 0);
     return user.pk;
+}
+
+
+int insertTestAccount(Storage &storage, int userID, int suffix)
+{
+    Account account;
+    account.label = "example";
+    account.username = "abc" + std::to_string(suffix);
+    account.url = "example.com";
+    account.keyHash = "password";
+    account.expiry = 0;
+    account.created = 0;
+    account.lastAccessed = 0;
+    account.lastModified = 0;
+    account.userID = userID;
+    storage.Insert(account);
+    WARN_GT(account.pk, 0);
+    return account.pk;
 }
 
 
@@ -275,6 +294,26 @@ TEST_CASE("api-delete-user") {
     httplib::Client client(clientConnString);
     // END SETUP
 
+    int id = insertTestUser(storage, 0);
+
+    SUBCASE("valid") {
+        json j{{"pk", id}};
+        auto response = client.Delete("/user", j.dump(), "application/json");
+        REQUIRE_EQ(response->status, 204);
+    }
+
+    SUBCASE("invalid") {
+        SUBCASE("bad-pk") {
+            json j{{"pk", 9999}};
+            auto response = client.Delete("/user", j.dump(), "application/json");
+            REQUIRE_EQ(response->status, 204);  // 204 even if resource doesn't exist and couldn't be deleted
+        }
+        SUBCASE("bad-types") {
+            json j{{"pk", "1"}};
+            auto response = client.Delete("/user", j.dump(), "application/json");
+            REQUIRE_EQ(response->status, 400);
+        }
+    }
 
     // TEARDOWN
     srv.Stop();
@@ -287,6 +326,7 @@ TEST_CASE("api-list-users") {
     std::string clientConnString = "http://127.0.0.1:8089";
     HTTPServer srv;
     std::string dbFilename = "test/test.sqlite3";
+    remove(dbFilename.c_str());
     Storage storage(dbFilename);
     srv.Init(&storage);
     auto runThread = std::thread([&](){
@@ -297,7 +337,21 @@ TEST_CASE("api-list-users") {
     }
     httplib::Client client(clientConnString);
     // END SETUP
+    int numUsers;
 
+    SUBCASE("empty") { numUsers = 0; }
+    SUBCASE("single") { numUsers = 1; }
+    SUBCASE("multiple") { numUsers = 10; }
+
+    for (int i = 0; i < numUsers; i++) {
+        insertTestUser(storage, i);
+    }
+
+    auto response = client.Get("/users");
+    REQUIRE_EQ(response->status, 200);
+    REQUIRE_EQ(response->get_header_value("Content-Type"), "application/json");
+    auto j = json::parse(response->body);
+    REQUIRE_EQ(j.size(), numUsers);
 
     // TEARDOWN
     srv.Stop();
@@ -321,6 +375,32 @@ TEST_CASE("api-create-account") {
     httplib::Client client(clientConnString);
     // END SETUP
 
+    int userID = insertTestUser(storage, 0);
+
+    SUBCASE("valid") {
+        json j{
+                {"pk", -1},
+                {"label", "example"},
+                {"username", "abc123"},
+                {"url", "example.com"},
+                {"keyHash", "password"},
+                {"created", 0},
+                {"lastAccessed", 0},
+                {"lastModified", 0},
+                {"expiry", 0},
+                {"userID", userID}
+        };
+
+        auto response = client.Post("/account", j.dump(), "application/json");
+        REQUIRE_EQ(response->status, 201);
+        REQUIRE_EQ(response->get_header_value("Content-Type"), "application/json");
+
+        json r = json::parse(response->body);
+        REQUIRE_EQ(r.at("label"), j.at("label"));
+        REQUIRE_EQ(r.at("username"), j.at("username"));
+        REQUIRE_EQ(r.at("url"), j.at("url"));
+        REQUIRE_EQ(r.at("expiry").get<long>(), j.at("expiry").get<long>());
+    }
 
     // TEARDOWN
     srv.Stop();
@@ -333,6 +413,7 @@ TEST_CASE("api-get-account") {
     std::string clientConnString = "http://127.0.0.1:8089";
     HTTPServer srv;
     std::string dbFilename = "test/test.sqlite3";
+    remove(dbFilename.c_str());
     Storage storage(dbFilename);
     srv.Init(&storage);
     auto runThread = std::thread([&](){
@@ -344,6 +425,42 @@ TEST_CASE("api-get-account") {
     httplib::Client client(clientConnString);
     // END SETUP
 
+    int numAccounts;
+
+    int userID = insertTestUser(storage, 0);
+
+    SUBCASE("valid-user") {
+        SUBCASE("empty") {
+            numAccounts = 0;
+        }
+        SUBCASE("single") {
+            numAccounts = 1;
+        }
+        SUBCASE("multiple") {
+            numAccounts = 10;
+        }
+
+        for (int i = 0; i < numAccounts; i++) {
+            insertTestAccount(storage, userID, i);
+        }
+        auto response = client.Get(("/account?user=" + std::to_string(userID)).c_str());
+        REQUIRE_EQ(response->status, 200);
+        REQUIRE_EQ(response->get_header_value("Content-Type"), "application/json");
+
+        json j = json::parse(response->body);
+        REQUIRE_EQ(j.size(), numAccounts);
+    }
+
+    SUBCASE("invalid-user") {
+        SUBCASE("bad-pk") {
+            auto response = client.Get(("/account?user=" + std::to_string(9999)).c_str());
+            REQUIRE_EQ(response->status, 404);
+        }
+        SUBCASE("missing-param") {
+            auto response = client.Get("/account");
+            REQUIRE_EQ(response->status, 400);
+        }
+    }
 
     // TEARDOWN
     srv.Stop();
