@@ -113,9 +113,12 @@ void HTTPServer::Init(Storage *store)
                     // TODO create a new session (token in a cookie maybe)
                     json j = *user;
                     response.set_content(j.dump(), "application/json");
+                    response.status = 200;
+                    return;
                 }
 
-                response.status = 200;
+                response.status = 401;
+
             });
 
     // User logout
@@ -142,15 +145,10 @@ void HTTPServer::Init(Storage *store)
 
                 storage->Insert(record);
 
-                if (record.pk > 0) {
-                    json j = record;
-                    j.erase("keyHash");
-                    response.status = 201;
-                    response.set_content(j.dump(), "application/json");
-                } else {
-                    response.status = 500;
-                    response.set_content("Unable to store new User record.", "text/plain");
-                }
+                json j = record;
+                j.erase("keyHash");
+                response.status = 201;
+                response.set_content(j.dump(), "application/json");
             });
 
     // Get a single user by primary key or username
@@ -211,14 +209,20 @@ void HTTPServer::Init(Storage *store)
 
                 std::unique_ptr<User> user;
                 try {
-                    user = storage->GetByID<User>(data.at("pk").get<int>());
+                    int id = data.at("pk").get<int>();
+                    user = storage->GetByID<User>(id);
                 } catch (const json::exception& err) {
                     response.status = 400;
+                    return;
                 }
 
-                if (user != nullptr) {
-                    // Perform the update
+                if (user == nullptr) {
+                    response.status = 404;
+                    return;
+                }
 
+                // Perform the update
+                try {
                     if (data.contains("username"))
                         user->username = data.at("username").get<std::string>();
 
@@ -229,16 +233,15 @@ void HTTPServer::Init(Storage *store)
                         user->lastName = data.at("lastName").get<std::string>();
 
                     storage->Update(*user);
-
-                } else {
-                    response.status = 404;
+                } catch (const json::exception &err) {
+                    response.status = 400;
                     return;
                 }
 
                 json j = *user;
                 j.erase("keyHash");
+                response.status = 200;
                 response.set_content(j.dump(), "application/json");
-                response.status = 204;
             });
 
     // Remove user
@@ -275,15 +278,10 @@ void HTTPServer::Init(Storage *store)
 
                 storage->Insert(record);
 
-                if (record.pk > 0) {
-                    json j = record;
-                    j.erase("keyHash");
-                    response.status = 201;
-                    response.set_content(j.dump(), "application/json");
-                } else {
-                    response.status = 500;
-                    response.set_content("Unable to store new Account record.", "text/plain");
-                }
+                json j = record;
+                j.erase("keyHash");
+                response.status = 201;
+                response.set_content(j.dump(), "application/json");
             });
 
     // Get all accounts for a particular user
@@ -346,21 +344,26 @@ void HTTPServer::Init(Storage *store)
                 }
 
                 // Perform the update
-                if (data.contains("label"))
-                    account->label = data.at("label").get<std::string>();
+                try {
+                    if (data.contains("label"))
+                        account->label = data.at("label").get<std::string>();
 
-                if (data.contains("username"))
-                    account->username = data.at("username").get<std::string>();
+                    if (data.contains("username"))
+                        account->username = data.at("username").get<std::string>();
 
-                if (data.contains("url"))
-                    account->url = data.at("url").get<std::string>();
+                    if (data.contains("url"))
+                        account->url = data.at("url").get<std::string>();
 
-                if (data.contains("expiry"))
-                    account->expiry = data.at("expiry").get<long>();
+                    if (data.contains("expiry"))
+                        account->expiry = data.at("expiry").get<long>();
 
-                // TODO update lastModified (now)
+                    // TODO update lastModified (now)
 
-                storage->Update(*account);
+                    storage->Update(*account);
+                } catch (const json::exception &err) {
+                    response.status = 400;
+                    return;
+                }
 
                 json j = *account;
                 j.erase("keyHash");
@@ -464,8 +467,9 @@ void HTTPServer::Init(Storage *store)
 /**
  * Runs the main listen loop for the HTTP server.
  */
-void HTTPServer::Run()
+void HTTPServer::Run(bool quiet)
 {
-    std::cout << "HTTP server listening at " << hostAddress << " on port " << hostPort << "..." << std::endl;
+    if (!quiet)
+        std::cout << "HTTP server listening at " << hostAddress << " on port " << hostPort << "..." << std::endl;
     listen(hostAddress.c_str(), hostPort, SOCK_STREAM);
 }
