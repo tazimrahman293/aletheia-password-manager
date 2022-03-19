@@ -584,6 +584,7 @@ TEST_CASE("api-generate-account-key") {
     std::string clientConnString = "http://127.0.0.1:8089";
     HTTPServer srv;
     std::string dbFilename = "test/test.sqlite3";
+    remove(dbFilename.c_str());
     Storage storage(dbFilename);
     srv.Init(&storage);
     auto runThread = std::thread([&](){
@@ -595,6 +596,64 @@ TEST_CASE("api-generate-account-key") {
     httplib::Client client(clientConnString);
     // END SETUP
 
+    int userID = insertTestUser(storage, 0);
+    int accountID = insertTestAccount(storage, userID, 0);
+
+    SUBCASE("valid") {
+        SUBCASE("random") {
+            json j{
+                    {"pk", accountID},
+                    {"random", true},
+                    {"length", 8},
+                    {"lowers", true},
+                    {"uppers", false},
+                    {"numbers", false},
+                    {"specials", false}
+            };
+            auto response = client.Put("/account/key", j.dump(), "application/json");
+            REQUIRE_EQ(response->status, 200);
+            REQUIRE_EQ(response->body, "");
+        }
+        SUBCASE("manual") {
+            json j{
+                    {"pk", accountID},
+                    {"random", false},
+                    {"key", "hunter2"}
+            };
+            auto response = client.Put("/account/key", j.dump(), "application/json");
+            REQUIRE_EQ(response->status, 200);
+            REQUIRE_EQ(response->body, "");
+        }
+    }
+
+    SUBCASE("invalid") {
+        SUBCASE("bad-pk") {
+            json j{
+                    {"pk", 9999},
+                    {"random", true},
+                    {"length", 8},
+                    {"lowers", true},
+                    {"uppers", false},
+                    {"numbers", false},
+                    {"specials", false}
+            };
+            auto response = client.Put("/account/key", j.dump(), "application/json");
+            REQUIRE_EQ(response->status, 404);
+        }
+        SUBCASE("bad-types") {
+            json j{
+                    {"pk", accountID},
+                    {"random", 1},
+                    {"length", 8},
+                    {"lowers", "true"},
+                    {"uppers", "false"},
+                    {"numbers", "false"},
+                    {"specials", "false"}
+            };
+            auto response = client.Put("/account/key", j.dump(), "application/json");
+            REQUIRE_EQ(response->status, 400);
+        }
+    }
 
     // TEARDOWN
     srv.Stop();
@@ -607,6 +666,7 @@ TEST_CASE("api-get-account-key") {
     std::string clientConnString = "http://127.0.0.1:8089";
     HTTPServer srv;
     std::string dbFilename = "test/test.sqlite3";
+    remove(dbFilename.c_str());
     Storage storage(dbFilename);
     srv.Init(&storage);
     auto runThread = std::thread([&](){
@@ -618,6 +678,31 @@ TEST_CASE("api-get-account-key") {
     httplib::Client client(clientConnString);
     // END SETUP
 
+    int userID = insertTestUser(storage, 0);
+    int accountID = insertTestAccount(storage, userID, 0);
+
+    SUBCASE("valid") {
+        auto response = client.Get(("/account/key?account=" + std::to_string(accountID)).c_str());
+        REQUIRE_EQ(response->status, 200);
+        REQUIRE_EQ(response->get_header_value("Content-Type"), "application/json");
+
+        json j = json::parse(response->body);
+        int id = j.at("pk").get<int>();
+        std::string key = j.at("key").get<std::string>();
+        REQUIRE_EQ(id, accountID);
+        REQUIRE_EQ(key, "password");
+    }
+
+    SUBCASE("invalid") {
+        SUBCASE("bad-pk") {
+            auto response = client.Get(("/account/key?account=" + std::to_string(9999)).c_str());
+            REQUIRE_EQ(response->status, 404);
+        }
+        SUBCASE("missing-param") {
+            auto response = client.Get("/account/key");
+            REQUIRE_EQ(response->status, 400);
+        }
+    }
 
     // TEARDOWN
     srv.Stop();
