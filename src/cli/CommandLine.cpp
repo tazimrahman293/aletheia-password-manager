@@ -20,43 +20,120 @@
 #include "events/AccountCreateEvent.h"
 #include "events/AccountUpdateEvent.h"
 #include "Storage.h"
+#include "data/User.h"
+#include "data/Account.h"
 
 
 void CommandLine::HandleCommands() {
-    //while (true) {
+    if (InputExists("-CLI")) { // Enter into the CLI
         std::cout << "CLI has been entered. Welcome!" << std::endl;
-        if  (CountTokens() >= 5 && InputExists("login") && IsTokenAtPosition("login", 1)) {  // Login command
+        std::string Input_username;
+        std::string command;
+        int Input_password;
+        bool valid_login = false;
+        while (true) {
+            std::cout << "What would you like to do? Type help for a list of commands." << std::endl;
+            //std::cin >> command;
+            std::getline(std::cin, command); // Command input for each one
+            if (command == "login") {  // Login command
 
-            std::cout << "Executing Login Command" << std::endl;
+                std::cout << "Executing Login Command" << std::endl;
+                std::cout << "Enter your username and password" << std::endl;
 
-            // Storing user inputs
-            std::string firstName = GetTokenAtPosition(2);
-            std::string lastName = GetTokenAtPosition(3);
-            // std::string Input_password = GetTokenAtPosition(4);
+                // Storing Username and Password inputs
+/*                std::getline(std::cin, Input_username);
+                std::cin >> Input_password;*/
+                std::cin >> Input_username >> Input_password;
 
-            std::vector<User> allUsers = database->GetAllUsers();
+                std::vector<User> allUsers = database->GetAllUsers(); // Grab database of all users registered
 
-            for (User &user : allUsers) {
-                if ((user.firstName == firstName) &&
-                    (user.lastName == lastName)) {
-                    // std::cout << "Login successful. Welcome " << *Database_ID->firstName <<" " << *Database_ID->lastName << std::endl;
-                    std::cout << "Access to structure successful" << std::endl;
-                    break;
+                for (User &user : allUsers) {
+                    if ((user.username == Input_username) && (user.pk == Input_password)) {
+                        // std::cout << "Login successful. Welcome " << *Database_ID->firstName <<" " << *Database_ID->lastName << std::endl;
+                        valid_login = true;
+                        break;
+                    }
+                    else{ // Checking to make sure database is being accessed
+                        std::cout << "Passwords from database " << user.pk << std::endl;
+                    }
                 }
+
+                if (valid_login == true){
+                    std::cout << "Welcome, " << Input_username << std::endl;
+                } else{
+                    std::cout << "Invalid login attempt" << std::endl;
+                }
+                //std::cout << "Login command finished being executed" << std::endl;
+
+            } else if (command == "register"){ // Register a new user into the server
+                std::cout << "About to register" << std::endl;
+                std::cout << "Enter the username and password to be used" << std::endl;
+                std::getline(std::cin, Input_username);
+                std::cin >> Input_password;
+                //std::cin >> Input_username >> Input_password;
+
+                std::vector<User> allUsers = database->GetAllUsers();
+
+                bool UsernameExists;
+                for (User &user : allUsers){
+                    if (user.username == Input_username){
+                        UsernameExists = true;
+                        break;
+                    } else{
+                        UsernameExists = false;
+                    }
+                }
+
+                // Create a new User if the username doesn't exist, else output that the user exists
+                if (UsernameExists ==  true){
+                    std::cout << "Username exists already!" << std::endl;
+                } else{
+                    User NewUser;
+                    NewUser.username = Input_username;
+                    NewUser.pk = Input_password;
+                    database->Insert(NewUser); // Store user in database
+
+                    std::cout << "Successfully registered " << Input_username << std::endl;
+                }
+
+                std::cout << "Register command finished executing" << std::endl;
+
+
+            } else if (command == "new-account") {  /* Create account */
+
+                if (valid_login == false){
+                    std::cout << "Please login before creating a new account" << std::endl;
+                } else {
+                    std::cout << "Creating new account working" << std::endl;
+                }
+
+            } else if (command == "edit-account") {  // Edit account
+                if (valid_login == false){
+                    std::cout << "Please login before updating an account" << std::endl;
+                } else {
+                    std::cout << "Updating account command working"
+                              << std::endl;
+                }
+
+            } else if (command == "quit"){
+                std::cout << "Exiting Aletheia Password Manager. Thank you for using." << std::endl;
+                break;
+
+            } else if (command == "help") {
+                std::cout << "Command list for Aletheia Password Manager: " << std::endl;
+                std::cout << "login: Login to the Password Manager\n"
+                             "register: Create a new User\n"
+                             "new-account: Create new account to add to the database\n"
+                             "edit-account: Edit an existing account\n"
+                             "quit: Exit Aletheia Password Manager" << std::endl;
             }
-
-            std::cout << "Login command finished being executed" << std::endl;
-
-        } else if (InputExists("new-account") && IsTokenAtPosition("new-account", 1)) {  // Create account
-
-            std::cout << "Registration command working" << std::endl;
-
-        } else if (InputExists("edit-account") && IsTokenAtPosition("edit-account", 1)) {  // Edit account
-
-            std::cout << "Updating account command working" << std::endl;
-
+            else{
+                std::cout << "Invalid command input " << command << std::endl;
+            }
         }
-    //}
+    } else{
+        std::cout << "Invalid input to enter into CLI" << std::endl;
+    }
 }
 
 
