@@ -456,7 +456,6 @@ void HTTPServer::Init(Storage *store)
                 }
             });
 
-<<<<<<< HEAD
     // Update account key
     Put(
             "/account/key",
@@ -491,8 +490,6 @@ void HTTPServer::Init(Storage *store)
             [](const Request &request, Response &response) -> void {}
             );
 
-=======
->>>>>>> main
 }
 
 
