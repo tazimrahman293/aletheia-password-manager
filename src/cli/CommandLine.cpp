@@ -29,7 +29,7 @@ void CommandLine::HandleCommands() {
         std::cout << "CLI has been entered. Welcome!" << std::endl;
         std::string Input_username;
         std::string command;
-        int Input_password;
+        std::string Input_password;
         bool valid_login = false;
         while (true) {
             std::cout << "What would you like to do? Type help for a list of commands." << std::endl;
@@ -38,17 +38,16 @@ void CommandLine::HandleCommands() {
             if (command == "login") {  // Login command
 
                 std::cout << "Executing Login Command" << std::endl;
-                std::cout << "Enter your username and password" << std::endl;
 
-                // Storing Username and Password inputs
-/*                std::getline(std::cin, Input_username);
-                std::cin >> Input_password;*/
-                std::cin >> Input_username >> Input_password;
+                std::cout << "Enter your username" << std::endl;
+                std::getline(std::cin, Input_username);
+                std::cout << "Enter your password" << std::endl;
+                std::getline(std::cin, Input_password);
 
                 std::vector<User> allUsers = database->GetAllUsers(); // Grab database of all users registered
 
                 for (User &user : allUsers) {
-                    if ((user.username == Input_username) && (user.pk == Input_password)) {
+                    if ((user.username == Input_username) && (user.keyHash == Input_password)) {
                         // std::cout << "Login successful. Welcome " << *Database_ID->firstName <<" " << *Database_ID->lastName << std::endl;
                         valid_login = true;
                         break;
@@ -67,10 +66,10 @@ void CommandLine::HandleCommands() {
 
             } else if (command == "register"){ // Register a new user into the server
                 std::cout << "About to register" << std::endl;
-                std::cout << "Enter the username and password to be used" << std::endl;
+                std::cout << "Enter your username" << std::endl;
                 std::getline(std::cin, Input_username);
-                std::cin >> Input_password;
-                //std::cin >> Input_username >> Input_password;
+                std::cout << "Enter your password" << std::endl;
+                std::getline(std::cin, Input_password);
 
                 std::vector<User> allUsers = database->GetAllUsers();
 
@@ -90,7 +89,7 @@ void CommandLine::HandleCommands() {
                 } else{
                     User NewUser;
                     NewUser.username = Input_username;
-                    NewUser.pk = Input_password;
+                    NewUser.keyHash = Input_password;
                     database->Insert(NewUser); // Store user in database
 
                     std::cout << "Successfully registered " << Input_username << std::endl;
