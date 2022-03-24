@@ -25,7 +25,7 @@ export const dataAbout = {
     lightBg: false,
     lightText: true,
     lighttextDesc: false,
-    topLine: 'Top-Line',
+    topLine: 'Features',
     headline: 'Heading',
     description: 'Description',
     buttonLabel: 'Get started',
