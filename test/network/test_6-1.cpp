@@ -6,9 +6,16 @@
 #include "Storage.h"
 
 #include "doctest.h"
+#include "httplib.h"
 
+#include <chrono>
 #include <forward_list>
 #include <string>
+#include <thread>
+
+
+std::string clientConnString = "http://127.0.0.1:8089";
+std::string dbFilename = "test/test.sqlite3";
 
 TEST_SUITE_BEGIN("network");
 
@@ -43,9 +50,34 @@ TEST_CASE("network-constructor") {
 TEST_CASE("network-init") {
 
     HTTPServer server;
-    Storage storage("test/test.sqlite3");
+    Storage storage(dbFilename);
     REQUIRE_NOTHROW(server.Init(&storage));
 
+}
+
+TEST_CASE("network-connect") {
+
+    HTTPServer server;
+    Storage storage(dbFilename);
+    server.Init(&storage);
+
+    auto runThread = std::thread([&](){
+        server.Run();
+    });
+
+    while (!server.IsRunning()) {
+        std::this_thread::sleep_for(std::chrono::nanoseconds{1});
+    }
+
+    httplib::Client client(clientConnString);
+
+    auto response = client.Get("/hello");
+    REQUIRE_EQ(response->status, 200);
+    REQUIRE_EQ(response->get_header_value("Content-Type"), "text/plain");
+    REQUIRE_EQ(response->body, "Hello, world!");
+
+    server.Stop();
+    runThread.join();
 }
 
 TEST_SUITE_END();  // network

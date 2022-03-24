@@ -65,11 +65,10 @@ COV_EXCL = '/usr*' \
 		   '${PROJ_DIR}/include/httplib.h' \
 		   '${PROJ_DIR}/include/json.h' \
 		   '${PROJ_DIR}/include/sqlite_orm.h' \
-		   '${PROJ_DIR}/include/network/HTTPServer.h' \
-		   '${PROJ_DIR}/src/network/HTTPServer.cpp' \
 		   '${PROJ_DIR}/test/*'
 
 TEST_RESULT  = $(COV_DIR)/test_results.xml
+TEST_FLAGS   =
 
 # Defined at runtime in command-line
 ARGS=
@@ -80,7 +79,7 @@ all: build $(APP_DIR)/$(TARGET)
 # Run code coverage analysis by using gcov on a modified version of the test target
 # Generate a report using lcov/genhtml
 coverage: CFLAGS += --coverage
-coverage: build all test $(OBJECTS) $(TEST_OBJECTS)
+coverage: build all auto-test $(OBJECTS) $(TEST_OBJECTS)
 	@./$(APP_DIR)/$(TEST_TARGET) $(ARGS)
 	@export GCOV_PREFIX=$(PROJ_DIR) && echo $$GCOV_PREFIX && gcov $(OBJECTS)
 	@lcov -c -d . -o $(COV_INFO)
@@ -119,8 +118,10 @@ build:
 test: CFLAGS += -DTEST
 test: INCLUDE += -Itest/include/
 test: build $(APP_DIR)/$(TEST_TARGET)
-	@./$(APP_DIR)/$(TEST_TARGET) -r=junit -o=$(TEST_RESULT)
-	@cat $(TEST_RESULT)
+	@./$(APP_DIR)/$(TEST_TARGET) $(TEST_FLAGS)
+
+auto-test: TEST_FLAGS += -r=junit -o=$(TEST_RESULT)
+auto-test: test
 
 # Links object files and external libs into the test target binary
 $(APP_DIR)/$(TEST_TARGET): $(TEST_OBJECTS)

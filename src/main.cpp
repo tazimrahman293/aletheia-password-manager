@@ -75,7 +75,7 @@ int main(int argc, char *argv[])
         // Spin up server instance and run listen loop
         HTTPServer server(hostAddress, hostPort);
         server.Init(&database);
-        server.Run();
+        server.Run(false);  // quiet = false
     } else {
         cli.HandleCommands();
     }

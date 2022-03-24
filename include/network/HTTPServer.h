@@ -39,7 +39,9 @@ public:
     void operator=(HTTPServer& other) = delete;  // No assignment
 
     void Init(Storage *store);
-    void Run();
+    void Run(bool quiet = true);
+    bool IsRunning() { return is_running(); }
+    void Stop() { stop(); }
 
 };
 
