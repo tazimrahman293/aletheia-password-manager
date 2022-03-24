@@ -74,6 +74,25 @@ export const SidebarLink = styled(LinkScroll)`
 
 `;
 
+export const SidebarLinkRouter = styled(LinkRouter)`
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.9rem;
+    text-decoration: none;
+    list-style: none;
+    transition: 0.2s ease-in-out;
+    color: #ffffff;
+    cursor: pointer;
+
+    &:hover {
+        /* color: #02D48E; */
+        color: #F56300;
+        transition: 0.2s ease-in-out;
+    }
+
+`;
+
 export const SidebarButton = styled.div`
     display: flex;
     justify-content: center;

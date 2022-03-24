@@ -12,27 +12,27 @@ YupPassword(yup)
 
 
 // URL for user requests
-const userUrl = '/user';
+const accountUrl = '/account';
 
 
 /**
  * 
  * @returns signUp Page
  */
-const SignUp = () => {
+const CreateAccount = () => {
 
     const formik = useFormik({
         initialValues: {
-            firstName: '',
-            lastName: '',
+            label: '',
+            url: '',
             userName: '',
             password: '',
-            confirmPassword: ''
+
         },
         validateOnChange: false,
         validationSchema: yup.object({
-            firstName: yup.string().required().max(255),
-            lastName: yup.string().required().max(255),
+            label: yup.string().required().max(255),
+            url: yup.string().required().max(255),
             userName: yup.string().required().max(255),
             // TODO: Check for existing user Name
             // .test('Unique User Name', 'UserName already in use', // <- key, message
@@ -51,7 +51,6 @@ const SignUp = () => {
             //     }
             // ),
             password: yup.string().password().required().max(255),
-            confirmPassword: yup.string().oneOf([yup.ref('password'), null], "Passwords must match")
         }),
         // function for submission event handling
         // initializes api requests
@@ -59,20 +58,26 @@ const SignUp = () => {
 
             alert(JSON.stringify({
                 'pk': 1,
-                'firstName': values.firstName,
-                'lastName': values.lastName,
-                'keyHash': values.password,
-                'username': values.userName
+                'username': values.userName,
+                'label': values.label,
+                'url': values.url,
+                'keyHash': values.password
             }, null, 2));
 
             // post request to register new user
             axios
-                .post(userUrl, JSON.stringify({
+                .post(accountUrl, JSON.stringify({
                     'pk': 1,
                     'username': values.userName,
-                    'firstName': values.firstName,
-                    'lastName': values.lastName,
-                    'keyHash': values.password
+                    'label': values.label,
+                    'url': values.url,
+                    'keyHash': values.password,
+                    "created": 0,
+                    "lastAccessed": 0,
+                    "lastModified": 0,
+                    "expiry": 0,
+                    "userID": 1
+
                 }),// TODO shift headers into AXIOS api
                     { headers: { 'Content-Type': 'application/json', crossDomain: true } }
                 )
@@ -119,38 +124,38 @@ const SignUp = () => {
                                                     color="textPrimary"
                                                     variant="h4"
                                                 >
-                                                    Create a new user
+                                                    Create a new account
                                                 </Typography>
                                                 <Typography
                                                     color="textSecondary"
                                                     gutterBottom
                                                     variant="body2"
                                                 >
-                                                    Fill the information to create a new user
+                                                    Fill the information to create a new account
                                                 </Typography>
                                             </Box>
                                             <TextField
-                                                error={Boolean(formik.touched.firstName && formik.errors.firstName)}
+                                                error={Boolean(formik.touched.label && formik.errors.label)}
                                                 fullWidth
-                                                helperText={formik.touched.firstName && formik.errors.firstName}
-                                                label="First Name"
+                                                helperText={formik.touched.label && formik.errors.label}
+                                                label="Label"
                                                 margin="normal"
-                                                name="firstName"
+                                                name="label"
                                                 onBlur={formik.handleBlur}
                                                 onChange={formik.handleChange}
-                                                value={formik.values.firstName}
+                                                value={formik.values.label}
                                                 variant="outlined"
                                             />
                                             <TextField
-                                                error={Boolean(formik.touched.lastName && formik.errors.lastName)}
+                                                error={Boolean(formik.touched.url && formik.errors.url)}
                                                 fullWidth
-                                                helperText={formik.touched.lastName && formik.errors.lastName}
-                                                label="Last Name"
+                                                helperText={formik.touched.url && formik.errors.url}
+                                                label="Url"
                                                 margin="normal"
-                                                name="lastName"
+                                                name="url"
                                                 onBlur={formik.handleBlur}
                                                 onChange={formik.handleChange}
-                                                value={formik.values.lastName}
+                                                value={formik.values.url}
                                                 variant="outlined"
                                             />
                                             <TextField
@@ -178,19 +183,7 @@ const SignUp = () => {
                                                 value={formik.values.password}
                                                 variant="outlined"
                                             />
-                                            <TextField
-                                                error={Boolean(formik.touched.confirmPassword && formik.errors.confirmPassword)}
-                                                fullWidth
-                                                helperText={formik.touched.confirmPassword && formik.errors.confirmPassword}
-                                                label="Confirm Password"
-                                                margin="normal"
-                                                name="confirmPassword"
-                                                onBlur={formik.handleBlur}
-                                                onChange={formik.handleChange}
-                                                type="password"
-                                                value={formik.values.confirmPassword}
-                                                variant="outlined"
-                                            />
+                                        
 
 
                                             <Box sx={{ py: 2 }}>
@@ -202,7 +195,7 @@ const SignUp = () => {
                                                     type="submit"
                                                     variant="contained"
                                                 >
-                                                    Sign Up Now
+                                                    Create Account
                                                 </Button>
                                             </Box>
                                             <Typography
@@ -212,8 +205,8 @@ const SignUp = () => {
                                                 Have an account?
                                                 {' '}
 
-                                                <LinkRouter to="/signIn" id="RouterNavLink" style={{ color: '#F56300' }}>
-                                                    Sign In
+                                                <LinkRouter to="/dashboard" id="RouterNavLink" style={{ color: '#F56300' }}>
+                                                    Go to Dashboard
                                                 </LinkRouter>
                                             </Typography>
                                         </form>
@@ -233,4 +226,4 @@ const SignUp = () => {
     )
 }
 
-export default SignUp
+export default CreateAccount

@@ -63,12 +63,7 @@ void HTTPServer::Init(Storage *store)
     using httplib::Request, httplib::Response;
     using json = nlohmann::json;
 
-    Options(
-            R"(\*)",
-            [](const Request &request, Response &response) -> void
-            {
-                response.set_header("Access-Control-Allow-Origin", "*");
-            });
+    set_default_headers(defaultHeaders);
 
     // For testing purposes
     Get(
@@ -460,6 +455,40 @@ void HTTPServer::Init(Storage *store)
                     response.status = 404;
                 }
             });
+
+    // Update account key
+    Put(
+            "/account/key",
+            [this](const Request& request, Response& response) -> void
+            {
+                auto data = json::parse(request.body);
+                int id;
+                std::string key;
+                try {
+                    id = data.at("pk").get<int>();
+                    key = data.at("key").get<std::string>();
+                } catch (const json::exception& err) {
+                    response.status = 400;
+                    return;
+                }
+
+                auto account = storage->GetByID<Account>(id);
+
+                if (account != nullptr) {
+                    account->keyHash = key;
+                    storage->Update(*account);
+                } else {
+                    response.status = 404;
+                }
+
+                response.status = 204;
+            }
+            );
+
+    Options(
+            R"(.*)",
+            [](const Request &request, Response &response) -> void {}
+            );
 
 }
 

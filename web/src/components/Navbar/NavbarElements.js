@@ -46,6 +46,19 @@ export const NavLogo = styled(LinkScroll)`
     text-decoration: none;
 `;
 
+export const NavLogoRouter = styled(LinkRouter)`
+    /* color: #02D48E; */
+    color: #F56300;
+    justify-self: flex-start;
+    cursor: pointer;
+    font-size: 2rem;
+    display: flex;
+    align-items: center;
+    margin-left: 24px;
+    font-weight: bold;
+    text-decoration: none;
+`;
+
 
 export const IconMobile = styled.div`
     display: none;
@@ -92,17 +105,11 @@ export const NavLinks = styled(LinkScroll)`
     cursor: pointer;
     &.active {
         border-bottom: 3px solid #F56300;
-    }
-
-    /* :hover, :focus{
-        border-bottom: 3px solid #02D48E;
-    } */
-   
-    
+    }    
 `;
 
 export const NavLinkRouter = styled(LinkRouter)`
-    color: #ffffff;    
+    color: #F56300;    
     display: flex;
     align-items: center;
     text-decoration: none;
@@ -112,12 +119,7 @@ export const NavLinkRouter = styled(LinkRouter)`
     cursor: pointer;
     &.active {
         border-bottom: 3px solid #F56300;
-    }
-
-    /* :hover, :focus{
-        border-bottom: 3px solid #02D48E;
-    } */
-   
+    } 
     
 `;
 
