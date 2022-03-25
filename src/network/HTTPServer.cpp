@@ -456,35 +456,6 @@ void HTTPServer::Init(Storage *store)
                 }
             });
 
-    // Update account key
-    Put(
-            "/account/key",
-            [this](const Request& request, Response& response) -> void
-            {
-                auto data = json::parse(request.body);
-                int id;
-                std::string key;
-                try {
-                    id = data.at("pk").get<int>();
-                    key = data.at("key").get<std::string>();
-                } catch (const json::exception& err) {
-                    response.status = 400;
-                    return;
-                }
-
-                auto account = storage->GetByID<Account>(id);
-
-                if (account != nullptr) {
-                    account->keyHash = key;
-                    storage->Update(*account);
-                } else {
-                    response.status = 404;
-                }
-
-                response.status = 204;
-            }
-            );
-
     Options(
             R"(.*)",
             [](const Request &request, Response &response) -> void {}
