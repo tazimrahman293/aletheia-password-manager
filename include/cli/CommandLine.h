@@ -36,7 +36,7 @@ public:
     [[nodiscard]] std::string GetInput() const { return input; };
     [[nodiscard]] std::string GetCommand() const { return command; };
     [[nodiscard]] std::string GetOutput() const { return output; };
-    void SetDatabase(Storage* Database) { this->database = Database; };
+    void SetDatabase(Storage* db) { this->database = db; };
 
 };
 #endif //CLI_COMMANDHANDLER_H
