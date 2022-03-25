@@ -77,6 +77,7 @@ int main(int argc, char *argv[])
         server.Init(&database);
         server.Run(false);  // quiet = false
     } else {
+        cli.SetDatabase(&database); // Use initialized database
         cli.HandleCommands();
     }
 
