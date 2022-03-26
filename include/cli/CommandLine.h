@@ -15,24 +15,18 @@
 #include "events/AccountUpdateEvent.h"
 #include "Storage.h"
 #include "cli/InputParser.h"
+#include "cli/ContextManager.h"
 
 
 class CommandLine : public InputParser {
 
     Storage* database;
 
-    enum Context {
-        Welcome,  // Initial menu (not authenticated)
-        Register,  // Registration menu
-        Login,  // Login menu
-        Main,  // Main menu after successful login
-    };
-
-    Context context;
+    ContextManager ctxManager;
 
 public:
 
-    CommandLine(int argc, char **argv, Storage *db) : InputParser(argc, argv), database(db), context(Welcome) { }
+    CommandLine(int argc, char **argv, Storage *db) : InputParser(argc, argv), database(db) { }
 
     static void Print(const std::string &message);
     static void PrintLine(const std::string &message);
