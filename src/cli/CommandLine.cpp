@@ -3,139 +3,160 @@
  * Top level module containing implementations of handler functions for each user input
  */
 
-#include <algorithm>
 #include <iostream>
 #include <string>
-#include <vector>
 
 #include "cli/CommandLine.h"
 #include "cli/InputParser.h"
-#include "Storage.h"
 #include "data/User.h"
 #include "data/Account.h"
 
 
+void CommandLine::Print(const std::string &message)
+{
+    std::cout << message << std::flush;
+}
+
+
+void CommandLine::PrintLine(const std::string &message)
+{
+    std::cout << message << std::endl;
+}
+
+
+std::string CommandLine::GetInput(const std::string &prompt)
+{
+    std::cout << prompt << " " << std::flush;
+    std::string input;
+    std::getline(std::cin, input);
+    return input;
+}
+
+
 void CommandLine::HandleCommands() {
-    if (InputExists("-CLI")) { // Enter into the CLI
-        std::cout << "CLI has been entered. Welcome!" << std::endl;
-        std::string inputCommand;
-        std::string inputUsername;
-        std::string inputPassword;
-        bool validLogin = false;
-        while (true) {
-            std::cout << "What would you like to do? Type help for a list of commands." << std::endl;
+    PrintLine("Welcome to Aletheia password manager!");
+    std::string command;
 
-            std::getline(std::cin, inputCommand); // Command input for each one
-            if (inputCommand == "login") {  // Login command
-                bool success;
+    while (true) {
+        PrintLine("What would you like to do? Type help for a list of commands.");
+        command = GetInput(">>");
 
-                while (!success) {
-                    std::cout << "Username: " << std::flush;
-                    std::getline(std::cin, inputUsername);
-
-                    std::cout << "Password: " << std::flush;
-                    std::getline(std::cin, inputPassword);
-
-                    auto user = database->GetUserByUsername(inputUsername);
-
-                    if (user != nullptr && user->keyHash == inputPassword) {
-                        success = true;
-                        std::cout << "Logged in. Welcome " << user->firstName << "." << std::endl;
-
-                    } else {
-                        // Non-existing username provided or password is incorrect
-                        if (user == nullptr || user->keyHash != inputPassword) {
-                            std::cout << "Invalid login attempt" << std::endl;
-                        }
-                    }
-                }
-
-            } else if (inputCommand == "register") { // Register a new user into the server
-                std::string password1 = "x", password2 = "y";
-                bool usernameExists = true;
-
-                while (usernameExists) {
-                    std::cout << "Username: " << std::flush;
-                    std::getline(std::cin, inputUsername);
-
-                    auto user = database->GetUserByUsername(inputUsername);
-                    if (user == nullptr) {
-                        usernameExists = false;
-                    } else {
-                        std::cout << "Username " << inputUsername << " exists - try again" << std::endl;
-                    }
-                }
-
-                std::string firstName, lastName;
-
-                while (firstName.empty()) {
-                    std::cout << "First name: " << std::flush;
-                    std::getline(std::cin, firstName);
-                }
-
-                std::cout << "Last name: " << std::flush;
-                std::getline(std::cin, lastName);
-
-                while (password1 != password2) {
-                    std::cout << "Password: " << std::flush;
-                    std::getline(std::cin, password1);
-
-                    std::cout << "Confirm password: " << std::flush;
-                    std::getline(std::cin, password2);
-
-                    if (password1 == password2) {
-                        inputPassword = password2;
-                        break;
-                    }
-
-                    std::cout << "Passwords do not match - try again" << std::endl;
-
-                }
-
-                User newUser;
-                newUser.username = inputUsername;
-                newUser.firstName = firstName;
-                newUser.lastName = lastName;
-                newUser.keyHash = inputPassword;
-                database->Insert(newUser); // Store user in database
-
-                std::cout << "Successfully registered "
-                          << inputUsername << "(" << firstName << " " << lastName << ")" << std::endl;
-
-            } else if (inputCommand == "new-account") {  /* Create account */
-
-                if (validLogin == false){
-                    std::cout << "Please login before creating a new account" << std::endl;
-                } else {
-                    std::cout << "Creating new account working" << std::endl;
-                }
-
-            } else if (inputCommand == "edit-account") {  // Edit account
-                if (validLogin == false){
-                    std::cout << "Please login before updating an account" << std::endl;
-                } else {
-                    std::cout << "Updating account command working"
-                              << std::endl;
-                }
-
-            } else if (inputCommand == "quit"){
-                std::cout << "Exiting Aletheia Password Manager. Thank you for using." << std::endl;
-                break;
-
-            } else if (inputCommand == "help") {
-                std::cout << "Command list for Aletheia Password Manager: " << std::endl;
-                std::cout << "login: Login to the Password Manager\n"
-                             "register: Create a new User\n"
-                             "new-account: Create new account to add to the database\n"
-                             "edit-account: Edit an existing account\n"
-                             "quit: Exit Aletheia Password Manager" << std::endl;
+        if (command == "login") {  // Login command
+            if (!ctxManager.SetContext(Login)) {
+                PrintLine("Cannot use login command from this menu.");
+                continue;
             }
-            else{
-                std::cout << "Invalid command input " << inputCommand << std::endl;
+
+            bool success = false;
+
+            std::string username, password;
+            while (!success) {
+                username = GetInput("Username:");
+                password = GetInput("Password:");
+
+                auto user = database->GetUserByUsername(username);
+
+                if (user != nullptr && user->keyHash == password) {
+                    // User exists and password is correct
+                    success = true;
+                    if (!ctxManager.SetContext(Main)) {
+                        PrintLine("Unable to log in at this time.");
+                        continue;
+                    }
+                    ctxManager.authenticated = true;
+                    PrintLine("Welcome " + user->firstName + ".");
+
+                } else {
+                    // Non-existing username provided or password is incorrect
+                    PrintLine("Invalid login!");
+                }
             }
+
+        } else if (command == "register") { // Register a new user into the server
+            if (!ctxManager.SetContext(Register)) {
+                PrintLine("Cannot use register command from this menu.");
+                continue;
+            }
+
+            bool usernameExists = true;
+
+            std::string username;
+            while (usernameExists) {
+                username = GetInput("Username:");
+
+                auto user = database->GetUserByUsername(username);
+                if (user == nullptr) {
+                    usernameExists = false;
+                } else {
+                    PrintLine("User " + username + " exists - try again.");
+                }
+            }
+
+            std::string firstName, lastName;
+            while (firstName.empty()) {
+                firstName = GetInput("First name:");
+            }
+            lastName = GetInput("Last name:");  // Last name is optional
+
+            std::string password1, password2;
+            do {
+                password1 = GetInput("Password:");
+                password2 = GetInput("Confirm password:");
+
+                if (password1 == password2) {
+                    if (password2.empty()) {
+                        PrintLine("Please enter a non-empty password.");
+                        continue;
+                    }
+                    break;
+                }
+
+                PrintLine("Passwords do not match - try again.");
+
+            } while (password1 != password2 || password2.empty());
+
+            User newUser;
+            newUser.username = username;
+            newUser.firstName = firstName;
+            newUser.lastName = lastName;
+            newUser.keyHash = password2;
+            database->Insert(newUser); // Store user in database
+
+            std::ostringstream registerMessage;
+            registerMessage << "Registered new user: " << username << " (" << firstName << " " << lastName << ").";
+            PrintLine(registerMessage.str());
+
+        } else if (command == "new-account") {  /* Create account */
+            if (ctxManager.GetContext() != Main || !ctxManager.authenticated) {
+                PrintLine("Please sign in before creating a new account.");
+                continue;
+            }
+            PrintLine("Creating a new account.");
+
+        } else if (command == "edit-account") {  // Edit account
+            if (ctxManager.GetContext() != Main || !ctxManager.authenticated){
+                PrintLine("Please sign in before updating an account.");
+                continue;
+            }
+            PrintLine("Updating an account.");
+
+        } else if (command == "quit"){
+            PrintLine("Exiting. Thank you for using Aletheia!");
+            // TODO invalidate session?
+            break;
+
+        } else if (command == "help") {
+            // TODO Determine context and print only the commands that are currently valid
+            Print("Command list for Aletheia:\n");
+            Print("  login\t\tLog in to the password manager\n");
+            Print("  register\tCreate a new user profile\n");
+            Print("  new-account\tCreate a new account entry\n");
+            Print("  edit-account\tEdit an existing account\n");
+            PrintLine("  quit\t\tLog out and exit Aletheia\n");
         }
-    } else{
-        std::cout << "Invalid input to enter into CLI" << std::endl;
+        else{
+            PrintLine("Invalid command: " + command);
+        }
     }
 }
 
