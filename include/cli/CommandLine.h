@@ -1,7 +1,9 @@
 //
 // Created by Tazim Rahman on 2022-02-28.
 //
-#include <string>
+#ifndef CLI_COMMANDHANDLER_H
+#define CLI_COMMANDHANDLER_H
+
 #include <vector>
 
 
@@ -14,29 +16,32 @@
 #include "Storage.h"
 #include "cli/InputParser.h"
 
-#ifndef CLI_COMMANDHANDLER_H
-#define CLI_COMMANDHANDLER_H
-class CommandLine : public InputParser {
 
-    std::string input;
-    std::string output;
-    std::string command;
+class CommandLine : public InputParser {
 
     Storage* database;
 
+    enum Context {
+        Welcome,  // Initial menu (not authenticated)
+        Register,  // Registration menu
+        Login,  // Login menu
+        Main,  // Main menu after successful login
+    };
+
+    Context context;
+
 public:
 
-    CommandLine(int argc, char **argv, Storage *db) : InputParser(argc, argv) {
-        database = db;
-    }
+    CommandLine(int argc, char **argv, Storage *db) : InputParser(argc, argv), database(db), context(Welcome) { }
 
-    void HandleCommands(); // Handling of every Event and Command
+    static void Print(const std::string &message);
+    static void PrintLine(const std::string &message);
+    static std::string GetInput(const std::string &prompt);
 
-    // Grabbing and updating respective variables
-    [[nodiscard]] std::string GetInput() const { return input; };
-    [[nodiscard]] std::string GetCommand() const { return command; };
-    [[nodiscard]] std::string GetOutput() const { return output; };
+    void HandleCommands();
+
     void SetDatabase(Storage* db) { this->database = db; };
 
 };
+
 #endif //CLI_COMMANDHANDLER_H
