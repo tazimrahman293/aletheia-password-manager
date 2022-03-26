@@ -20,10 +20,12 @@ class ContextManager {
 
 public:
 
-    ContextManager() : context(Welcome) { }
+    bool authenticated;
+
+    ContextManager() : context(Welcome), authenticated(false) { }
 
     [[nodiscard]] Context GetContext() const { return context; }
-    void SetContext(Context ctx);
+    bool SetContext(Context ctx);
 
 };
 

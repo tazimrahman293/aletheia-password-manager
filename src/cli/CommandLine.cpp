@@ -35,26 +35,35 @@ std::string CommandLine::GetInput(const std::string &prompt)
 
 void CommandLine::HandleCommands() {
     PrintLine("Welcome to Aletheia password manager!");
-    std::string inputCommand;
-    std::string inputUsername;
-    std::string inputPassword;
-    bool validLogin = false;
+    std::string command;
+
     while (true) {
         PrintLine("What would you like to do? Type help for a list of commands.");
-        inputCommand = GetInput(">>");
+        command = GetInput(">>");
 
-        if (inputCommand == "login") {  // Login command
+        if (command == "login") {  // Login command
+            if (!ctxManager.SetContext(Login)) {
+                PrintLine("Cannot use login command from this menu.");
+                continue;
+            }
+
             bool success = false;
 
+            std::string username, password;
             while (!success) {
-                inputUsername = GetInput("Username:");
-                inputPassword = GetInput("Password:");
+                username = GetInput("Username:");
+                password = GetInput("Password:");
 
-                auto user = database->GetUserByUsername(inputUsername);
+                auto user = database->GetUserByUsername(username);
 
-                if (user != nullptr && user->keyHash == inputPassword) {
+                if (user != nullptr && user->keyHash == password) {
                     // User exists and password is correct
                     success = true;
+                    if (!ctxManager.SetContext(Main)) {
+                        PrintLine("Unable to log in at this time.");
+                        continue;
+                    }
+                    ctxManager.authenticated = true;
                     PrintLine("Welcome " + user->firstName + ".");
 
                 } else {
@@ -63,7 +72,12 @@ void CommandLine::HandleCommands() {
                 }
             }
 
-        } else if (inputCommand == "register") { // Register a new user into the server
+        } else if (command == "register") { // Register a new user into the server
+            if (!ctxManager.SetContext(Register)) {
+                PrintLine("Cannot use register command from this menu.");
+                continue;
+            }
+
             bool usernameExists = true;
 
             std::string username;
@@ -102,34 +116,37 @@ void CommandLine::HandleCommands() {
             } while (password1 != password2 || password2.empty());
 
             User newUser;
-            newUser.username = inputUsername;
+            newUser.username = username;
             newUser.firstName = firstName;
             newUser.lastName = lastName;
             newUser.keyHash = password2;
             database->Insert(newUser); // Store user in database
 
-            PrintLine("Registered new user: " + username + " (" + firstName + " " + lastName + ").");
+            std::ostringstream registerMessage;
+            registerMessage << "Registered new user: " << username << " (" << firstName << " " << lastName << ").";
+            PrintLine(registerMessage.str());
 
-        } else if (inputCommand == "new-account") {  /* Create account */
-            if (!validLogin){
+        } else if (command == "new-account") {  /* Create account */
+            if (ctxManager.GetContext() != Main || !ctxManager.authenticated) {
                 PrintLine("Please sign in before creating a new account.");
-            } else {
-                PrintLine("Creating a new account.");
+                continue;
             }
+            PrintLine("Creating a new account.");
 
-        } else if (inputCommand == "edit-account") {  // Edit account
-            if (!validLogin){
+        } else if (command == "edit-account") {  // Edit account
+            if (ctxManager.GetContext() != Main || !ctxManager.authenticated){
                 PrintLine("Please sign in before updating an account.");
-            } else {
-                PrintLine("Updating an account.");
+                continue;
             }
+            PrintLine("Updating an account.");
 
-        } else if (inputCommand == "quit"){
+        } else if (command == "quit"){
             PrintLine("Exiting. Thank you for using Aletheia!");
             // TODO invalidate session?
             break;
 
-        } else if (inputCommand == "help") {
+        } else if (command == "help") {
+            // TODO Determine context and print only the commands that are currently valid
             Print("Command list for Aletheia:\n");
             Print("  login\t\tLog in to the password manager\n");
             Print("  register\tCreate a new user profile\n");
@@ -138,7 +155,7 @@ void CommandLine::HandleCommands() {
             PrintLine("  quit\t\tLog out and exit Aletheia\n");
         }
         else{
-            PrintLine("Invalid command: " + inputCommand);
+            PrintLine("Invalid command: " + command);
         }
     }
 }
