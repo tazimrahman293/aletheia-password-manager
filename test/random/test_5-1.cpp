@@ -189,6 +189,12 @@ TEST_CASE("random-password") {
 			CHECK_GE(characterOccurances[characterIndex], characterOccurancesExpected - characterOccuranceVariance);
 		}
 #endif
+
+		// ensure first character is not a special character
+		const std::string specialCharacters = "~`!@#$%^&*()_-+={[}]|:;,.?";
+		for (int characterIndex = 0; characterIndex < specialCharacters.length(); characterIndex++) {
+			CHECK_NE(password[0], specialCharacters[characterIndex]);
+		}
 	}
 
 	SUBCASE("random-password-invalid-length") {
