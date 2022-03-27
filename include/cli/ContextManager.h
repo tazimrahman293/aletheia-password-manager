@@ -22,7 +22,9 @@ public:
 
     bool authenticated;
 
-    ContextManager() : context(Welcome), authenticated(false) { }
+    int activeUserID;
+
+    ContextManager() : context(Welcome), authenticated(false), activeUserID(0) { }
 
     [[nodiscard]] Context GetContext() const { return context; }
     bool SetContext(Context ctx);

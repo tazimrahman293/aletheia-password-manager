@@ -1,8 +1,10 @@
 /**
- * cli.pp
- * Top level module containing implementations of handler functions for each user input
+ * CommandLine.pp
+ * Top level module containing implementations of commands for each user input
  */
 
+#include <chrono>
+#include <algorithm>
 #include <iostream>
 #include <string>
 
@@ -64,6 +66,7 @@ void CommandLine::HandleCommands() {
                         continue;
                     }
                     ctxManager.authenticated = true;
+                    ctxManager.activeUserID = user->pk;
                     PrintLine("Welcome " + user->firstName + ".");
 
                 } else {
@@ -122,6 +125,9 @@ void CommandLine::HandleCommands() {
             newUser.keyHash = password2;
             database->Insert(newUser); // Store user in database
 
+            ctxManager.authenticated = true;
+            ctxManager.activeUserID = newUser.pk;
+
             std::ostringstream registerMessage;
             registerMessage << "Registered new user: " << username << " (" << firstName << " " << lastName << ").";
             PrintLine(registerMessage.str());
@@ -131,7 +137,31 @@ void CommandLine::HandleCommands() {
                 PrintLine("Please sign in before creating a new account.");
                 continue;
             }
-            PrintLine("Creating a new account.");
+            PrintLine("Creating a new account...");
+
+            std::string label = GetInput("Account Label:");
+            std::string accountUsername = GetInput("Username:");
+            std::string accountPassword = GetInput("Password:");
+            std::string URL = GetInput("URL:");
+
+            auto user = database->GetByID<User>(ctxManager.activeUserID); // Search for user to assign userID
+
+            // Getting current time and converting to long data type in a single line (can be changed if needed)
+            long value_ms = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::time_point_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now()).time_since_epoch()).count();
+
+            Account newAccount;
+            newAccount.username = accountUsername;
+            newAccount.keyHash = accountPassword;
+            newAccount.label = label;
+            newAccount.url = URL;
+            newAccount.userID = user->pk;
+
+            newAccount.created = value_ms;
+            newAccount.lastAccessed = value_ms;
+            newAccount.lastModified = value_ms;
+
+            database->Insert(newAccount);
+            PrintLine("Successfully added new account: " + label);
 
         } else if (command == "edit-account") {  // Edit account
             if (ctxManager.GetContext() != Main || !ctxManager.authenticated){
@@ -140,9 +170,112 @@ void CommandLine::HandleCommands() {
             }
             PrintLine("Updating an account.");
 
+            std::string fieldToModify;
+            std::string accountToModify;
+
+            bool foundAccount = false;
+            bool success = false;
+            std::vector<Account> accountDatabase = database->GetAllAccountsByUserID(ctxManager.activeUserID);
+
+            PrintLine("Current accounts:");
+
+            for (Account &account : accountDatabase) {
+                PrintLine(account.label);
+            }
+
+            while (!success) {
+                accountToModify = GetInput("Enter an account label to modify:");
+
+                PrintLine("Available fields:\n label\n username\n password\n url\n expiry");
+                fieldToModify = GetInput("What field would you like to modify?");
+
+                Account modifiedAccount;
+
+                // Search for account
+                for (Account &account : accountDatabase){
+
+                    if (account.label == accountToModify){
+                        modifiedAccount = account;
+                        foundAccount = true;
+                        break;
+                    }
+                }
+
+                // Modify account
+                if (foundAccount) {
+                    if (fieldToModify == "username") {
+                        modifiedAccount.username = GetInput("New username:");
+
+                    } else if (fieldToModify == "password") {
+                        std::string password1 = "x", password2 = "y";
+                        while (password1 != password2) {
+                            password1 = GetInput("New password:");
+                            password2 = GetInput("Confirm new password:");
+                            if (password1 == password2) {
+                                // TODO hash the plain text
+                                modifiedAccount.keyHash = password2;
+                            } else {
+                                PrintLine("Passwords do not match - try again.");
+                            }
+                        }
+
+                    } else if (fieldToModify == "label") {
+                        modifiedAccount.label = GetInput("New label:");
+
+                    } else if (fieldToModify == "expiry") {
+                        PrintLine("NOT IMPLEMENTED YET");
+
+                    } else {
+                        PrintLine("Invalid field entered - try again.");
+
+                    }
+
+                    // Updating time last modified and accessed
+                    long value_ms = std::chrono::duration_cast<std::chrono::milliseconds>(
+                            std::chrono::time_point_cast<std::chrono::milliseconds>(
+                                    std::chrono::high_resolution_clock::now()
+                                    ).time_since_epoch()
+                                    ).count();
+                    modifiedAccount.lastModified = value_ms;
+                    modifiedAccount.lastAccessed = value_ms;
+
+                    database->Update(modifiedAccount);
+                    PrintLine("Account successfully updated!");
+
+                } else{
+                    std::ostringstream notFound;
+                    notFound << "Account " << accountToModify << " not found - please try again.";
+                    PrintLine(notFound.str());
+
+                }
+
+                success = true;
+            }
+
+        } else if (command == "view-accounts"){
+            if (ctxManager.GetContext() != Main || !ctxManager.authenticated){
+                PrintLine("Please sign in before viewing accounts.");
+                continue;
+            }
+            std::vector<Account> userAccounts = database->GetAllAccountsByUserID(ctxManager.activeUserID);
+
+            long value_ms = std::chrono::duration_cast<std::chrono::milliseconds>(
+                    std::chrono::time_point_cast<std::chrono::milliseconds>(
+                            std::chrono::high_resolution_clock::now()
+                            ).time_since_epoch()
+                            ).count();
+
+            PrintLine("Your accounts:");
+            for (Account &account : userAccounts) {
+                PrintLine(account.label);
+                account.lastAccessed = value_ms;
+            }
+
         } else if (command == "quit"){
             PrintLine("Exiting. Thank you for using Aletheia!");
             // TODO invalidate session?
+            ctxManager.authenticated = false;
+            ctxManager.activeUserID = 0;
             break;
 
         } else if (command == "help") {
@@ -151,6 +284,7 @@ void CommandLine::HandleCommands() {
             Print("  login\t\tLog in to the password manager\n");
             Print("  register\tCreate a new user profile\n");
             Print("  new-account\tCreate a new account entry\n");
+            Print("  view-accounts\tView account information\n");
             Print("  edit-account\tEdit an existing account\n");
             PrintLine("  quit\t\tLog out and exit Aletheia\n");
         }
