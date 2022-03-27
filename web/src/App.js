@@ -3,6 +3,10 @@ import {BrowserRouter as Router, Routes, Route} from 'react-router-dom'
 import Home from './pages';
 import SignInPage from './pages/signIn';
 import SignUpPage from './pages/signUp';
+import User from './pages/user';
+import SettingsPage from './pages/settings';
+import DashboardPage from './pages/dashboard';
+import CreateAccountPage from './pages/createAccount';
 
 /**
  * 
@@ -15,7 +19,10 @@ function App() {
         <Route path='/' element={<Home/>}/>
         <Route path='/signIn' element={<SignInPage/>}/>
         <Route path='/signUp' element={<SignUpPage/>}/>
-
+        <Route path='/user' element={<User/>}/>
+        <Route path='/settings' element={<SettingsPage/>}/>
+        <Route path='/dashboard' element={<DashboardPage/>}/>
+        <Route path='/createAccount' element={<CreateAccountPage/>}/>
       </Routes>
     </Router>
   );

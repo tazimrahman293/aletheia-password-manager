@@ -63,12 +63,7 @@ void HTTPServer::Init(Storage *store)
     using httplib::Request, httplib::Response;
     using json = nlohmann::json;
 
-    Options(
-            R"(\*)",
-            [](const Request &request, Response &response) -> void
-            {
-                response.set_header("Access-Control-Allow-Origin", "*");
-            });
+    set_default_headers(defaultHeaders);
 
     // For testing purposes
     Get(
@@ -83,10 +78,10 @@ void HTTPServer::Init(Storage *store)
             "/login",
             [this](const Request& request, Response& response) -> void
             {
-                auto data = json::parse(request.body);
                 std::string username;
                 std::string pass;
                 try {
+                    auto data = json::parse(request.body);
                     username = data.at("username").get<std::string>();
                     pass = data.at("key").get<std::string>();
                 } catch (const json::exception& err) {
@@ -249,9 +244,9 @@ void HTTPServer::Init(Storage *store)
             "/user",
             [this](const Request& request, Response& response) -> void
             {
-                json data = json::parse(request.body);
                 int id;
                 try {
+                    json data = json::parse(request.body);
                     id = data.at("pk").get<int>();
                 } catch (const json::exception& err) {
                     response.status = 400;
@@ -376,9 +371,9 @@ void HTTPServer::Init(Storage *store)
             "/account",
             [this](const Request& request, Response& response) -> void
             {
-                json data = json::parse(request.body);
                 int id;
                 try {
+                    json data = json::parse(request.body);
                     id = data.at("pk").get<int>();
                 } catch (const json::exception& err) {
                     response.status = 400;
@@ -460,6 +455,11 @@ void HTTPServer::Init(Storage *store)
                     response.status = 404;
                 }
             });
+
+    Options(
+            R"(.*)",
+            [](const Request &request, Response &response) -> void {}
+            );
 
 }
 

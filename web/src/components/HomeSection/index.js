@@ -23,7 +23,7 @@ const HomeSection = () => {
         <HomeH1> Security is not just a feature. It’s our foundation.</HomeH1>
         <HomeP>Every design decision in Aletheia begins with the safety and privacy of your data in mind.</HomeP>
         <HomeBtnWrapper>
-          <ButtonComponent to='about' onMouseEnter={onHover} onMouseLeave={onHover}  big='true' fontBig='true'  smooth={true} duration={500} spy={true} exact='true' offset={-80}>
+          <ButtonComponent to='about' onMouseEnter={onHover} onMouseLeave={onHover}  big="true" fontbig="true"  smooth="true" duration={500} spy={true} exact="true" offset={-80}>
             Learn More {hover ? <ArrowForward /> : <ArrowRight/>}
           </ButtonComponent>
         </HomeBtnWrapper>

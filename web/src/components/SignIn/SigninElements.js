@@ -48,6 +48,11 @@ export const FormH1 = styled.h1`
   font-weight: 700;
   text-align: center;
 `
+export const FormError = styled.p`
+  color: black;
+  font-size: 15px;
+`;
+
 export const FormLabel = styled.label`
   margin-bottom: 8px;
   font-size: 20px;
