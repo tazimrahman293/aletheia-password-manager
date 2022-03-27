@@ -96,6 +96,7 @@ pages:
       when: never
     - if: $CI_PIPELINE_SOURCE == 'push' && $CI_COMMIT_REF_NAME == 'main'
   script:
+    - mkdir public
     - mv build/coverage/html/ public/
     - gem install bundler
     - bundle install
