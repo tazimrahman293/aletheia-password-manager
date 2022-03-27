@@ -7,6 +7,9 @@
 
 #include "doctest.h"
 
+// un-comment the line below to enable testing for randomness. Makes tests very slow.
+// #define TEST_RANDOMNESS	(1)
+
 
 TEST_SUITE_BEGIN("rng");
 
@@ -33,7 +36,7 @@ TEST_CASE("rng-bounds") {
 	        minBound = maxBound = 1;
 	    }
 
-		SUBCASE("rng-valid-bounds-1-1") {
+		SUBCASE("rng-valid-bounds-22-99") {
 	        minBound = 22;
 			maxBound = 99;
 	    }
@@ -50,7 +53,7 @@ TEST_CASE("rng-bounds") {
 			// check new value is above (or equal to) minimum bound
 			CHECK_GE(newValue, minBound);
 			// check new value is below (or equal to) maximum bound
-			CHECK_LE(newValue, maxBound);
+			CHECK_LT(newValue, maxBound);
 			// increment counter if a match is detected
 			if (oldValue == newValue)
 				matchCounter++;
@@ -110,8 +113,8 @@ TEST_CASE("random-password") {
 	int length = 0;
 
 	SUBCASE("random-password-valid") {
-		int matchCounter = 0;
-		int matchMax = 0;
+		const int maxLength = 1024;	// max length of a generated password
+		const int sampleSize = 2000;	// generate many passwords for each test subcase
 
 		SUBCASE("random-password-valid-length") {
 			SUBCASE("random-password-valid-length-8") {
@@ -123,11 +126,7 @@ TEST_CASE("random-password") {
 			}
 
 			SUBCASE("random-password-valid-length-1000") {
-				length = 1000;
-			}
-
-			SUBCASE("random-password-valid-length-500") {
-				length = 500;
+				length = 1020;
 			}
 
 			SUBCASE("random-password-valid-length-24") {
@@ -144,46 +143,52 @@ TEST_CASE("random-password") {
 				length = 1025;
 			}
 
-			SUBCASE("random-password-truncated-length-9999") {
-				length = 9999;
-			}
-
-			SUBCASE("random-password-truncated-length-2000") {
-				length = 2000;
-			}
-
 			SUBCASE("random-password-truncated-length-9000") {
 				length = 9000;
 			}
 
 			// ensure correct length (truncated to max size)
 			password = pg->NewPassword(length);
-			CHECK_EQ(password.length(), 1024);
+			CHECK_EQ(password.length(), maxLength);
 			// update length value for future tests below
-			length = 1024;
+			length = maxLength;
 		}
 
 		// ensure passwords aren't empty or null
 		CHECK_NE(password.length(), 0);
 		CHECK_NE(password, "");
 
+#ifdef TEST_RANDOMNESS
 		// ensure passwords have reasonable level of complexity and randomness
+		const std::string characters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789~`!@#$%^&*()_-+={[}]|:;,.?";
+		int characterOccurances[characters.length()] = { 0 };
 
-		// duplicates within 4 characters counts as a "match"
-		int diversityWindow = 4;
-		// allow one match for every 8 characters
-		matchMax = (length / diversityWindow) / 2;
-		// evaluate every character in the password (start checking after first few)
-		for (int i = diversityWindow-1; i < length; i++) {
-			// check the previous characters in the password
-			for (int j = 1; j < diversityWindow; j++) {
-				// if there are matching characters, increment the counter
-				if (password[i] == password[i-j])
-					matchCounter++;
+		// the amount of each character we expect to see
+		int characterOccurancesExpected = (length * sampleSize) / (characters.length());
+		// occurances must be within a +/- % range of expected values
+		float variancePermitted = 0.50;
+		int characterOccuranceVariance = (int) characterOccurancesExpected * variancePermitted;
+
+		// run many generations to produce a large enough sample size
+		for (int test = 0; test < sampleSize; test++) {
+			// generate new password
+			password = pg->NewPassword(length);
+			// evaluate every character in the password
+			for (int passwordIndex = 0; passwordIndex < length; passwordIndex++) {
+				// increment the occurance counter for each character found
+				for (int characterIndex = 0; characterIndex < characters.length(); characterIndex++) {
+					if (password[passwordIndex] == characters[characterIndex])
+						characterOccurances[characterIndex]++;
+				}
 			}
 		}
 
-		CHECK_LE(matchCounter, matchMax);
+		// now that all tests are completed, check for occurance variability
+		for (int characterIndex = 0; characterIndex < characters.length(); characterIndex++) {
+			CHECK_LE(characterOccurances[characterIndex], characterOccurancesExpected + characterOccuranceVariance);
+			CHECK_GE(characterOccurances[characterIndex], characterOccurancesExpected - characterOccuranceVariance);
+		}
+#endif
 	}
 
 	SUBCASE("random-password-invalid-length") {

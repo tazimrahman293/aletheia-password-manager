@@ -19,7 +19,7 @@ RandomNumberGenerator::RandomNumberGenerator()
 /**
  * Generate and return a random number from with a range.
  *
- * @param minValue The minimum value of the random number (inclusive).
+ * @param minValue The minimum value of the random number (exclusive).
  * @param maxValue The maximum value of the random number (inclusive).
  * @return A random value within the bounds specified above. 0 on error.
  */
@@ -36,7 +36,7 @@ int RandomNumberGenerator::GetNew(int minValue, int maxValue)
 	Seed();
 
 	// generate random value between bounds
-	int randomNumber = (hydro_random_u32() % (maxValue - minValue)) + minValue;
+	int randomNumber = hydro_random_uniform(maxValue-minValue) + minValue;
 
 	return randomNumber;
 }
