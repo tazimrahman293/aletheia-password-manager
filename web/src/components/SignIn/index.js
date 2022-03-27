@@ -7,6 +7,7 @@ import { Box, Button, Container, TextField, Typography } from '@mui/material';
 import { Link as LinkRouter } from 'react-router-dom';
 import { Nav, NavContainer } from '../Navbar/NavbarElements';
 import { Icon } from './../SignIn/SigninElements';
+import PropTypes from 'prop-types';
 
 // URL for user requests
 const userUrl = '/login';
@@ -15,7 +16,7 @@ const userUrl = '/login';
  * 
  * @returns SignIn Page
  */
-const SignIn = () => {
+export default function SignIn({ setToken }) {
 
     const formik = useFormik({
         initialValues: {
@@ -25,8 +26,8 @@ const SignIn = () => {
         validateOnChange: false,
         validationSchema: yup.object({
             // TODO: change it to UserName
-            // userName: yup.string().required().max(255),
-            userName: yup.number().required().max(255),
+            userName: yup.string().required().max(255),
+            // userName: yup.number().required().max(255),
             password: yup.string().required().max(255)
         }),
         // function for submission event handling
@@ -37,12 +38,17 @@ const SignIn = () => {
             axios
                 .post(userUrl, JSON.stringify({
                     // TODO: pk for now, need API support for username
-                    'pk': values.userName,
+                    'username': values.userName,
                     'key': values.password
                 }),
                     { headers: { 'Content-Type': 'application/json', crossDomain: true } }
                 )
-                .then(response => { console.log(response.data) })
+                .then(response => {
+                    // on Success pass the response as a token to setToken Function
+                    const token = response.data
+                    console.log(token)
+                    setToken(token);
+                })
                 .catch(error => { console.log(error.data) });
             console.log(JSON.stringify(values, null, 2))
         }
@@ -99,7 +105,6 @@ const SignIn = () => {
                                                 onChange={formik.handleChange}
                                                 value={formik.values.userName}
                                                 variant="outlined"
-                                                type="number"
                                             />
                                             <TextField
                                                 error={Boolean(formik.touched.password && formik.errors.password)}
@@ -154,4 +159,7 @@ const SignIn = () => {
     )
 }
 
-export default SignIn
+SignIn.propTypes = {
+    setUser: PropTypes.func.isRequired
+};
+
