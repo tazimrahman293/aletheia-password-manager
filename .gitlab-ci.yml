@@ -83,3 +83,24 @@ cover:
       - build/objects/test/**/*.o
       - build/objects/test/*.d
       - build/objects/test/**/*.d
+
+pages:
+  stage: deploy
+  image: ruby:2.7
+  needs:
+    - job: cover
+      artifacts: true
+  rules:
+    - changes:
+      - web/*
+      when: never
+    -if: $CI_PIPELINE_SOURCE == 'push' && $CI_COMMIT_REF_NAME == 'main'
+  script:
+    - mv build/coverage/html/ public/
+    - gem install bundler
+    - bundle install
+    - bundle exec jekyll build -d public
+  artifacts:
+    paths:
+      - public
+    expire_in: 30 days
