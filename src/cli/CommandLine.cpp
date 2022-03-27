@@ -267,13 +267,14 @@ void CommandLine::HandleCommands() {
 
             PrintLine("Your accounts:");
             for (Account &account : userAccounts) {
-                PrintLine(account.label);
+                std::ostringstream accountLine;
+                accountLine << account.label << " - " << account.username << " (" << account.url << ")";
+                PrintLine(accountLine.str());
                 account.lastAccessed = value_ms;
             }
 
-        } else if (command == "quit"){
+        } else if (command == "quit") {
             PrintLine("Exiting. Thank you for using Aletheia!");
-            // TODO invalidate session?
             ctxManager.authenticated = false;
             ctxManager.activeUserID = 0;
             break;
@@ -287,6 +288,7 @@ void CommandLine::HandleCommands() {
             Print("  view-accounts\tView account information\n");
             Print("  edit-account\tEdit an existing account\n");
             PrintLine("  quit\t\tLog out and exit Aletheia\n");
+
         }
         else{
             PrintLine("Invalid command: " + command);
