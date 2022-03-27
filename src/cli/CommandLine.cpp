@@ -66,6 +66,7 @@ void CommandLine::HandleCommands() {
                         continue;
                     }
                     ctxManager.authenticated = true;
+                    ctxManager.activeUserID = user->pk;
                     PrintLine("Welcome " + user->firstName + ".");
 
                 } else {
@@ -124,6 +125,9 @@ void CommandLine::HandleCommands() {
             newUser.keyHash = password2;
             database->Insert(newUser); // Store user in database
 
+            ctxManager.authenticated = true;
+            ctxManager.activeUserID = newUser.pk;
+
             std::ostringstream registerMessage;
             registerMessage << "Registered new user: " << username << " (" << firstName << " " << lastName << ").";
             PrintLine(registerMessage.str());
@@ -133,43 +137,31 @@ void CommandLine::HandleCommands() {
                 PrintLine("Please sign in before creating a new account.");
                 continue;
             }
-            PrintLine("Creating a new account.");
-            std::string accountUsernameInput;
-            std::string accountPasswordInput;
-            std::string URL;
-            std::string label;
+            PrintLine("Creating a new account...");
 
-            // Username and password inputs for new account
-            std::cout << "Account Username: " << std::flush;
-            std::getline(std::cin, accountUsernameInput);
+            std::string label = GetInput("Account Label:");
+            std::string accountUsername = GetInput("Username:");
+            std::string accountPassword = GetInput("Password:");
+            std::string URL = GetInput("URL:");
 
-            std::cout << "Account Password: " << std::flush;
-            std::getline(std::cin, accountPasswordInput);
-
-            std::cout << "Where is this account being used?" << std::flush;
-            std::getline(std::cin, label);
-
-            std::cout << "Website URL: " << std::flush;
-            std::getline(std::cin, URL);
-
-            auto User = database->GetUserByUsername(inputUsername); // Search for user to assign userID
+            auto user = database->GetByID<User>(ctxManager.activeUserID); // Search for user to assign userID
 
             // Getting current time and converting to long data type in a single line (can be changed if needed)
             long value_ms = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::time_point_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now()).time_since_epoch()).count();
 
             Account newAccount;
-            newAccount.username = accountUsernameInput;
-            newAccount.keyHash = accountPasswordInput;
+            newAccount.username = accountUsername;
+            newAccount.keyHash = accountPassword;
             newAccount.label = label;
             newAccount.url = URL;
-            newAccount.userID = User->pk;
+            newAccount.userID = user->pk;
 
             newAccount.created = value_ms;
             newAccount.lastAccessed = value_ms;
             newAccount.lastModified = value_ms;
 
             database->Insert(newAccount);
-            std::cout << "Successfully added account " << accountUsernameInput << std::endl;
+            PrintLine("Successfully added new account: " + label);
 
         } else if (command == "edit-account") {  // Edit account
             if (ctxManager.GetContext() != Main || !ctxManager.authenticated){
@@ -177,38 +169,32 @@ void CommandLine::HandleCommands() {
                 continue;
             }
             PrintLine("Updating an account.");
-            std::string modifyInput;
-            std::string accountUsername;
-            std::string newAccountUsername;
-            std::string newAccountPassword;
 
-            std::string verifyNewAccountUsername;
-            std::string verifyNewAccountPassword;
+            std::string fieldToModify;
+            std::string accountToModify;
 
             bool foundAccount = false;
             bool success = false;
-            std::vector<Account> accountDatabase =
-                database->GetAllAccountsByUserID(pk);
+            std::vector<Account> accountDatabase = database->GetAllAccountsByUserID(ctxManager.activeUserID);
 
-            std::cout << "Current accounts: " << std::endl;
+            PrintLine("Current accounts:");
 
-            for (Account account : accountDatabase) {
-                std::cout << account.username << std::endl;
+            for (Account &account : accountDatabase) {
+                PrintLine(account.label);
             }
 
             while (!success) {
-                std::cout << "Which account would you like to modify?" << std::flush;
-                std::getline(std::cin, accountUsername);
+                accountToModify = GetInput("Enter an account label to modify:");
 
-                std::cout << "What would you like to modify?"  << std::flush;
-                std::getline(std::cin, modifyInput);
+                PrintLine("Available fields:\n label\n username\n password\n url\n expiry");
+                fieldToModify = GetInput("What field would you like to modify?");
 
                 Account modifiedAccount;
 
                 // Search for account
-                for (Account account : accountDatabase){
+                for (Account &account : accountDatabase){
 
-                    if (account.username == accountUsername){
+                    if (account.label == accountToModify){
                         modifiedAccount = account;
                         foundAccount = true;
                         break;
@@ -217,78 +203,79 @@ void CommandLine::HandleCommands() {
 
                 // Modify account
                 if (foundAccount) {
-                    if (modifyInput == "username") {
-                        while (newAccountUsername != verifyNewAccountUsername) {
-                            std::cout << "Enter the new username: " << std::flush;
-                            std::getline(std::cin, newAccountUsername);
+                    if (fieldToModify == "username") {
+                        modifiedAccount.username = GetInput("New username:");
 
-                            std::cout << "Verify the new username: " << std::flush;
-                            std::getline(std::cin, verifyNewAccountUsername);
-
-                            if (newAccountUsername == verifyNewAccountUsername) {
-                                modifiedAccount.username = newAccountUsername;
-                            }
-
-                            else {
-                                std::cout << "Usernames do not match" << std::endl;
-                            }
-                        }
-
-                    } else if (modifyInput == "password") {
-                        while (newAccountPassword != verifyNewAccountPassword) {
-                            std::cout << "Enter the new password: " << std::flush;
-                            std::getline(std::cin, newAccountPassword);
-
-                            std::cout << "Verify the new password: " << std::flush;
-                            std::getline(std::cin, verifyNewAccountPassword);
-
-                            if (newAccountPassword == verifyNewAccountPassword) {
-                                modifiedAccount.keyHash = newAccountPassword;
-                            }
-
-                            else {
-                                std::cout << "Passwords do not match" << std::endl;
+                    } else if (fieldToModify == "password") {
+                        std::string password1 = "x", password2 = "y";
+                        while (password1 != password2) {
+                            password1 = GetInput("New password:");
+                            password2 = GetInput("Confirm new password:");
+                            if (password1 == password2) {
+                                // TODO hash the plain text
+                                modifiedAccount.keyHash = password2;
+                            } else {
+                                PrintLine("Passwords do not match - try again.");
                             }
                         }
+
+                    } else if (fieldToModify == "label") {
+                        modifiedAccount.label = GetInput("New label:");
+
+                    } else if (fieldToModify == "expiry") {
+                        PrintLine("NOT IMPLEMENTED YET");
 
                     } else {
-                        std::cout << "Cannot modify " << modifyInput << std::endl;
+                        PrintLine("Invalid field entered - try again.");
+
                     }
 
                     // Updating time last modified and accessed
-                    long value_ms = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::time_point_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now()).time_since_epoch()).count();
+                    long value_ms = std::chrono::duration_cast<std::chrono::milliseconds>(
+                            std::chrono::time_point_cast<std::chrono::milliseconds>(
+                                    std::chrono::high_resolution_clock::now()
+                                    ).time_since_epoch()
+                                    ).count();
                     modifiedAccount.lastModified = value_ms;
                     modifiedAccount.lastAccessed = value_ms;
 
                     database->Update(modifiedAccount);
-                    std::cout << "Account has been updated!" << std::endl;
+                    PrintLine("Account successfully updated!");
 
                 } else{
-                    std::cout << accountUsername << " not found" << std::endl;
+                    std::ostringstream notFound;
+                    notFound << "Account " << accountToModify << " not found - please try again.";
+                    PrintLine(notFound.str());
+
                 }
 
                 success = true;
             }
 
-        } else if (inputCommand == "view-accounts"){
-            if (validLogin == false){
-                std::cout << "Please login before accessing your accounts" << std::endl;
+        } else if (command == "view-accounts"){
+            if (ctxManager.GetContext() != Main || !ctxManager.authenticated){
+                PrintLine("Please sign in before viewing accounts.");
+                continue;
+            }
+            std::vector<Account> userAccounts = database->GetAllAccountsByUserID(ctxManager.activeUserID);
 
-            } else {
-                std::vector<Account> accountDatabase = database->GetAllAccountsByUserID(pk);
+            long value_ms = std::chrono::duration_cast<std::chrono::milliseconds>(
+                    std::chrono::time_point_cast<std::chrono::milliseconds>(
+                            std::chrono::high_resolution_clock::now()
+                            ).time_since_epoch()
+                            ).count();
 
-                long value_ms = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::time_point_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now()).time_since_epoch()).count();
-
-                std::cout << "Accounts used by " << inputUsername << ":"<< std::endl;
-                for (Account account : accountDatabase) {
-                    std::cout << account.username << std::endl;
-                    account.lastAccessed = value_ms;
-                }
+            PrintLine("Your accounts:");
+            for (Account &account : userAccounts) {
+                PrintLine(account.label);
+                account.lastAccessed = value_ms;
             }
 
         } else if (command == "quit"){
             PrintLine("Exiting. Thank you for using Aletheia!");
             // TODO invalidate session?
+            ctxManager.authenticated = false;
+            ctxManager.activeUserID = 0;
             break;
 
         } else if (command == "help") {
