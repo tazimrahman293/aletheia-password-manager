@@ -127,6 +127,7 @@ void CommandLine::HandleCommands() {
 
             ctxManager.authenticated = true;
             ctxManager.activeUserID = newUser.pk;
+            ctxManager.SetContext(Main);
 
             std::ostringstream registerMessage;
             registerMessage << "Registered new user: " << username << " (" << firstName << " " << lastName << ").";
