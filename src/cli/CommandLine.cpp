@@ -284,7 +284,7 @@ void CommandLine::HandleCommands() {
             Print("  login\t\tLog in to the password manager\n");
             Print("  register\tCreate a new user profile\n");
             Print("  new-account\tCreate a new account entry\n");
-            Print("  view-account\tView account information\n");
+            Print("  view-accounts\tView account information\n");
             Print("  edit-account\tEdit an existing account\n");
             PrintLine("  quit\t\tLog out and exit Aletheia\n");
         }
