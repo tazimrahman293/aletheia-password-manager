@@ -7,7 +7,6 @@
 #include <vector>
 
 #include <Storage.h>
-#include <hydrogen.h>
 
 #include "network/HTTPServer.h"
 #include "cli/CommandLine.h"
@@ -49,12 +48,6 @@
  */
 int main(int argc, char *argv[])
 {
-	// initialize the libhydrogen Authentication library
-	if (hydro_init() != 0) {
-		printf("Failed to initialize Hydrogren authentication library. Exiting...\n");
-		exit(-1);
-	}
-
     CommandLine cli(argc, argv, nullptr);
 
     // Set database filename (either using -d value or default to db.sqlite3)
