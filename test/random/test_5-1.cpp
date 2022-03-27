@@ -109,21 +109,81 @@ TEST_CASE("random-password") {
 	std::string password = "";
 	int length = 0;
 
-	SUBCASE("random-password-valid-length") {
-		SUBCASE("random-password-valid-length-8") {
-			length = 8;
+	SUBCASE("random-password-valid") {
+		int matchCounter = 0;
+		int matchMax = 0;
+
+		SUBCASE("random-password-valid-length") {
+			SUBCASE("random-password-valid-length-8") {
+				length = 8;
+			}
+
+			SUBCASE("random-password-valid-length-100") {
+				length = 100;
+			}
+
+			SUBCASE("random-password-valid-length-1000") {
+				length = 1000;
+			}
+
+			SUBCASE("random-password-valid-length-500") {
+				length = 500;
+			}
+
+			SUBCASE("random-password-valid-length-24") {
+				length = 24;
+			}
+
+			// ensure correct length
+			password = pg->NewPassword(length);
+			CHECK_EQ(password.length(), length);
 		}
 
-		SUBCASE("random-password-valid-length-100") {
-			length = 100;
+		SUBCASE("random-password-truncated-length") {
+			SUBCASE("random-password-truncated-length-1025") {
+				length = 1025;
+			}
+
+			SUBCASE("random-password-truncated-length-9999") {
+				length = 9999;
+			}
+
+			SUBCASE("random-password-truncated-length-2000") {
+				length = 2000;
+			}
+
+			SUBCASE("random-password-truncated-length-9000") {
+				length = 9000;
+			}
+
+			// ensure correct length (truncated to max size)
+			password = pg->NewPassword(length);
+			CHECK_EQ(password.length(), 1024);
+			// update length value for future tests below
+			length = 1024;
 		}
 
-		SUBCASE("random-password-valid-length-1") {
-			length = 1;
+		// ensure passwords aren't empty or null
+		CHECK_NE(password.length(), 0);
+		CHECK_NE(password, "");
+
+		// ensure passwords have reasonable level of complexity and randomness
+
+		// duplicates within 4 characters counts as a "match"
+		int diversityWindow = 4;
+		// allow one match for every 8 characters
+		matchMax = (length / diversityWindow) / 2;
+		// evaluate every character in the password (start checking after first few)
+		for (int i = diversityWindow-1; i < length; i++) {
+			// check the previous characters in the password
+			for (int j = 1; j < diversityWindow; j++) {
+				// if there are matching characters, increment the counter
+				if (password[i] == password[i-j])
+					matchCounter++;
+			}
 		}
 
-		password = pg->NewPassword(length);
-		REQUIRE_EQ(password.length(), length);
+		CHECK_LE(matchCounter, matchMax);
 	}
 
 	SUBCASE("random-password-invalid-length") {
@@ -143,20 +203,6 @@ TEST_CASE("random-password") {
 		REQUIRE_EQ(password.length(), 0);
 		REQUIRE_EQ(password, "");
 	}
-
-	SUBCASE("random-password-truncated-length") {
-		SUBCASE("random-password-truncated-length-1025") {
-			length = 1025;
-		}
-
-		SUBCASE("random-password-truncated-length-1025") {
-			length = 9999;
-		}
-
-		password = pg->NewPassword(length);
-		REQUIRE_EQ(password.length(), 1024);
-	}
-
 }
 
 TEST_SUITE_END();
