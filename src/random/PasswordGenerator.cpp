@@ -30,9 +30,6 @@ std::string PasswordGenerator::NewPassword(int length)
 	int characterOption = 0;	// which character within this type
 	std::string password = "";	// the password to be generated and returned
 
-	if (length <= 0)
-		return password;
-
 	for (int index = 0; index < length; index++)
 	{
 		// enforce maximum password length rules
