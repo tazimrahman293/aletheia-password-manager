@@ -24,7 +24,13 @@ public:
 
     int activeUserID;
 
-    ContextManager() : context(Welcome), authenticated(false), activeUserID(0) { }
+    bool quitting;
+
+    ContextManager() :
+            context(Welcome),
+            authenticated(false),
+            activeUserID(0),
+            quitting(false) { }
 
     [[nodiscard]] Context GetContext() const { return context; }
     bool SetContext(Context ctx);
