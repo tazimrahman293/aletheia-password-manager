@@ -22,15 +22,11 @@ const userUrl = '/user';
 const SignUp = () => {
 
     function validateUsername(value) {
-        axios.get('/user?username=' + value)
+        let error;
+        axios.get('/user?username='+value)
             .then((response) => {
-                if (value === response['username']) { 
-                    console.log("TRUUEUEE")
-                    return true;
-                } else {
-                    return false;
-                }
-                
+                if (value === response['username']) { error = 'Nice try!'; }
+                return error;
             })
 
     }
@@ -44,10 +40,38 @@ const SignUp = () => {
             confirmPassword: ''
         },
         validateOnChange: false,
+        // validate: (value, props) => {
+        //     return (
+        //         axios.get('/user?username='+value)
+        //         .then((response) => {
+        //             let error;
+        //             if (value === response['username']) { error = 'Nice try!'; }
+        //             return error;
+        //         }))
+        //     },
         validationSchema: yup.object({
             firstName: yup.string().required().max(255),
             lastName: yup.string().required().max(255),
-            userName: yup.string().required().max(255).validate(),
+            userName: yup.string().required().max(255),
+            // TODO: Check for existing user Name
+            // .test('Unique User Name', 'UserName already in use', // <- key, message
+            //     function (values) {
+            //         return new Promise((resolve, reject) => {
+            //             axios.get('/users')
+            //                 .then((response) => {
+            //                     for (let index = 0; index < JSON.parse(response).length; index++) {
+            //                         if (response[index].username === 'ppa')
+            //                             resolve(true)
+            //                     }
+            //                 })
+            //                 .catch((error) => {
+            //                     if (error.response.content === "The User Name has already been taken.") {
+            //                         resolve(false);
+            //                     }
+            //                 })
+            //         })
+            //     }
+            // ),
             password: yup.string().password().required().max(255),
             confirmPassword: yup.string().oneOf([yup.ref('password'), null], "Passwords must match")
         }),
@@ -76,7 +100,15 @@ const SignUp = () => {
                 )
                 .then(response => { console.log(response.data) })
                 .catch(error => { console.log(error.data) });
-    }
+
+            // testing get request
+            //     axios
+            //         .get(userUrl
+            //         )
+            //         .then(response => { console.log(response.data) })
+            //         .catch(error => { console.log(error.data) });
+            // }
+        }
     });
 
 
@@ -144,7 +176,7 @@ const SignUp = () => {
                                                 variant="outlined"
                                             />
                                             <TextField
-                                                error={Boolean(formik.touched.userName && true)}
+                                                // error={Boolean(formik.touched.userName && formik.errors.userName)}
                                                 fullWidth
                                                 helperText={formik.touched.userName && formik.errors.userName}
                                                 label="User Name"
@@ -154,7 +186,7 @@ const SignUp = () => {
                                                 onChange={formik.handleChange}
                                                 value={formik.values.userName}
                                                 variant="outlined"
-                                                // validate={validateUsername(formik.values.userName)}
+                                                validate={validateUsername(formik.values.userName)}
                                             />
                                             <TextField
                                                 error={Boolean(formik.touched.password && formik.errors.password)}
