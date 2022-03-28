@@ -18,6 +18,8 @@ void CommandLine::Print(const std::string &message)
 {
     if (!testMode)
         std::cout << message << std::flush;
+    else
+        outStream << message;
 }
 
 
@@ -25,6 +27,8 @@ void CommandLine::PrintLine(const std::string &message)
 {
     if (!testMode)
         std::cout << message << std::endl;
+    else
+        outStream << message << "\n";
 }
 
 
@@ -32,6 +36,8 @@ std::string CommandLine::GetInput(const std::string &prompt)
 {
     if (!testMode)
         std::cout << prompt << " " << std::flush;
+    else
+        outStream << prompt;
 
     std::string input;
     if (testMode)
@@ -290,6 +296,7 @@ void CommandLine::HandleCommands(const std::string &command) {
         }
 
     } else if (command == "quit") {
+        PrintLine("Logged out.");
         ctxManager.authenticated = false;
         ctxManager.activeUserID = 0;
         ctxManager.quitting = true;

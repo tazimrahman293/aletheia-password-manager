@@ -31,6 +31,7 @@ TEST_CASE("cli-quit") {
     std::string command = cli->GetInput("");
     REQUIRE_EQ(command, "quit");
     cli->HandleCommands(command);
+    REQUIRE_EQ(cli->outStream.str(), "Logged out.\n");
     REQUIRE_FALSE(cli->IsRunning());
 }
 
