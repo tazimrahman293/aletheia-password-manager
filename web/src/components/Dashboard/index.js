@@ -52,7 +52,7 @@ const tableIcons = {
 export default function Dashboard() {
 
   const columns = [
-    { field: 'pk', title: 'Id', editable:false },
+    { field: 'pk', title: 'Id', editable: false },
     { title: "Icon", render: rowData => <Avatar maxInitials={1} size={40} round={true} name={rowData === undefined ? " " : rowData.label} /> },
     { field: 'label', title: 'Account Name' },
     { field: 'username', title: 'User Name' },
@@ -96,7 +96,13 @@ export default function Dashboard() {
     }
 
     if (errorList.length < 1) {
-      axios.patch("/account", newData)
+      axios.patch("/account", JSON.stringify({
+        'pk': newData.pk,
+        'url': newData.url,
+        'label': newData.label,
+        'username': newData.username
+
+      }))
         .then(res => {
           const dataUpdate = [...data];
           const index = oldData.tableData.id;
@@ -146,7 +152,7 @@ export default function Dashboard() {
         "expiry": 0,
         "userID": token.pk
 
-    }))
+      }))
         .then(res => {
           let dataToAdd = [...data];
           dataToAdd.push(newData);
@@ -170,9 +176,11 @@ export default function Dashboard() {
   }
 
   const handleRowDelete = (oldData, resolve) => {
-    const pk = JSON.stringify({ 'pk': oldData.pk });
-    console.log(pk)
-    axios.delete("/account", pk)
+    const id = JSON.stringify({ pk: oldData.pk });
+    console.log(id)
+    axios
+      .delete("/account", JSON.stringify(id),
+      { headers: { 'Content-Type': 'application/json', crossDomain: true } })
       .then(res => {
         const dataDelete = [...data];
         const index = oldData.tableData.pk;

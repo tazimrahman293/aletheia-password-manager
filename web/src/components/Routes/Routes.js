@@ -7,7 +7,8 @@ import SettingsPage from '../../pages/settings'
 import CreateAccountPage from '../../pages/createAccount'
 import DashboardPage from '../../pages/dashboard'
 import useToken from '../UseToken/useToken'
-import NotFound from '../Error/404'
+import ServerDownPage from '../../pages/serverDown'
+import NotFoundPage from '../../pages/notFound'
 
 /**
  * 
@@ -23,7 +24,8 @@ const AppRoutes = () => {
       <Routes>
 
         <Route path='/' element={<Home />} />
-        <Route path='/404' element={<NotFound />} />
+        <Route path='/404' element={<NotFoundPage/>} />
+        <Route path='/500' element={<ServerDownPage />} />
         
         
         {

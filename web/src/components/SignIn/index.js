@@ -8,6 +8,7 @@ import { Link as LinkRouter } from 'react-router-dom';
 import { Nav, NavContainer } from '../Navbar/NavbarElements';
 import { Icon } from './../SignIn/SigninElements';
 import PropTypes from 'prop-types';
+import { Navigate } from 'react-router';
 
 // URL for user requests
 const userUrl = '/login';
@@ -49,7 +50,14 @@ export default function SignIn({ setToken }) {
                     console.log(token)
                     setToken(token);
                 })
-                .catch(error => { console.log(error.data) });
+                .catch(error => { 
+                    // console.log(error.data)
+                    if (!error.request){
+                        <Navigate replace to='/500'/>
+                    } else {
+                        console.log(error.data)
+                    }
+                });
             console.log(JSON.stringify(values, null, 2))
         }
     });

@@ -1,23 +1,23 @@
 import React from 'react'
 import ScrollToTop from '../components/ScrollToTop'
 import { Helmet } from "react-helmet";
-import NotFound from './../components/Error/404'
+import ServerDown from './../components/Error/serverDown';
 /**
  * 
- * @returns 404 page from component
+ * @returns 500 page from component
  */
-const NotFoundPage = () => {
+const ServerDownPage = () => {
 
   return (
     <>
       <Helmet>
         <meta charSet="utf-8" />
-        <title>404 | Page Not Found</title>
+        <title>500 | Server Down</title>
       </Helmet>
       <ScrollToTop />
-      <NotFound/>
+      <ServerDown/>
     </>
   )
 }
 
-export default NotFoundPage
+export default ServerDownPage
