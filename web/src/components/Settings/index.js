@@ -1,23 +1,29 @@
 //TODO: Implement the settings component 
-import React, { useState } from 'react'
+import React from 'react'
 import { Box, Button, Card, CardContent, CardHeader, Divider,  TextField} from '@mui/material';
 import { Column1, Column2, DataContainer, DataRow, DataWrapper, TextWrapper, ImgWrap, Img } from './../DataSection/DataElements';
+import { useFormik} from 'formik';
+import * as yup from "yup";
+const Settings = () => {
 
-const Settings = (props) => {
-    const [values, setValues] = useState({
-        currentPassword: '',
-        newPassword: '',
-        confirmPassword: ''
-      });
+      const formik = useFormik({
+          initialValues: {
+              currentPassword: '',
+              newPassword: '',
+              confirmPassword: ''
+          },
+          validateOnChange:false,
+          validationSchema: yup.object({
+            currentPassword: yup.string().password().required().max(255),
+            newPassword: yup.string().password().required().max(255),
+            confirmPassword: yup.string().oneOf([yup.ref('password'), null], "Passwords must match")
+          }),
 
+          onSubmit: values => {
 
-    // TODO: Convert the form into an formik element.
-      const handleChange = (event) => {
-        setValues({
-          ...values,
-          [event.target.name]: event.target.value
-        });
-      };
+          }
+
+      })
     
     //TODO: Create API request of type PATCH to update user details
     return (
@@ -27,7 +33,7 @@ const Settings = (props) => {
                     <DataRow imgStart='true'>
                         <Column1>
                             <TextWrapper>
-                                <form {...props}>
+                                <form onSubmit={formik.handleSubmit}>
                                     <Card>
                                         <CardHeader
                                             subheader="Update password"
@@ -40,9 +46,10 @@ const Settings = (props) => {
                                                 label="Current Password"
                                                 margin="normal"
                                                 name="currentPassword"
-                                                onChange={handleChange}
+                                                onBlur={formik.handleBlur}
+                                                onChange={formik.handleChange}
                                                 type="password"
-                                                value={values.currentPassword}
+                                                value={formik.values.currentPassword}
                                                 variant="outlined"
                                             />
                                             <TextField
@@ -50,9 +57,10 @@ const Settings = (props) => {
                                                 label="New Password"
                                                 margin="normal"
                                                 name="newPassword"
-                                                onChange={handleChange}
+                                                onBlur={formik.handleBlur}
+                                                onChange={formik.handleChange}
                                                 type="password"
-                                                value={values.newPassword}
+                                                value={formik.values.newPassword}
                                                 variant="outlined"
                                             />
                                             <TextField
@@ -60,9 +68,10 @@ const Settings = (props) => {
                                                 label="Confirm password"
                                                 margin="normal"
                                                 name="confirmPassword"
-                                                onChange={handleChange}
+                                                onBlur={formik.handleBlur}
+                                                onChange={formik.handleChange}
                                                 type="password"
-                                                value={values.confirmPassword}
+                                                value={formik.values.confirmPassword}
                                                 variant="outlined"
                                             />
                                         </CardContent>
@@ -75,8 +84,12 @@ const Settings = (props) => {
                                             }}
                                         >
                                             <Button
-                                                color="primary"
-                                                variant="contained"
+                                               style={{ backgroundColor: '#F56300' }}
+                                               disabled={formik.isSubmitting}
+                                               fullWidth
+                                               size="large"
+                                               type="submit"
+                                               variant="contained"
                                             >
                                                 Update
                                             </Button>

@@ -1,26 +1,38 @@
-import { useState } from 'react';
 import { Box, Button, Card, CardContent, CardHeader, Divider, Grid, TextField } from '@mui/material';
+import { useFormik } from 'formik';
+import axios from 'axios';
+
+const userUpdateUrl = '/user'
 
 export const UserProfileDetails = (props) => {
-    const [values, setValues] = useState({
-        firstName: 'Akash',
-        lastName: 'Gill',
-        userName: 'akashGill'
-    });
 
-    const handleChange = (event) => {
-        setValues({
-            ...values,
-            [event.target.name]: event.target.value
-        });
-    };
+    const formik = useFormik({
+        initialValues: {
+            //TODO: Add initial values from the logged in users details
+            firstName: '',
+            lastName: '',
+            userName: ''
+        },
+        validateOnChange: false,
+        onSubmit: values => {
+
+            axios
+                .patch(userUpdateUrl , JSON.stringify({
+                    firstName: values.firstName,
+                    lastName: values.lastName,
+                    userName: values.userName
+                }),
+                    { headers: { 'Content-Type': 'application/json', crossDomain: true } }
+                )
+                .then(response => {alert(JSON.stringify(response.data))})
+
+                .catch(error => {console.log(error.data)})
+        }
+        
+    })
 
     return (
-        <form
-            autoComplete="off"
-            noValidate
-            {...props}
-        >
+        <form onSubmit={formik.handleSubmit}>
             <Card 
             variant="outlined"
             
@@ -46,9 +58,10 @@ export const UserProfileDetails = (props) => {
                                 // helperText="Please specify the first name"
                                 label="First name"
                                 name="firstName"
-                                onChange={handleChange}
+                                onBlur={formik.handleBlur}
+                                onChange={formik.handleChange}
                                 required
-                                value={values.firstName}
+                                value={formik.values.firstName}
                                 variant="outlined"
                             />
                         </Grid>
@@ -61,9 +74,10 @@ export const UserProfileDetails = (props) => {
                                 fullWidth
                                 label="Last name"
                                 name="lastName"
-                                onChange={handleChange}
+                                onBlur={formik.handleBlur}
+                                onChange={formik.handleChange}
                                 required
-                                value={values.lastName}
+                                value={formik.values.lastName}
                                 variant="outlined"
                             />
                         </Grid>
@@ -76,9 +90,10 @@ export const UserProfileDetails = (props) => {
                             fullWidth
                             label="User Name"
                             name="userName"
-                            onChange={handleChange}
+                            onBlur={formik.handleBlur}
+                            onChange={formik.handleChange}
                             required
-                            value={values.userName}
+                            value={formik.values.userName}
                             variant="outlined"
                         />
                         </Grid>
@@ -93,8 +108,12 @@ export const UserProfileDetails = (props) => {
                     }}
                 >
                     <Button
-                        color="primary"
-                        variant="contained"
+                       style={{ backgroundColor: '#F56300' }}
+                       disabled={formik.isSubmitting}
+                       fullWidth
+                       size="large"
+                       type="submit"
+                       variant="contained"
                     >
                         Update Details
                     </Button>

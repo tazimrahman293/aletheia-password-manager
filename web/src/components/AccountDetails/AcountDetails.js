@@ -14,7 +14,7 @@ export const UserProfileDetails = (props) => {
             [event.target.name]: event.target.value
         });
     };
-
+    // TODO: convert the forms to formik 
     return (
         <form
             autoComplete="off"
