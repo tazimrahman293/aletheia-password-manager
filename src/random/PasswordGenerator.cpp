@@ -24,11 +24,29 @@ PasswordGenerator::PasswordGenerator()
  *               exceeds the internally defined maximum length.
  * @return A randomly generated password string.
  */
-std::string PasswordGenerator::NewPassword(int length)
+std::string PasswordGenerator::NewPassword(int length, bool lower, bool upper, bool number, bool special)
 {
-	int alphanumericOption = 0;	// what type of character (lowercase, etc.)
-	int characterOption = 0;	// which character within this type
-	std::string password = "";	// the password to be generated and returned
+	int characterOption = 0;			// index of which character to choose
+	std::string password = "";			// the password to be generated and returned
+	std::string characterOptions = "";	// string of all available characters
+
+	// password must be of positive non-zero length
+	if (length <= 0)
+		return password;
+
+	// all passwords require at least ONE OF: lower, upper, number
+	if (lower == false && upper == false && number == false)
+		return password;
+
+	// concat string options together based on selected input
+	if (lower)
+		characterOptions += characters[alphanumericOptionsLower];
+	if (upper)
+		characterOptions += characters[alphanumericOptionsUpper];
+	if (number)
+		characterOptions += characters[alphanumericOptionsNumber];
+	if (special)
+		characterOptions += characters[alphanumericOptionsSpecial];
 
 	for (int index = 0; index < length; index++)
 	{
@@ -36,18 +54,15 @@ std::string PasswordGenerator::NewPassword(int length)
 		if (index == maxLength)
 			return password;
 
-		// initial character can be lower, upper, or number (not a symbol)
-		if (index == 0)
-			alphanumericOption = random->GetNew(0, alphanumericOptionsNumber);
+		// initial character can be lower, upper, or number (not a special symbol)
+		if (index == 0 && special == true)
+			characterOption = random->GetNew(0, characterOptions.length() - characters[alphanumericOptionsSpecial].length());
 		// all other characters can include special symbols
 		else
-			alphanumericOption = random->GetNew(0, alphanumericOptionsCount-1);
-
-		// determine which character to place
-		characterOption = random->GetNew(0, characters[alphanumericOption].length()-1);
+			characterOption = random->GetNew(0, characterOptions.length());
 
 		// add the new character to the password
-		password += characters[alphanumericOption][characterOption];
+		password += characterOptions[characterOption];
 	}
 
 	return password;

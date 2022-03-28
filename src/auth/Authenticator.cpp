@@ -36,7 +36,7 @@ std::vector<uint8_t> Authenticator::Hash(std::string password)
 		return std::vector<uint8_t>();
 
 	// create a byte array for storing resultant hash
-	uint8_t hashBytes[128] = { 0 };
+	uint8_t hashBytes[hashSize] = { 0 };
 
 	// generate the hash
 	int result = hydro_pwhash_create(hashBytes, password.c_str(),

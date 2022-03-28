@@ -28,7 +28,7 @@ else
 		TARGET_SUFFIX = -osx
 	endif
 endif
-LDFLAGS += -lstdc++ -lsqlite3 -lpthread -ldl -lm
+LDFLAGS += -lstdc++ -lsqlite3 -lpthread -ldl -lm -lhydrogen
 INCLUDE = -Iinclude/
 
 PROJ_DIR = $(shell pwd)
@@ -39,7 +39,6 @@ SRC     = $(wildcard src/*.cpp) \
 		  $(wildcard src/**/*.cpp)
 
 HDR     = $(wildcard include/**/*.h) \
-		  include/Crypto.h \
 		  include/Storage.h
 
 OBJECTS = $(SRC:%.cpp=$(OBJ_DIR)/%.o)
@@ -63,6 +62,7 @@ COV_HTML = $(COV_DIR)/html
 # List of exclusions from the lcov report
 COV_EXCL = '/usr*' \
 		   '${PROJ_DIR}/include/httplib.h' \
+		   '${PROJ_DIR}/include/hydrogen.h' \
 		   '${PROJ_DIR}/include/json.h' \
 		   '${PROJ_DIR}/include/sqlite_orm.h' \
 		   '${PROJ_DIR}/test/*'
