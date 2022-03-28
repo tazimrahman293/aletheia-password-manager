@@ -23,14 +23,16 @@ const AppRoutes = () => {
       <Routes>
 
         <Route path='/' element={<Home />} />
-        <Route path='/signUp' element={<SignUpPage />} />
         <Route path='/404' element={<NotFound />} />
         
         
         {
-        // If the token is  not present then redirect to SignInPage 
-        !token && (<Route path='/signIn' element={<SignInPage setToken={setToken} />} />)
-        }
+          // If the token is  not present then redirect to SignInPage 
+          !token && (<>
+          <Route path='/signIn' element={<SignInPage setToken={setToken} />} />
+          <Route path='/signUp' element={<SignUpPage />} />
+          </>
+          )}
         
         
         {

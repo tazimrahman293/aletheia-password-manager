@@ -1,13 +1,13 @@
 import { Box, Button, Card, CardContent, CardHeader, Divider, Grid, TextField } from '@mui/material';
 import { useFormik } from 'formik';
-import axios from 'axios';
+import axios from '../../api/axios';
 import useToken from '../UseToken/useToken';
 
 const userUpdateUrl = '/user'
 
-export const UserProfileDetails = (props) => {
+export const UserProfileDetails = () => {
 
-    const { token } = useToken();
+    const { token, setToken } = useToken();
 
     const formik = useFormik({
         initialValues: {
@@ -18,28 +18,30 @@ export const UserProfileDetails = (props) => {
         },
         validateOnChange: false,
         onSubmit: values => {
-
             axios
-                .patch(userUpdateUrl , JSON.stringify({
-                    'pk': 2,
+                .patch(userUpdateUrl, JSON.stringify({
+                    'pk': token.pk,
                     'username': values.userName,
                     'firstName': values.firstName,
                     'lastName': values.lastName
                 }),
-                    { headers: { 'Content-Type': 'application/json', crossDomain: true } }
+                { headers: { 'Content-Type': 'application/json', crossDomain: true } }
                 )
-                .then(response => {alert(JSON.stringify(response.data))})
+                .then(response => { 
+                    const token = response.data
+                    console.log(token)
+                    setToken(token); })
 
-                .catch(error => {console.log(error.data)})
+                .catch(error => { console.log(error.data) })
         }
-        
+
     })
 
     return (
         <form onSubmit={formik.handleSubmit}>
-            <Card 
-            variant="outlined"
-            
+            <Card
+                variant="outlined"
+
             >
                 <CardHeader
                     subheader="The information can be edited"
@@ -90,16 +92,16 @@ export const UserProfileDetails = (props) => {
                             md={12}
                             xs={12}
                         >
-                        <TextField
-                            fullWidth
-                            label="User Name"
-                            name="userName"
-                            onBlur={formik.handleBlur}
-                            onChange={formik.handleChange}
-                            required
-                            value={formik.values.userName}
-                            variant="outlined"
-                        />
+                            <TextField
+                                fullWidth
+                                label="User Name"
+                                name="userName"
+                                onBlur={formik.handleBlur}
+                                onChange={formik.handleChange}
+                                required
+                                value={formik.values.userName}
+                                variant="outlined"
+                            />
                         </Grid>
                     </Grid>
                 </CardContent>
@@ -112,12 +114,12 @@ export const UserProfileDetails = (props) => {
                     }}
                 >
                     <Button
-                       style={{ backgroundColor: '#F56300' }}
-                       disabled={formik.isSubmitting}
-                       fullWidth
-                       size="large"
-                       type="submit"
-                       variant="contained"
+                        style={{ backgroundColor: '#F56300' }}
+                        disabled={formik.isSubmitting}
+                        fullWidth
+                        size="large"
+                        type="submit"
+                        variant="contained"
                     >
                         Update Details
                     </Button>

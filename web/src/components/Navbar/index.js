@@ -56,7 +56,8 @@ const Navbar = ({ toggle }) => {
                             <NavLinks to='team' smooth={true} duration={500} spy={true} exact='true' offset={-80}>Team</NavLinks>
                         </NavItems>
                         <NavItems>
-                            <NavLinkRouter to='/signUp'>Sign Up</NavLinkRouter>
+                        {token ? <NavLinkRouter replace to='/dashboard'>Dashboard</NavLinkRouter> : <NavLinkRouter to='/signUp'>Sign Up</NavLinkRouter>}
+                            
                         </NavItems>
                     </NavMenu>
                     <NavButton>

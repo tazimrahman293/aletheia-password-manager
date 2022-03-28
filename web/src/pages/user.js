@@ -52,7 +52,7 @@ const User = () => {
                                             md={6}
                                             xs={12}
                                         >
-                                            <UserProfileDetails />
+                                            <UserProfileDetails/>
                                         </Grid>
                                     </Container>
                                 </Box>
