@@ -178,9 +178,12 @@ export default function Dashboard() {
   const handleRowDelete = (oldData, resolve) => {
     const id = JSON.stringify({ pk: oldData.pk });
     console.log(id)
+    
     axios
-      .delete("/account", JSON.stringify(id),
-      { headers: { 'Content-Type': 'application/json', crossDomain: true } })
+      ({url : "/account",
+        method: 'DELETE',
+        data: id}
+      )
       .then(res => {
         const dataDelete = [...data];
         const index = oldData.tableData.pk;

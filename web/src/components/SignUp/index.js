@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { DataContainer, DataWrapper, DataRow, Column1, Column2, TextWrapper, ImgWrap, Img } from './../DataSection/DataElements';
 import * as yup from "yup";
 import { Link as LinkRouter } from 'react-router-dom';
@@ -8,6 +8,7 @@ import { useFormik } from 'formik';
 import { Box, Button, Container, TextField, Typography } from '@mui/material';
 import { Nav, NavContainer } from '../Navbar/NavbarElements'
 import { Icon } from './../SignIn/SigninElements'
+import Alert from '@material-ui/lab/Alert';
 YupPassword(yup)
 
 
@@ -21,6 +22,10 @@ const userUrl = '/user';
  */
 const SignUp = () => {
 
+    //for error handling
+    const [iserror, setIserror] = useState(false)
+    const [errorMessages, setErrorMessages] = useState([])
+
     const formik = useFormik({
         initialValues: {
             firstName: '',
@@ -30,15 +35,24 @@ const SignUp = () => {
             confirmPassword: ''
         },
         validateOnChange: false,
-        // validate: (value, props) => {
-        //     return (
-        //         axios.get('/user?username='+value)
-        //         .then((response) => {
-        //             let error;
-        //             if (value === response['username']) { error = 'Nice try!'; }
-        //             return error;
-        //         }))
-        //     },
+        validate: (value) => {
+            return (
+                axios.get('/user?username=' + value.userName)
+                    .then((response) => {
+                        if (response) {
+                            setIserror(true)
+                            setErrorMessages(["Username alrady exisits"])
+                            console.log(errorMessages)
+                        } else {
+                            setIserror(false)
+                            setErrorMessages([])
+                        }
+                    }))
+                    .catch((error) => {
+                        setIserror(false)
+                        setErrorMessages([])
+                    })
+        },
         validationSchema: yup.object({
             firstName: yup.string().required().max(255),
             lastName: yup.string().required().max(255),
@@ -114,6 +128,15 @@ const SignUp = () => {
                                                     Fill the information to create a new user
                                                 </Typography>
                                             </Box>
+                                            <div>
+                                                {iserror &&
+                                                    <Alert severity="error">
+                                                        {errorMessages.map((msg, i) => {
+                                                            return <div key={i}>{msg}</div>
+                                                        })}
+                                                    </Alert>
+                                                }
+                                            </div>
                                             <TextField
                                                 error={Boolean(formik.touched.firstName && formik.errors.firstName)}
                                                 fullWidth
