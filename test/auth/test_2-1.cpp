@@ -27,43 +27,56 @@ TEST_CASE("auth-hash-and-verify") {
 	std::vector<uint8_t> hash[sampleSize];
 	bool valid = false;
 
-	SUBCASE("auth-hash-and-verify-password") {
-		password = "password";
-	}
-
-	SUBCASE("auth-hash-and-verify-password-special") {
-		password = "pa$$word1234567890______~`!@#$%^&*()_-+={[}]|:;,.?";
-	}
-
-	SUBCASE("auth-hash-and-verify-password-short") {
-		password = "p";
-	}
-
-	SUBCASE("auth-hash-and-verify-password-long") {
-		password = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-	}
-
-	// create many unique hashes for the same password
-	for (int i = 0; i < sampleSize; i++) {
-		hash[i] = auth->Hash(password);
-
-		// check that hash is correct size
-		CHECK_EQ(hash[i].size(), hashSize);
-
-		// check that all hashes are unique
-		for (int j = 1; i-j >= 0; j++) {
-			CHECK_NE(hash[i], hash[i-j]);
+	SUBCASE("auth-hash-and-verify-valid-password") {
+		SUBCASE("auth-hash-and-verify-valid-password-normal") {
+			password = "password";
 		}
 
-		// check that new hash still validates password
-		valid = auth->Verify(hash[i], password);
-		CHECK(valid);
+		SUBCASE("auth-hash-and-verify-valid-password-special") {
+			password = "pa$$word1234567890______~`!@#$%^&*()_-+={[}]|:;,.?";
+		}
 
-		// check that an invalid password does not get validated
-		passwordAttempt = "__";
-		valid = auth->Verify(hash[i], passwordAttempt);
-		CHECK(!valid);
+		SUBCASE("auth-hash-and-verify-valid-password-short") {
+			password = "p";
+		}
+
+		SUBCASE("auth-hash-and-verify-valid-password-long") {
+			password = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+		}
+
+		// create many unique hashes for the same password
+		for (int i = 0; i < sampleSize; i++) {
+			hash[i] = auth->Hash(password);
+
+			// check that hash is correct size
+			CHECK_EQ(hash[i].size(), hashSize);
+
+			// check that all hashes are unique
+			for (int j = 1; i-j >= 0; j++) {
+				CHECK_NE(hash[i], hash[i-j]);
+			}
+
+			// check that new hash still validates password
+			valid = auth->Verify(hash[i], password);
+			CHECK(valid);
+
+			// check that an invalid password does not get validated
+			passwordAttempt = "__";
+			valid = auth->Verify(hash[i], passwordAttempt);
+			CHECK(!valid);
+		}
 	}
+
+	SUBCASE("auth-hash-and-verify-invalid-password") {
+		password = "";
+		for (int i = 0; i < sampleSize; i++) {
+			hash[i] = auth->Hash(password);
+
+			// check that hash is expected size (0 for empty password)
+			CHECK_EQ(hash[i].size(), 0);
+		}
+	}
+
 }
 
 TEST_SUITE_END();

@@ -31,6 +31,10 @@ Authenticator::Authenticator()
  */
 std::vector<uint8_t> Authenticator::Hash(std::string password)
 {
+	// password must have non-zero length
+	if (password.length() <= 0)
+		return std::vector<uint8_t>();
+
 	// create a byte array for storing resultant hash
 	uint8_t hashBytes[hashSize] = { 0 };
 
