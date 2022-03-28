@@ -9,16 +9,11 @@
 #include <httplib.h>
 #include <json.h>
 
+#include "aletheia.h"
 #include "data/Account.h"
 #include "network/EventBus.h"
 #include "network/HTTPServer.h"
 #include "random/PasswordGenerator.h"
-
-// #include "events/LoginAttemptEvent.h"
-// #include "events/LogoutEvent.h"
-// #include "events/AccountCreateEvent.h"
-// #include "events/AccountUpdateEvent.h"
-// #include "events/AccountDeleteEvent.h"
 
 
 /**
@@ -53,12 +48,13 @@ void publishEvent(ArgType... args)
 /**
  * Initializes the HTTP server instance by setting up all the available API endpoints.
  */
-void HTTPServer::Init(Storage *store)
+void HTTPServer::Init(Storage *store, Authenticator *authenticator)
 {
     assert(hostPort > 1023 && hostPort <= 65535 && "Port must be between 1024 and 65535");
     assert(store != nullptr && "Storage cannot be nullptr!");
 
     this->storage = store;
+    this->auth = authenticator;
 
     using httplib::Request, httplib::Response;
     using json = nlohmann::json;
@@ -90,7 +86,7 @@ void HTTPServer::Init(Storage *store)
                 }
 
                 // Short-circuit this whole callback if there was no password sent
-                if (pass.empty()) {  // TODO or other problems with the formation of the password, or if invalid
+                if (pass.empty()) {
                     response.status = 401;
                     return;
                 }
@@ -102,11 +98,12 @@ void HTTPServer::Init(Storage *store)
                     return;
                 }
 
-                // TODO hash password/key to check if valid login
-                if (pass == user->keyHash) {
-                    // TODO obviously we need to hash the sent password and compare with the keyHash
-                    // TODO create a new session (token in a cookie maybe)
+                auto hash = charsToHash(user->hash);
+
+
+                if (auth->Verify(hash, pass)) {
                     json j = *user;
+                    j.erase("password");
                     response.set_content(j.dump(), "application/json");
                     response.status = 200;
                     return;
@@ -138,10 +135,13 @@ void HTTPServer::Init(Storage *store)
                     return;
                 }
 
+                auto hash = auth->Hash(record.password);
+                auto chars = hashToChars(hash);
+                record.hash = chars;
                 storage->Insert(record);
 
                 json j = record;
-                j.erase("keyHash");
+                j.erase("password");
                 response.status = 201;
                 response.set_content(j.dump(), "application/json");
             });
@@ -169,7 +169,7 @@ void HTTPServer::Init(Storage *store)
                 }
 
                 json j = *user;
-                j.erase("keyHash");
+                j.erase("password");
                 response.set_content(j.dump(), "application/json");
                 response.status = 200;
             });
@@ -183,7 +183,7 @@ void HTTPServer::Init(Storage *store)
                 json j = json::array();
                 for (auto& user : users) {
                     j.emplace_back(user);
-                    j.back().erase("keyHash");  // Don't transmit key on this endpoint
+                    j.back().erase("password");  // Don't transmit key on this endpoint
                 }
 
                 response.set_content(j.dump(), "application/json");
@@ -234,7 +234,7 @@ void HTTPServer::Init(Storage *store)
                 }
 
                 json j = *user;
-                j.erase("keyHash");
+                j.erase("password");
                 response.status = 200;
                 response.set_content(j.dump(), "application/json");
             });

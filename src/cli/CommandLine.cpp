@@ -12,6 +12,7 @@
 #include "cli/InputParser.h"
 #include "data/User.h"
 #include "data/Account.h"
+#include "aletheia.h"
 
 
 void CommandLine::Print(const std::string &message)
@@ -59,7 +60,12 @@ void CommandLine::DoRegister(
     newUser.username = username;
     newUser.firstName = firstName;
     newUser.lastName = lastName;
-    newUser.keyHash = password;
+    newUser.password = password;
+
+    auto hash = auth->Hash(password);
+    auto chars = hashToChars(hash);
+    newUser.hash = chars;
+
     database->Insert(newUser);
 
     ctxManager.authenticated = true;
@@ -77,7 +83,8 @@ void CommandLine::DoLogin(const std::string &username, const std::string &passwo
 {
     auto user = database->GetUserByUsername(username);
 
-    if (user != nullptr && user->keyHash == password) {
+    auto hash = charsToHash(user->hash);
+    if (user != nullptr && auth->Verify(hash, password)) {
         // User exists and password is correct
         if (!ctxManager.SetContext(Main)) {
             PrintLine("Unable to log in at this time.");

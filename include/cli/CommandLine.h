@@ -8,6 +8,7 @@
 #include <vector>
 
 
+#include "auth/Authenticator.h"
 #include "data/Account.h"
 #include "network/EventBus.h"
 #include "events/LoginAttemptEvent.h"
@@ -22,6 +23,8 @@
 class CommandLine : public InputParser {
 
     Storage* database;
+
+    Authenticator *auth;
 
     ContextManager ctxManager;
 
@@ -61,7 +64,7 @@ public:
             );
     void DoLogin(const std::string &username, const std::string &password);
 
-    void SetDatabase(Storage* db) { this->database = db; };
+    void Init(Storage *db, Authenticator *authenticator) { this->database = db; this->auth = authenticator; };
 
 };
 

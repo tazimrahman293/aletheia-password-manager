@@ -26,8 +26,8 @@ public:
 	Authenticator();
 	~Authenticator() = default;
 
-	std::vector<uint8_t> Hash(std::string password);
-	bool Verify(std::vector<uint8_t> hash, std::string password);
+	std::vector<uint8_t> Hash(const std::string &password);
+	bool Verify(std::vector<uint8_t> hash, const std::string &password);
 };
 
 

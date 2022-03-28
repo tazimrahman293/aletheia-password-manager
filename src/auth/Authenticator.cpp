@@ -29,11 +29,11 @@ Authenticator::Authenticator()
  * @param password	A plaintext password that can later be validated against this hash.
  * @return A byte vector containing the new hash.
  */
-std::vector<uint8_t> Authenticator::Hash(std::string password)
+std::vector<uint8_t> Authenticator::Hash(const std::string &password)
 {
 	// password must have non-zero length
 	if (password.length() <= 0)
-		return std::vector<uint8_t>();
+		return {};
 
 	// create a byte array for storing resultant hash
 	uint8_t hashBytes[hashSize] = { 0 };
@@ -44,7 +44,7 @@ std::vector<uint8_t> Authenticator::Hash(std::string password)
 
 	// return an empty vector if the creation attempt failed
 	if (result != 0)
-		return std::vector<uint8_t>();
+		return {};
 
 	// return a vector containing the hash
 	std::vector<uint8_t> hash(hashBytes, hashBytes + hashSize);
@@ -58,7 +58,7 @@ std::vector<uint8_t> Authenticator::Hash(std::string password)
  * @param passwordAttempt A plaintext string of the password to verify.
  * @returns true (1) on success & verified, false (0) otherwise.
  */
-bool Authenticator::Verify(std::vector<uint8_t> hash, std::string passwordAttempt)
+bool Authenticator::Verify(std::vector<uint8_t> hash, const std::string &passwordAttempt)
 {
 	// convert the hash to a simple byte array
 	uint8_t *hashBytes = &hash[0];

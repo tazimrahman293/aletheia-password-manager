@@ -51,7 +51,7 @@ std::unique_ptr<User> Storage::GetUserByUsername(const std::string &username) no
     user->username = std::get<1>(first);
     user->firstName = std::get<2>(first);
     user->lastName = std::get<3>(first);
-    user->keyHash = std::get<4>(first);
+    user->hash = std::get<4>(first);
     return user;
 }
 
