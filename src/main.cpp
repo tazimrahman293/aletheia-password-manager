@@ -7,53 +7,22 @@
 #include <vector>
 
 #include <Storage.h>
-#include <hydrogen.h>
 
+#include "auth/Authenticator.h"
 #include "network/HTTPServer.h"
 #include "cli/CommandLine.h"
 #include "cli/InputParser.h"
 
-///**
-// * Gets flags/options/positional arguments from the command line using argc and argv)
-// */
-//class InputParser {
-//
-//    // All individual (space-delimited) tokens from the command-line input
-//    std::vector<std::string> tokens;
-//
-//public:
-//
-//    InputParser(int& argc, char **argv) {
-//        for (int i = 1; i < argc; ++i)
-//            tokens.emplace_back(std::string(argv[i]));
-//    }
-//
-//    [[nodiscard]]
-//    bool HasOption(const std::string& option) const {
-//        return std::find(tokens.begin(), tokens.end(), option) != tokens.end();
-//    }
-//
-//    [[nodiscard]]
-//    const std::string& GetOptionValue(const std::string& option) const {
-//        std::vector<std::string>::const_iterator it;
-//        it = std::find(tokens.begin(), tokens.end(), option);
-//        if (it != tokens.end() && ++it != tokens.end())
-//            return *it;
-//        static const std::string empty_str;
-//        return empty_str;
-//    }
-//};
+
+Authenticator *auth = nullptr;	// Authentication and Encryption entry point
+
 
 /**
  * Manages passwords
  */
 int main(int argc, char *argv[])
 {
-	// initialize the libhydrogen Authentication library
-	if (hydro_init() != 0) {
-		printf("Failed to initialize Hydrogren authentication library. Exiting...\n");
-		exit(-1);
-	}
+	auth = new Authenticator();
 
     CommandLine cli(argc, argv, nullptr);
 
