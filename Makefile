@@ -63,6 +63,7 @@ COV_HTML = $(COV_DIR)/html
 # List of exclusions from the lcov report
 COV_EXCL = '/usr*' \
 		   '${PROJ_DIR}/include/httplib.h' \
+		   '${PROJ_DIR}/include/hydrogen.h' \
 		   '${PROJ_DIR}/include/json.h' \
 		   '${PROJ_DIR}/include/sqlite_orm.h' \
 		   '${PROJ_DIR}/test/*'
