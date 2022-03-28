@@ -25,7 +25,8 @@ class HTTPServer : private httplib::Server {
 
     httplib::Headers defaultHeaders = {
             {"Access-Control-Allow-Origin", "*"},
-            {"Access-Control-Allow-Headers", "*"}
+            {"Access-Control-Allow-Headers", "*"},
+            { "Access-Control-Allow-Methods", "*"}
     };
 
 public:

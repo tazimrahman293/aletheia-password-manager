@@ -7,6 +7,7 @@
 #include <vector>
 
 #include <Storage.h>
+#include <hydrogen.h>
 
 #include "auth/Authenticator.h"
 #include "network/HTTPServer.h"
