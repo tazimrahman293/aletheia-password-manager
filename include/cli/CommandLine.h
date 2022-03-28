@@ -16,10 +16,12 @@
 #include "events/AccountUpdateEvent.h"
 #include "Storage.h"
 #include "cli/InputParser.h"
-#include "cli/ContextManager.h"
-
 
 class CommandLine : public InputParser {
+
+    std::string input;
+    std::string output;
+    std::string command;
 
     Storage* database;
 
@@ -64,5 +66,4 @@ public:
     void SetDatabase(Storage* db) { this->database = db; };
 
 };
-
 #endif //CLI_COMMANDHANDLER_H

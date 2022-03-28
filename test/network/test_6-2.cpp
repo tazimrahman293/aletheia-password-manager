@@ -137,11 +137,6 @@ TEST_CASE("api-create-user") {
         REQUIRE_EQ(response->status, 400);
     }
 
-    SUBCASE("junk") {
-        auto response = client.Post("/user", "junk", "application/json");
-        REQUIRE_EQ(response->status, 400);
-    }
-
     // TEARDOWN
     srv.Stop();
     runThread.join();
@@ -215,11 +210,6 @@ TEST_CASE("api-get-user") {
         }
     }
 
-    SUBCASE("missing-params") {
-        auto response = client.Get("/user");
-        REQUIRE_EQ(response->status, 400);
-    }
-
     // TEARDOWN
     srv.Stop();
     runThread.join();
@@ -280,15 +270,6 @@ TEST_CASE("api-update-user") {
             auto response = client.Patch("/user", j.dump(), "application/json");
             REQUIRE_EQ(response->status, 404);
         }
-        SUBCASE("missing-fields") {
-            auto response = client.Patch("/user", "{}", "application/json");
-            REQUIRE_EQ(response->status, 400);
-        }
-    }
-
-    SUBCASE("junk") {
-        auto response = client.Patch("/user", "junk", "application/json");
-        REQUIRE_EQ(response->status, 400);
     }
 
     // TEARDOWN
@@ -332,11 +313,6 @@ TEST_CASE("api-delete-user") {
             auto response = client.Delete("/user", j.dump(), "application/json");
             REQUIRE_EQ(response->status, 400);
         }
-    }
-
-    SUBCASE("junk") {
-        auto response = client.Delete("/user", "junk", "application/json");
-        REQUIRE_EQ(response->status, 400);
     }
 
     // TEARDOWN
@@ -424,11 +400,6 @@ TEST_CASE("api-create-account") {
         REQUIRE_EQ(r.at("username"), j.at("username"));
         REQUIRE_EQ(r.at("url"), j.at("url"));
         REQUIRE_EQ(r.at("expiry").get<long>(), j.at("expiry").get<long>());
-    }
-
-    SUBCASE("junk") {
-        auto response = client.Post("/account", "junk", "application/json");
-        REQUIRE_EQ(response->status, 400);
     }
 
     // TEARDOWN
@@ -555,15 +526,6 @@ TEST_CASE("api-update-account") {
             auto response = client.Patch("/account", j.dump(), "application/json");
             REQUIRE_EQ(response->status, 404);
         }
-        SUBCASE("missing-fields") {
-            auto response = client.Patch("/account", "{}", "application/json");
-            REQUIRE_EQ(response->status, 400);
-        }
-    }
-
-    SUBCASE("junk") {
-        auto response = client.Patch("/account", "junk", "application/json");
-        REQUIRE_EQ(response->status, 400);
     }
 
     // TEARDOWN
@@ -609,11 +571,6 @@ TEST_CASE("api-delete-account") {
             auto response = client.Delete("/account", j.dump(), "application/json");
             REQUIRE_EQ(response->status, 400);
         }
-    }
-
-    SUBCASE("junk") {
-        auto response = client.Delete("/account", "junk", "application/json");
-        REQUIRE_EQ(response->status, 400);
     }
 
     // TEARDOWN
@@ -696,11 +653,6 @@ TEST_CASE("api-generate-account-key") {
             auto response = client.Put("/account/key", j.dump(), "application/json");
             REQUIRE_EQ(response->status, 400);
         }
-    }
-
-    SUBCASE("junk") {
-        auto response = client.Put("/account/key", "junk", "application/json");
-        REQUIRE_EQ(response->status, 400);
     }
 
     // TEARDOWN
@@ -807,18 +759,7 @@ TEST_CASE("api-login") {
         REQUIRE_EQ(response->status, 400);
     }
 
-    SUBCASE("user-does-not-exist") {
-        j.at("username") = "i-dont-exist-9999";
-        auto response = client.Post("/login", j.dump(), "application/json");
-        REQUIRE_EQ(response->status, 401);
-    }
-
-    SUBCASE("junk") {
-        auto response = client.Post("/login", "junk", "application/json");
-        REQUIRE_EQ(response->status, 400);
-    }
-
-    // TEARDOWN
+// TEARDOWN
     srv.Stop();
     runThread.join();
     // END TEARDOWN

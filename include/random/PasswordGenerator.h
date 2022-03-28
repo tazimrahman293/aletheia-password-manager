@@ -20,7 +20,7 @@ class PasswordGenerator {
 		alphanumericOptionsLower = 0,	// lowercase characters
 		alphanumericOptionsUpper = 1,	// uppercase characters
 		alphanumericOptionsNumber = 2,	// numeric characters
-		alphanumericOptionsSpecial = 3,	// special symbol characters
+		alphanumericOptionsSymbol = 3,	// special symbol characters
 		alphanumericOptionsCount = 4,	// the number of alphanumeric options
 	};
 
@@ -42,7 +42,7 @@ public:
 	PasswordGenerator();
 	~PasswordGenerator() = default;
 
-	std::string NewPassword(int length, bool lower=true, bool upper=true, bool number=true, bool special=true);
+	std::string NewPassword(int length);
 
 };
 

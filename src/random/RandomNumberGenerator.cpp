@@ -3,7 +3,10 @@
 // Authors: Tyrel Kostyk
 
 #include <random/RandomNumberGenerator.h>
-#include <hydrogen.h>
+
+#include <stdexcept>
+#include <stdlib.h>
+#include <time.h>
 
 
 /**
@@ -19,24 +22,21 @@ RandomNumberGenerator::RandomNumberGenerator()
 /**
  * Generate and return a random number from with a range.
  *
- * @param minValue The minimum value of the random number (exclusive).
+ * @param minValue The minimum value of the random number (inclusive).
  * @param maxValue The maximum value of the random number (inclusive).
- * @return A random value within the bounds specified above. 0 on error.
+ * @return A random value within the bounds specified above.
  */
 int RandomNumberGenerator::GetNew(int minValue, int maxValue)
 {
-    if (minValue == maxValue)
+    if (minValue == maxValue) {
         return maxValue;
-	if (minValue < 0 || maxValue < 0)
-		return 0;
-	if (minValue > maxValue)
-		return 0;
+    }
 
-	// reseed before random generation
+	// seed the randomizer
 	Seed();
 
-	// generate random value between bounds
-	int randomNumber = hydro_random_uniform(maxValue-minValue) + minValue;
+	// generate random value within bounds
+	int randomNumber = (rand() % (maxValue - minValue)) + minValue;
 
 	return randomNumber;
 }
@@ -47,5 +47,6 @@ int RandomNumberGenerator::GetNew(int minValue, int maxValue)
  */
 void RandomNumberGenerator::Seed()
 {
-	hydro_random_reseed();
+	// seed the randomizer with the current time
+	srand(time(NULL));
 }

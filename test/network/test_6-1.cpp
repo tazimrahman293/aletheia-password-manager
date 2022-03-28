@@ -80,23 +80,4 @@ TEST_CASE("network-connect") {
     runThread.join();
 }
 
-TEST_CASE("network-run-non-quiet") {
-    // SETUP
-    HTTPServer srv;
-    Storage storage(dbFilename);
-    srv.Init(&storage);
-    auto runThread = std::thread([&](){
-        srv.Run(false);
-    });
-    while (!srv.IsRunning()) {
-    std::this_thread::sleep_for(std::chrono::nanoseconds{1});
-    }
-    // END SETUP
-
-    // TEARDOWN
-    srv.Stop();
-    runThread.join();
-    // END TEARDOWN
-}
-
 TEST_SUITE_END();  // network
