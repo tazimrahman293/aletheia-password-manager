@@ -1,10 +1,7 @@
 //
 // Created by Tazim Rahman on 2022-02-28.
 //
-#ifndef CLI_COMMANDHANDLER_H
-#define CLI_COMMANDHANDLER_H
-
-#include <iostream>
+#include <string>
 #include <vector>
 
 
@@ -25,45 +22,18 @@ class CommandLine : public InputParser {
 
     Storage* database;
 
-    ContextManager ctxManager;
-
-    bool testMode;
-
-    class CommandInStream : public std::istringstream {
-    public:
-        CommandInStream() = default;
-    };
-    class CommandOutStream : public std::ostringstream {
-    public:
-        CommandOutStream() = default;
-    };
-
 public:
 
-    CommandLine(int argc, char **argv, Storage *db, bool testMode) :
-            InputParser(argc, argv), database(db), testMode(testMode) { }
-    CommandLine(int argc, char **argv, Storage *db) : CommandLine(argc, argv, db, false) { }
+    CommandLine(int argc, char **argv, Storage *db) : InputParser(argc, argv) {
+        database = db;
+    }
 
-    CommandInStream inStream;
-    CommandOutStream outStream;
+    void HandleCommands(); // Handling of every Event and Command
 
-    void Print(const std::string &message);
-    void PrintLine(const std::string &message);
-    std::string GetInput(const std::string &prompt);
-
-    [[nodiscard]] bool IsRunning() const { return !ctxManager.quitting; }
-
-    void HandleCommands(const std::string &command);
-
-    void DoRegister(
-            const std::string &username,
-            const std::string &firstName,
-            const std::string &lastName,
-            const std::string &password
-            );
-    void DoLogin(const std::string &username, const std::string &password);
-
-    void SetDatabase(Storage* db) { this->database = db; };
+    // Grabbing and updating respective variables
+    [[nodiscard]] std::string GetInput() const { return input; };
+    [[nodiscard]] std::string GetCommand() const { return command; };
+    [[nodiscard]] std::string GetOutput() const { return output; };
 
 };
 #endif //CLI_COMMANDHANDLER_H
