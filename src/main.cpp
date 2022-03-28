@@ -53,7 +53,15 @@ int main(int argc, char *argv[])
         server.Run(false);  // quiet = false
     } else {
         cli.SetDatabase(&database); // Use initialized database
-        cli.HandleCommands();
+        std::string command;
+        cli.PrintLine("Welcome to Aletheia password manager!");
+        while (cli.IsRunning()) {
+            cli.PrintLine("What would you like to do? Type help for a list of commands.");
+            command = cli.GetInput(">>");
+
+            cli.HandleCommands(command);
+        }
+        cli.PrintLine("Exiting. Thank you for using Aletheia!");
     }
 
     return 0;
