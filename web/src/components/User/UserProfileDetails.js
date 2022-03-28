@@ -1,26 +1,30 @@
 import { Box, Button, Card, CardContent, CardHeader, Divider, Grid, TextField } from '@mui/material';
 import { useFormik } from 'formik';
 import axios from 'axios';
+import useToken from '../UseToken/useToken';
 
 const userUpdateUrl = '/user'
 
 export const UserProfileDetails = (props) => {
 
+    const { token } = useToken();
+
     const formik = useFormik({
         initialValues: {
             //TODO: Add initial values from the logged in users details
-            firstName: '',
-            lastName: '',
-            userName: ''
+            firstName: token.firstName,
+            lastName: token.lastName,
+            userName: token.username
         },
         validateOnChange: false,
         onSubmit: values => {
 
             axios
                 .patch(userUpdateUrl , JSON.stringify({
-                    firstName: values.firstName,
-                    lastName: values.lastName,
-                    userName: values.userName
+                    'pk': 2,
+                    'username': values.userName,
+                    'firstName': values.firstName,
+                    'lastName': values.lastName
                 }),
                     { headers: { 'Content-Type': 'application/json', crossDomain: true } }
                 )

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { FaBars } from 'react-icons/fa';
 import { Nav, NavContainer, NavLogo, IconMobile, NavMenu, NavItems, NavLinks, NavButton, NavButtonLink, NavLinkRouter } from './NavbarElements';
 import { animateScroll as scroll } from 'react-scroll';
-import useToken from '../UseToken/useToken'
+import useToken from '../UseToken/useToken';
 import deleteToken from '../UseToken/deleteToken';
 
 /**
