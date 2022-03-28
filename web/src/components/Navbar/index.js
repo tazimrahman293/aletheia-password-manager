@@ -1,7 +1,9 @@
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
 import { FaBars } from 'react-icons/fa';
 import { Nav, NavContainer, NavLogo, IconMobile, NavMenu, NavItems, NavLinks, NavButton, NavButtonLink, NavLinkRouter } from './NavbarElements';
 import { animateScroll as scroll } from 'react-scroll';
+import useToken from '../UseToken/useToken'
+import deleteToken from '../UseToken/deleteToken';
 
 /**
  * 
@@ -10,13 +12,15 @@ import { animateScroll as scroll } from 'react-scroll';
  */
 const Navbar = ({ toggle }) => {
 
+    const { token } = useToken();
+
     /**
      * Function to implement smooth scroll on to Navbar
      */
     const [scrollNav, setScrollNav] = useState(false)
 
     const changeNav = () => {
-        if(window.scrollY >= 80) {
+        if (window.scrollY >= 80) {
             setScrollNav(true)
         } else {
             setScrollNav(false)
@@ -43,7 +47,7 @@ const Navbar = ({ toggle }) => {
                     </IconMobile>
                     <NavMenu>
                         <NavItems>
-                            <NavLinks to='about'  smooth={true} duration={500} spy={true} exact='true' offset={-80}>About</NavLinks>
+                            <NavLinks to='about' smooth={true} duration={500} spy={true} exact='true' offset={-80}>About</NavLinks>
                         </NavItems>
                         <NavItems>
                             <NavLinks to='features' smooth={true} duration={500} spy={true} exact='true' offset={-80}>Features</NavLinks>
@@ -56,7 +60,7 @@ const Navbar = ({ toggle }) => {
                         </NavItems>
                     </NavMenu>
                     <NavButton>
-                        <NavButtonLink to='/signIn'>Sign In</NavButtonLink>
+                    {token ? <NavButtonLink onClick={deleteToken} replace to='/'>Sign Out</NavButtonLink> : <NavButtonLink to='/signIn'>Sign In</NavButtonLink>}
                     </NavButton>
                 </NavContainer>
             </Nav>

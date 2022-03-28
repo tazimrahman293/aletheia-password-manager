@@ -1,5 +1,7 @@
 import React from 'react'
 import { SidebarContainer, Icon, CrossIcon, SideBarWrapper, SidebarMenu, SidebarButton, SidebarButtonRouter, SidebarLinkRouter} from './../Sidebar/SidebarElements'
+import useToken from '../UseToken/useToken';
+import deleteToken from '../UseToken/deleteToken';
 
 /**
  * 
@@ -7,7 +9,7 @@ import { SidebarContainer, Icon, CrossIcon, SideBarWrapper, SidebarMenu, Sidebar
  * @returns SidebarUser
  */
 const SidebarUser = ({isOpen, toggle}) => {
-
+    const { token } = useToken();
 
     return (
         <SidebarContainer isOpen={isOpen} onClick={toggle}>
@@ -22,7 +24,7 @@ const SidebarUser = ({isOpen, toggle}) => {
                     <SidebarLinkRouter to='/settings' id='settings'>Settings</SidebarLinkRouter>
                 </SidebarMenu>
                 <SidebarButton>
-                    <SidebarButtonRouter to='/signin'> Sign In</SidebarButtonRouter>
+                {token ? <SidebarButtonRouter onClick={deleteToken} to='/'>Sign Out</SidebarButtonRouter> : <SidebarButtonRouter to='/signIn'>Sign In</SidebarButtonRouter>}
                 </SidebarButton>
             </SideBarWrapper>
         </SidebarContainer>

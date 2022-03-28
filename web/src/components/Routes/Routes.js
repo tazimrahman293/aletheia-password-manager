@@ -7,6 +7,7 @@ import SettingsPage from '../../pages/settings'
 import CreateAccountPage from '../../pages/createAccount'
 import DashboardPage from '../../pages/dashboard'
 import useToken from '../UseToken/useToken'
+import NotFound from '../Error/404'
 
 /**
  * 
@@ -23,7 +24,8 @@ const AppRoutes = () => {
 
         <Route path='/' element={<Home />} />
         <Route path='/signUp' element={<SignUpPage />} />
-
+        <Route path='/404' element={<NotFound />} />
+        
         
         {
         // If the token is  not present then redirect to SignInPage 
@@ -41,10 +43,7 @@ const AppRoutes = () => {
             <Route path='/dashboard' element={<DashboardPage />} />
           </>
         )}
-
-        
-        <Route path="*" element={<Navigate replace to={ token ? 'dashboard' : '/signIn'}/>}/>
-      
+        <Route path="*" element={<Navigate replace to={ token ? 'dashboard' : '/signIn'}/>}/>      
       </Routes>
     </Router>
   </>
