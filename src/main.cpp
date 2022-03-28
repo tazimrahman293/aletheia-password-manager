@@ -7,9 +7,13 @@
 #include <Storage.h>
 #include <hydrogen.h>
 
+#include "auth/Authenticator.h"
 #include "network/HTTPServer.h"
 #include "cli/CommandLine.h"
 #include "cli/InputParser.h"
+
+
+Authenticator *auth = nullptr;	// Authentication and Encryption entry point
 
 
 /**
@@ -17,11 +21,7 @@
  */
 int main(int argc, char *argv[])
 {
-	// initialize the libhydrogen Authentication library
-	if (hydro_init() != 0) {
-		printf("Failed to initialize Hydrogren authentication library. Exiting...\n");
-		exit(-1);
-	}
+	auth = new Authenticator();
 
     CommandLine cli(argc, argv, nullptr);
 

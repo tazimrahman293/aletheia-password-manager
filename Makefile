@@ -39,7 +39,6 @@ SRC     = $(wildcard src/*.cpp) \
 		  $(wildcard src/**/*.cpp)
 
 HDR     = $(wildcard include/**/*.h) \
-		  include/Crypto.h \
 		  include/Storage.h
 
 OBJECTS = $(SRC:%.cpp=$(OBJ_DIR)/%.o)
