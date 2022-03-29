@@ -5,6 +5,8 @@
 #include <aletheia.h>
 #include <auth/Authenticator.h>
 #include <hydrogen.h>
+#include <stdlib.h>
+#include <cstring>
 
 
 /**
@@ -18,55 +20,74 @@ Authenticator::Authenticator()
 		printf("Failed to initialize Hydrogren encryption library. Exiting...\n");
 		exit(-1);
 	}
-
-	// create the local master key
-	hydro_pwhash_keygen(masterKey);
 }
 
 
 /**
- * Create a high-entropy hash that represents the provided plaintext password.
- * @param password	A plaintext password that can later be validated against this hash.
- * @return A byte vector containing the new hash.
+ * Create an encrypted message that represents the provided plaintext password.
+ * @param password	A plaintext password.
+ * @return A byte vector containing the new encrypted message.
  */
-std::vector<uint8_t> Authenticator::Hash(std::string password)
+std::vector<uint8_t> Authenticator::Encrypt(const std::string &password)
 {
 	// password must have non-zero length
 	if (password.length() <= 0)
-		return std::vector<uint8_t>();
+		return {};
 
-	// create a byte array for storing resultant hash
-	uint8_t hashBytes[128] = { 0 };
+	// create a byte array for storing resultant encrypted message
+	int encryptedSize = encryptedOverhead + password.length();
+	uint8_t *encryptedBytes = (uint8_t *)malloc(encryptedSize);
+	if (encryptedBytes == nullptr)
+		return std::vector<uint8_t>();;
+	memset(encryptedBytes, 0, encryptedSize);
 
-	// generate the hash
-	int result = hydro_pwhash_create(hashBytes, password.c_str(),
-		password.length(), masterKey, opsLimit, memLimit, threads);
+	// generate the encrypted message
+	int result = hydro_secretbox_encrypt(encryptedBytes, password.c_str(),
+		password.length(), encryptId, context, masterKey);
 
 	// return an empty vector if the creation attempt failed
-	if (result != 0)
+	if (result != 0) {
+		free(encryptedBytes);
 		return std::vector<uint8_t>();
+	}
 
-	// return a vector containing the hash
-	std::vector<uint8_t> hash(hashBytes, hashBytes + hashSize);
-	return hash;
+	// return a vector containing the encrypted password
+	std::vector<uint8_t> encrypted(encryptedBytes, encryptedBytes + encryptedSize);
+	free(encryptedBytes);
+	return encrypted;
 }
 
 
 /**
- * Verifies the integreity of a password attempt against an existing hash.
- * @param hash A byte-vector containing an existing hash.
- * @param passwordAttempt A plaintext string of the password to verify.
- * @returns true (1) on success & verified, false (0) otherwise.
+ * Decrypts and verifies the integreity of an encrypted password.
+ * @param encrypted A byte-vector containing an encrypted password.
+ * @returns A string containing the decrypted password on success; empty string otherwise.
  */
-bool Authenticator::Verify(std::vector<uint8_t> hash, std::string passwordAttempt)
+std::string Authenticator::Decrypt(const std::vector<uint8_t> &encrypted)
 {
-	// convert the hash to a simple byte array
-	uint8_t *hashBytes = &hash[0];
+	// decrypted password to return
+	std::string password = "";
 
-	// verify the hash against the password attempt
-	int result = hydro_pwhash_verify(hashBytes, passwordAttempt.c_str(),
-		passwordAttempt.length(), masterKey, opsLimit, memLimit, threads);
+	// convert the encrypted message to a simple byte array
+	const uint8_t *encryptedBytes = &encrypted[0];
 
-	// return the success of the attempt
-	return (result == 0);
+	// prepare a byte array to receive the decrypted message
+	int decryptedSize = encrypted.size() - encryptedOverhead;
+	char *decryptedString = (char *)malloc(decryptedSize);
+	if (decryptedString == nullptr)
+		return password;
+	memset(decryptedString, 0, decryptedSize);
+
+	// verify and decrypt the password
+	int result = hydro_secretbox_decrypt(decryptedString, encryptedBytes,
+		encrypted.size(), encryptId, context, masterKey);
+
+	// convert char array to std::string upon success
+	if (result == 0) {
+		for (int i = 0; i < decryptedSize; i++)
+			password += decryptedString[i];
+	}
+
+	free(decryptedString);
+	return password;
 }

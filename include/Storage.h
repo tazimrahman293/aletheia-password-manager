@@ -30,14 +30,14 @@ inline auto createDatabase(const std::string &dbFilename) {
                     make_column("username", &User::username),
                     make_column("first_name", &User::firstName),
                     make_column("last_name", &User::lastName),
-                    make_column("key_hash", &User::keyHash)
+                    make_column("key_hash", &User::hash)
             ),
             make_table<Account>(
                     "accounts",
                     make_column("ID", &Account::pk, autoincrement(), primary_key()),
                     make_column("label", &Account::label),
                     make_column("username", &Account::username),
-                    make_column("key_hash", &Account::keyHash),
+                    make_column("key_hash", &Account::hash),
                     make_column("url", &Account::url),
                     make_column("created", &Account::created),
                     make_column("last_accessed", &Account::lastAccessed),

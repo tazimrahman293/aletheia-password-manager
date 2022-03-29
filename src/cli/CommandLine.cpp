@@ -12,6 +12,7 @@
 #include "cli/InputParser.h"
 #include "data/User.h"
 #include "data/Account.h"
+#include "aletheia.h"
 
 
 void CommandLine::Print(const std::string &message)
@@ -59,7 +60,12 @@ void CommandLine::DoRegister(
     newUser.username = username;
     newUser.firstName = firstName;
     newUser.lastName = lastName;
-    newUser.keyHash = password;
+    newUser.password = password;
+
+    auto hash = auth->Encrypt(password);
+    auto chars = hashToChars(hash);
+    newUser.hash = chars;
+
     database->Insert(newUser);
 
     ctxManager.authenticated = true;
@@ -77,7 +83,10 @@ void CommandLine::DoLogin(const std::string &username, const std::string &passwo
 {
     auto user = database->GetUserByUsername(username);
 
-    if (user != nullptr && user->keyHash == password) {
+    auto hash = charsToHash(user->hash);
+    auto k = auth->Decrypt(hash);
+
+    if (user != nullptr && password == k) {
         // User exists and password is correct
         if (!ctxManager.SetContext(Main)) {
             PrintLine("Unable to log in at this time.");
@@ -171,9 +180,12 @@ void CommandLine::HandleCommands(const std::string &command) {
         // Getting current time and converting to long data type in a single line (can be changed if needed)
         long value_ms = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::time_point_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now()).time_since_epoch()).count();
 
+		auto hash = auth->Encrypt(accountPassword);
+	    auto encryptedPassword = hashToChars(hash);
+
         Account newAccount;
         newAccount.username = accountUsername;
-        newAccount.keyHash = accountPassword;
+        newAccount.hash = encryptedPassword;
         newAccount.label = label;
         newAccount.url = URL;
         newAccount.userID = user->pk;
@@ -234,8 +246,9 @@ void CommandLine::HandleCommands(const std::string &command) {
                         password1 = GetInput("New password:");
                         password2 = GetInput("Confirm new password:");
                         if (password1 == password2) {
-                            // TODO hash the plain text
-                            modifiedAccount.keyHash = password2;
+							auto hash = auth->Encrypt(password1);
+						    auto encryptedPassword = hashToChars(hash);
+                            modifiedAccount.hash = encryptedPassword;
                         } else {
                             PrintLine("Passwords do not match - try again.");
                         }
@@ -289,8 +302,10 @@ void CommandLine::HandleCommands(const std::string &command) {
 
         PrintLine("Your accounts:");
         for (Account &account : userAccounts) {
+			auto hash = charsToHash(account.hash);
+		    auto decryptedPassword = auth->Decrypt(hash);
             std::ostringstream accountLine;
-            accountLine << account.label << " - " << account.username << " (" << account.url << ")";
+            accountLine << account.label << " - " << account.username << " (" << account.url << ") " << ": " << decryptedPassword;
             PrintLine(accountLine.str());
             account.lastAccessed = value_ms;
         }
@@ -317,5 +332,3 @@ void CommandLine::HandleCommands(const std::string &command) {
         PrintLine("Invalid command: " + command);
     }
 }
-
-
