@@ -12,7 +12,7 @@
 	    test
 
 CC      = gcc
-CFLAGS  = -std=c++17 -Wall -Wextra
+CFLAGS  = -std=c++17 #-Wall -Wextra
 
 # Get the OS of the current system and set the target flags appropriately
 ifeq ($(OS),Windows_NT)
