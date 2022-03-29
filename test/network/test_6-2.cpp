@@ -42,7 +42,7 @@
 //    account.label = "example";
 //    account.username = "abc" + std::to_string(suffix);
 //    account.url = "example.com";
-//    account.keyHash = "password";
+//    account.password = "password";
 //    account.expiry = 0;
 //    account.created = 0;
 //    account.lastAccessed = 0;
@@ -59,7 +59,7 @@
 //{
 //    using json = nlohmann::json;
 //    auto data = json::parse(body);
-//    data.erase("keyHash");
+//    data.erase("password");
 //    data.erase("password");
 //    return data.get<T>();
 //}
@@ -398,7 +398,7 @@
 //                {"label", "example"},
 //                {"username", "abc123"},
 //                {"url", "example.com"},
-//                {"keyHash", "password"},
+//                {"password", "password"},
 //                {"created", 0},
 //                {"lastAccessed", 0},
 //                {"lastModified", 0},

@@ -274,7 +274,7 @@ void HTTPServer::Init(Storage *store, Authenticator *authenticator)
                 storage->Insert(record);
 
                 json j = record;
-                j.erase("keyHash");
+                j.erase("password");
                 response.status = 201;
                 response.set_content(j.dump(), "application/json");
             });
@@ -304,7 +304,7 @@ void HTTPServer::Init(Storage *store, Authenticator *authenticator)
                 json j = json::array();
                 for (auto& account : accounts) {
                     j.emplace_back(account);
-                    j.back().erase("keyHash");  // Don't transmit key on this endpoint
+                    j.back().erase("password");  // Don't transmit key on this endpoint
                 }
 
                 response.set_content(j.dump(), "application/json");
@@ -361,7 +361,7 @@ void HTTPServer::Init(Storage *store, Authenticator *authenticator)
                 }
 
                 json j = *account;
-                j.erase("keyHash");
+                j.erase("password");
                 response.set_content(j.dump(), "application/json");
                 response.status = 200;
             });
@@ -421,10 +421,10 @@ void HTTPServer::Init(Storage *store, Authenticator *authenticator)
                 }
 
                 if (!random) {
-                    account->keyHash = key;
+                    account->password = key;
                 } else {
                     PasswordGenerator generator;
-                    account->keyHash = generator.NewPassword(length);
+                    account->password = generator.NewPassword(length);
                 }
 
                 storage->Update(*account);
@@ -449,7 +449,7 @@ void HTTPServer::Init(Storage *store, Authenticator *authenticator)
                 if (account != nullptr) {
                     json j;
                     j["pk"] = account->pk;
-                    j["key"] = account->keyHash;  // TODO need to decrypt first
+                    j["key"] = account->password;  // TODO need to decrypt first
                     response.set_content(j.dump(), "application/json");
                 } else {
                     response.status = 404;

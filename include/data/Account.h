@@ -6,7 +6,7 @@
 #define PROJECT_ACCOUNT_H
 
 #include <string>
-
+#include <vector>
 #include <json.h>
 
 
@@ -17,8 +17,9 @@ struct Account {
     int pk;
     std::string label;
     std::string username;
-    std::string keyHash;
+    std::string password;
     std::string url;
+	std::vector<char> hash;
     long created;
     long lastAccessed;
     long lastModified;
@@ -34,7 +35,7 @@ NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(\
         pk,\
         label,\
         username,\
-        keyHash,\
+        password,\
         url,\
         created,\
         lastAccessed,\

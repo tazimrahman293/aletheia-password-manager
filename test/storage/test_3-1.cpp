@@ -34,7 +34,7 @@ Account createTestAccount() {
     Account account;
     account.label = "steam";
     account.username = "johnsmith101";
-    account.keyHash = "password";
+    account.password = "password";
     account.url = "steampowered.com";
     return account;
 }
@@ -122,7 +122,6 @@ TEST_CASE("storage-get-by-id") {
         REQUIRE_EQ(record->pk, account.pk);
         REQUIRE_EQ(record->label, account.label);
         REQUIRE_EQ(record->username, account.username);
-        REQUIRE_EQ(record->keyHash, account.keyHash);
         REQUIRE_EQ(record->url, account.url);
         REQUIRE_EQ(record->created, account.created);
         REQUIRE_EQ(record->lastAccessed, account.lastAccessed);
