@@ -5,11 +5,11 @@ Content-Type: application/json
 {
   "pk": 1,
   "random": true,
-  "length": 16,
+  "length": 1023,
   "lowers": true,
-  "uppers": false,
-  "numbers": false,
-  "specials": false
+  "uppers": true,
+  "numbers": true,
+  "specials": true
 }
 
 ### Get Account Key

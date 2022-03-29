@@ -271,10 +271,13 @@ void HTTPServer::Init(Storage *store, Authenticator *authenticator)
                     return;
                 }
 
+                record.hash = hashToChars(auth->Encrypt(record.password));
+
                 storage->Insert(record);
 
                 json j = record;
                 j.erase("password");
+                j.erase("hash");
                 response.status = 201;
                 response.set_content(j.dump(), "application/json");
             });
@@ -304,6 +307,7 @@ void HTTPServer::Init(Storage *store, Authenticator *authenticator)
                 json j = json::array();
                 for (auto& account : accounts) {
                     j.emplace_back(account);
+                    j.back().erase("hash");
                     j.back().erase("password");  // Don't transmit key on this endpoint
                 }
 
@@ -362,6 +366,7 @@ void HTTPServer::Init(Storage *store, Authenticator *authenticator)
 
                 json j = *account;
                 j.erase("password");
+                j.erase("hash");
                 response.set_content(j.dump(), "application/json");
                 response.status = 200;
             });
@@ -424,9 +429,16 @@ void HTTPServer::Init(Storage *store, Authenticator *authenticator)
                     account->password = key;
                 } else {
                     PasswordGenerator generator;
-                    account->password = generator.NewPassword(length);
+                    account->password = generator.NewPassword(
+                            length,
+                            lowers,
+                            uppers,
+                            numbers,
+                            specials
+                            );
                 }
 
+                account->hash = hashToChars(auth->Encrypt(account->password));
                 storage->Update(*account);
                 response.status = 200;
             });
@@ -449,7 +461,8 @@ void HTTPServer::Init(Storage *store, Authenticator *authenticator)
                 if (account != nullptr) {
                     json j;
                     j["pk"] = account->pk;
-                    j["key"] = account->password;  // TODO need to decrypt first
+                    account->password = auth->Decrypt(charsToHash(account->hash));
+                    j["key"] = account->password;
                     response.set_content(j.dump(), "application/json");
                 } else {
                     response.status = 404;
