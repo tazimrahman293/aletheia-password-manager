@@ -18,6 +18,7 @@
 #include "Storage.h"
 #include "cli/InputParser.h"
 #include "cli/ContextManager.h"
+#include "random/PasswordGenerator.h"
 
 
 class CommandLine : public InputParser {
@@ -39,6 +40,8 @@ class CommandLine : public InputParser {
         CommandOutStream() = default;
     };
 
+	void PrintHelp();
+
 public:
 
     CommandLine(int argc, char **argv, Storage *db, bool testMode) :
@@ -47,6 +50,7 @@ public:
 
     CommandInStream inStream;
     CommandOutStream outStream;
+	PasswordGenerator rpg;
 
     void Print(const std::string &message);
     void PrintLine(const std::string &message);

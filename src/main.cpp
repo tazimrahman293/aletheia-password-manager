@@ -54,9 +54,9 @@ int main(int argc, char *argv[])
     } else {
         cli.Init(&database, auth);
         std::string command;
-        cli.PrintLine("Welcome to Aletheia password manager!");
+        cli.PrintLine("\nWelcome to Aletheia password manager!");
         while (cli.IsRunning()) {
-            cli.PrintLine("What would you like to do? Type help for a list of commands.");
+            cli.PrintLine("\nWhat would you like to do? Type 'help' for a list of commands.");
             command = cli.GetInput(">>");
 
             cli.HandleCommands(command);
