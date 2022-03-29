@@ -100,8 +100,8 @@ void HTTPServer::Init(Storage *store, Authenticator *authenticator)
 
                 auto hash = charsToHash(user->hash);
 
-
-                if (auth->Verify(hash, pass)) {
+                auto k = auth->Decrypt(hash);
+                if (k == pass) {
                     json j = *user;
                     j.erase("password");
                     response.set_content(j.dump(), "application/json");
@@ -135,7 +135,7 @@ void HTTPServer::Init(Storage *store, Authenticator *authenticator)
                     return;
                 }
 
-                auto hash = auth->Hash(record.password);
+                auto hash = auth->Encrypt(record.password);
                 auto chars = hashToChars(hash);
                 record.hash = chars;
                 storage->Insert(record);

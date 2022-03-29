@@ -62,7 +62,7 @@ void CommandLine::DoRegister(
     newUser.lastName = lastName;
     newUser.password = password;
 
-    auto hash = auth->Hash(password);
+    auto hash = auth->Encrypt(password);
     auto chars = hashToChars(hash);
     newUser.hash = chars;
 
@@ -84,7 +84,9 @@ void CommandLine::DoLogin(const std::string &username, const std::string &passwo
     auto user = database->GetUserByUsername(username);
 
     auto hash = charsToHash(user->hash);
-    if (user != nullptr && auth->Verify(hash, password)) {
+    auto k = auth->Decrypt(hash);
+
+    if (user != nullptr && password == k) {
         // User exists and password is correct
         if (!ctxManager.SetContext(Main)) {
             PrintLine("Unable to log in at this time.");
