@@ -25,10 +25,15 @@ RandomNumberGenerator::RandomNumberGenerator()
  */
 int RandomNumberGenerator::GetNew(int minValue, int maxValue)
 {
+	// simple optimization
     if (minValue == maxValue)
         return maxValue;
+
+	// no negative numbers allowed
 	if (minValue < 0 || maxValue < 0)
 		return 0;
+
+	// minimum value must not exceed maximum value
 	if (minValue > maxValue)
 		return 0;
 
