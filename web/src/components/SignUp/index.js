@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { DataContainer, DataWrapper, DataRow, Column1, Column2, TextWrapper, ImgWrap, Img } from './../DataSection/DataElements';
 import * as yup from "yup";
 import { Link as LinkRouter } from 'react-router-dom';
@@ -8,6 +8,7 @@ import { useFormik } from 'formik';
 import { Box, Button, Container, TextField, Typography } from '@mui/material';
 import { Nav, NavContainer } from '../Navbar/NavbarElements'
 import { Icon } from './../SignIn/SigninElements'
+import Alert from '@material-ui/lab/Alert';
 YupPassword(yup)
 
 
@@ -21,6 +22,10 @@ const userUrl = '/user';
  */
 const SignUp = () => {
 
+    //for error handling
+    const [iserror, setIserror] = useState(false)
+    const [errorMessages, setErrorMessages] = useState([])
+
     const formik = useFormik({
         initialValues: {
             firstName: '',
@@ -30,26 +35,28 @@ const SignUp = () => {
             confirmPassword: ''
         },
         validateOnChange: false,
+        validate: (value) => {
+            return (
+                axios.get('/user?username=' + value.userName)
+                    .then((response) => {
+                        if (response) {
+                            setIserror(true)
+                            setErrorMessages(["Username alrady exisits"])
+                            console.log(errorMessages)
+                        } else {
+                            setIserror(false)
+                            setErrorMessages([])
+                        }
+                    }))
+                    .catch((error) => {
+                        setIserror(false)
+                        setErrorMessages([])
+                    })
+        },
         validationSchema: yup.object({
             firstName: yup.string().required().max(255),
             lastName: yup.string().required().max(255),
             userName: yup.string().required().max(255),
-            // TODO: Check for existing user Name
-            // .test('Unique User Name', 'UserName already in use', // <- key, message
-            //     function (value) {
-            //         return new Promise((resolve, reject) => {
-            //             axios.get(userUrl)
-            //                 .then((res) => {
-            //                     resolve(true)
-            //                 })
-            //                 .catch((error) => {
-            //                     if (error.response.data.content === "The User Name has already been taken.") {
-            //                         resolve(false);
-            //                     }
-            //                 })
-            //         })
-            //     }
-            // ),
             password: yup.string().password().required().max(255),
             confirmPassword: yup.string().oneOf([yup.ref('password'), null], "Passwords must match")
         }),
@@ -61,7 +68,7 @@ const SignUp = () => {
                 'pk': 1,
                 'firstName': values.firstName,
                 'lastName': values.lastName,
-                'keyHash': values.password,
+                'password': values.password,
                 'username': values.userName
             }, null, 2));
 
@@ -72,20 +79,12 @@ const SignUp = () => {
                     'username': values.userName,
                     'firstName': values.firstName,
                     'lastName': values.lastName,
-                    'keyHash': values.password
+                    'password': values.password
                 }),// TODO shift headers into AXIOS api
                     { headers: { 'Content-Type': 'application/json', crossDomain: true } }
                 )
                 .then(response => { console.log(response.data) })
                 .catch(error => { console.log(error.data) });
-
-            // testing get request
-            //     axios
-            //         .get(userUrl
-            //         )
-            //         .then(response => { console.log(response.data) })
-            //         .catch(error => { console.log(error.data) });
-            // }
         }
     });
 
@@ -129,6 +128,15 @@ const SignUp = () => {
                                                     Fill the information to create a new user
                                                 </Typography>
                                             </Box>
+                                            <div>
+                                                {iserror &&
+                                                    <Alert severity="error">
+                                                        {errorMessages.map((msg, i) => {
+                                                            return <div key={i}>{msg}</div>
+                                                        })}
+                                                    </Alert>
+                                                }
+                                            </div>
                                             <TextField
                                                 error={Boolean(formik.touched.firstName && formik.errors.firstName)}
                                                 fullWidth

@@ -15,8 +15,6 @@ const User = () => {
         setIsOpen(!isOpen)
     }
 
-    //TODO: Convert this into formik object
-    //TODO: Create API request of type PATCH to update user details
     return (
         <>
             <Helmet>

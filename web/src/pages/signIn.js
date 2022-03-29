@@ -7,7 +7,7 @@ import { Helmet } from "react-helmet";
  * 
  * @returns SignIn page from component
  */
-const SignInPage = () => {
+const SignInPage = ({ setToken }) => {
 
   return (
     <>
@@ -16,7 +16,7 @@ const SignInPage = () => {
         <title>Sign In</title>
       </Helmet>
       <ScrollToTop />
-      <SignIn />
+      <SignIn setToken={setToken}/>
     </>
   )
 }
