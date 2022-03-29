@@ -3,7 +3,6 @@ import Home from '../../pages'
 import SignInPage from '../../pages/signIn'
 import SignUpPage from '../../pages/signUp'
 import User from '../../pages/user'
-import SettingsPage from '../../pages/settings'
 import CreateAccountPage from '../../pages/createAccount'
 import DashboardPage from '../../pages/dashboard'
 import useToken from '../UseToken/useToken'
@@ -42,7 +41,6 @@ const AppRoutes = () => {
         token && (
           <>
             <Route path='/user' element={<User />} />
-            <Route path='/settings' element={<SettingsPage />} />
             <Route path='/createAccount' element={<CreateAccountPage />} />
             <Route path='/dashboard' element={<DashboardPage />} />
           </>

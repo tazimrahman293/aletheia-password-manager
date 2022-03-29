@@ -24,7 +24,6 @@ import { Typography } from '@mui/material';
 import { Box } from '@mui/system';
 import useToken from '../UseToken/useToken';
 import axios from '../../api/axios';
-import { useFormik } from 'formik';
 import Demo from '../demo'
 
 const tableIcons = {
@@ -46,9 +45,6 @@ const tableIcons = {
   ThirdStateCheck: forwardRef((props, ref) => <Remove {...props} ref={ref} />),
   ViewColumn: forwardRef((props, ref) => <ViewColumn {...props} ref={ref} />)
 };
-
-
-
 
 export default function Dashboard() {
 
@@ -151,7 +147,7 @@ export default function Dashboard() {
         "username": newData.username,
         "label": newData.label,
         "url": newData.url,
-        "keyHash": newData.password,
+        "password": newData.password,
         "created": 0,
         "lastAccessed": 0,
         "lastModified": 0,
@@ -205,28 +201,6 @@ export default function Dashboard() {
       })
   }
 
-  const formik = useFormik({
-    initialValues: {
-      newPassword: '',
-      pk: 99,
-      random: false,
-      // if NOT random:
-      key: "PLAIN-TEXT-KEY",
-      // if random:
-      length: 8,
-      lowers: false,
-      uppers: false,
-      numbers: false,
-      specials: false
-
-    },
-    validateOnChange:false,
-    onSubmit: values => {
-      // API requests
-    }
-  })
-
-
   return (
 
     <Box
@@ -257,7 +231,7 @@ export default function Dashboard() {
       </div>
       <MaterialTable
         title={<Demo/>}
-        columns={columns}
+        columns={columns}   
         data={data}
         icons={tableIcons}
         editable={{

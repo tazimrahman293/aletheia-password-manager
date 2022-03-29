@@ -21,7 +21,6 @@ const SidebarUser = ({isOpen, toggle}) => {
                     <SidebarLinkRouter to='/' id='homePage'>Home</SidebarLinkRouter>
                     <SidebarLinkRouter to='/user' id='user' >User</SidebarLinkRouter>
                     <SidebarLinkRouter to='/dashboard' id='dashboard'>Dashboard</SidebarLinkRouter>
-                    <SidebarLinkRouter to='/settings' id='settings'>Settings</SidebarLinkRouter>
                 </SidebarMenu>
                 <SidebarButton>
                 {token ? <SidebarButtonRouter onClick={deleteToken} to='/'>Sign Out</SidebarButtonRouter> : <SidebarButtonRouter to='/signIn'>Sign In</SidebarButtonRouter>}

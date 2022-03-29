@@ -68,7 +68,7 @@ const SignUp = () => {
                 'pk': 1,
                 'firstName': values.firstName,
                 'lastName': values.lastName,
-                'keyHash': values.password,
+                'password': values.password,
                 'username': values.userName
             }, null, 2));
 
@@ -79,7 +79,7 @@ const SignUp = () => {
                     'username': values.userName,
                     'firstName': values.firstName,
                     'lastName': values.lastName,
-                    'keyHash': values.password
+                    'password': values.password
                 }),// TODO shift headers into AXIOS api
                     { headers: { 'Content-Type': 'application/json', crossDomain: true } }
                 )

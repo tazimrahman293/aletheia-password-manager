@@ -3,8 +3,8 @@ import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import Modal from '@mui/material/Modal';
-import axios from 'axios';
-import { useState } from 'react';
+import axios from '../api/axios';
+import { useState, useEffect } from 'react';
 
 const style = {
   position: 'absolute',
@@ -25,23 +25,34 @@ export default function BasicModal() {
 
   const generatePassword = () => {
     axios
-    .get('/account/key?account=22')
-    .then((response) => (response.data))
-    .then((data) => {setPassword(data)
-    console.log(data)})
+    .put('/account/key?account=1', {
+      "pk": 1,
+      "random": true,
+      "length": 16,
+      "lowers": true,
+      "uppers": true,
+      "numbers": true,
+      "specials": true
+    })
+    // .then((response) => {setPassword(response(response['key'])))
+    //   console.log(response['key'])})
+    // .then((data) => {setPassword(data)
+    // console.log(data.key)})
     .catch(error => {
       console.log(error)
     })
   } 
-  // useEffect(() => {
-  //   axios.
-  //   get('/account/key?account=1')
-  //   .then((response) => (response.data))
-  //   .then((data) => {setPassword(data)})
-  //   .catch(error => {
-  //     console.log(error)
-  //   })
-  // }, [])
+  useEffect(() => {
+    axios
+    .get('/account/key?account=1')
+    .then((response) => {setPassword((response.data['key']))
+    console.log(response.data['key'])})
+    // .then((data) => {setPassword(data)
+    // console.log(data)})
+    .catch(error => {
+      console.log(error)
+    })
+  })
 
   
   const [open, setOpen] = React.useState(false);

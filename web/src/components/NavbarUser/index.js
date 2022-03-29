@@ -30,9 +30,6 @@ const NavbarUser = ({ toggle }) => {
                         <NavItems>
                             <NavLinkR to='/dashboard' id='dashboard'>Dashboard</NavLinkR>
                         </NavItems>
-                        <NavItems>
-                            <NavLinkR to='/settings' id='settings'>Settings</NavLinkR>
-                        </NavItems>
                     </NavMenu>
                     <NavButton>
                     {token ? <NavButtonLink onClick={deleteToken} to='/'>Sign Out</NavButtonLink> : <NavButtonLink to='/signIn'>Sign In</NavButtonLink>}
