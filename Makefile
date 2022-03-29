@@ -65,6 +65,7 @@ COV_EXCL = '/usr*' \
 		   '${PROJ_DIR}/include/hydrogen.h' \
 		   '${PROJ_DIR}/include/json.h' \
 		   '${PROJ_DIR}/include/sqlite_orm.h' \
+		   '${PROJ_DIR}/src/network/*' \
 		   '${PROJ_DIR}/test/*'
 
 TEST_RESULT  = $(COV_DIR)/test_results.xml

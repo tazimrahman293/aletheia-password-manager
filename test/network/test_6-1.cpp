@@ -2,6 +2,7 @@
 // Created by jeremy on 2022-03-14.
 //
 
+#include "auth/Authenticator.h"
 #include "network/HTTPServer.h"
 #include "Storage.h"
 
@@ -51,7 +52,8 @@ TEST_CASE("network-init") {
 
     HTTPServer server;
     Storage storage(dbFilename);
-    REQUIRE_NOTHROW(server.Init(&storage));
+    Authenticator auth;
+    REQUIRE_NOTHROW(server.Init(&storage, &auth));
 
 }
 
@@ -59,7 +61,8 @@ TEST_CASE("network-connect") {
 
     HTTPServer server;
     Storage storage(dbFilename);
-    server.Init(&storage);
+    Authenticator auth;
+    server.Init(&storage, &auth);
 
     auto runThread = std::thread([&](){
         server.Run();
@@ -84,7 +87,8 @@ TEST_CASE("network-run-non-quiet") {
     // SETUP
     HTTPServer srv;
     Storage storage(dbFilename);
-    srv.Init(&storage);
+    Authenticator auth;
+    srv.Init(&storage, &auth);
     auto runThread = std::thread([&](){
         srv.Run(false);
     });

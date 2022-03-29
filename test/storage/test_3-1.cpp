@@ -2,6 +2,8 @@
 // Created by jeremy on 2022-03-10.
 //
 
+#include "aletheia.h"
+#include "auth/Authenticator.h"
 #include "data/Account.h"
 #include "data/User.h"
 #include "Storage.h"
@@ -14,12 +16,16 @@
 #include <string>
 
 
+Authenticator *auth = new Authenticator;
+
+
 User createTestUser() {
     User user;
     user.username = "abc123";
     user.firstName = "First";
     user.lastName = "Last";
-    user.keyHash = "pass";
+    user.password = "pass";
+    user.hash = hashToChars(auth->Encrypt("pass"));
     return user;
 }
 
@@ -98,7 +104,8 @@ TEST_CASE("storage-get-by-id") {
         REQUIRE_EQ(record->username, user.username);
         REQUIRE_EQ(record->firstName, user.firstName);
         REQUIRE_EQ(record->lastName, user.lastName);
-        REQUIRE_EQ(record->keyHash, user.keyHash);
+        auto k = auth->Decrypt(charsToHash(record->hash));
+        REQUIRE_EQ(k, user.password);
     }
 
     SUBCASE("storage-get-by-id-account") {

@@ -6,6 +6,7 @@
 #define USER_RECORD_H
 
 #include <string>
+#include <vector>
 
 #include <json.h>
 
@@ -18,7 +19,9 @@ struct User {
     std::string username;
     std::string firstName;
     std::string lastName;
-    std::string keyHash;
+    std::string password;
+
+    std::vector<char> hash;
 
     User() : pk(-1) { }
 };
@@ -30,7 +33,7 @@ NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(\
         username,\
         firstName,\
         lastName,\
-        keyHash\
+        password\
         )
 
 #endif  // USER_RECORD_H

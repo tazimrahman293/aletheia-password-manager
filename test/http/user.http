@@ -7,8 +7,7 @@ Content-Type: application/json
   "username": "jsmith1",
   "firstName": "John",
   "lastName": "Smith",
-  "keyHash": "cornucopia",
-  "typeID": 1
+  "password": "cornucopia"
 }
 
 ### Get List of All Users

@@ -28,11 +28,11 @@ Authenticator::Authenticator()
  * @param password	A plaintext password.
  * @return A byte vector containing the new encrypted message.
  */
-std::vector<uint8_t> Authenticator::Encrypt(std::string password)
+std::vector<uint8_t> Authenticator::Encrypt(const std::string &password)
 {
 	// password must have non-zero length
 	if (password.length() <= 0)
-		return std::vector<uint8_t>();
+		return {};
 
 	// create a byte array for storing resultant encrypted message
 	int encryptedSize = encryptedOverhead + password.length();
@@ -63,7 +63,7 @@ std::vector<uint8_t> Authenticator::Encrypt(std::string password)
  * @param encrypted A byte-vector containing an encrypted password.
  * @returns A string containing the decrypted password on success; empty string otherwise.
  */
-std::string Authenticator::Decrypt(std::vector<uint8_t> encrypted)
+std::string Authenticator::Decrypt(const std::vector<uint8_t> &encrypted)
 {
 	// decrypted password to return
 	std::string password = "";

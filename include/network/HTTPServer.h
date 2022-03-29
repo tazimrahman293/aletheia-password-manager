@@ -7,6 +7,7 @@
 
 #include <httplib.h>
 #include "Storage.h"
+#include "auth/Authenticator.h"
 
 
 /**
@@ -22,6 +23,9 @@ class HTTPServer : private httplib::Server {
 
     // Handle for the storage instance (database)
     Storage *storage = nullptr;
+
+    // Handle for authenticator instance
+    Authenticator *auth = nullptr;
 
     httplib::Headers defaultHeaders = {
             {"Access-Control-Allow-Origin", "*"},
@@ -39,7 +43,7 @@ public:
     HTTPServer(HTTPServer& other) = delete;  // No copying
     void operator=(HTTPServer& other) = delete;  // No assignment
 
-    void Init(Storage *store);
+    void Init(Storage *store, Authenticator *authenticator);
     void Run(bool quiet = true);
     bool IsRunning() { return is_running(); }
     void Stop() { stop(); }

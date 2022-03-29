@@ -38,8 +38,8 @@ public:
 	Authenticator();
 	~Authenticator() = default;
 
-	std::vector<uint8_t> Encrypt(std::string password);
-	std::string Decrypt(std::vector<uint8_t> encrypted);
+	std::vector<uint8_t> Encrypt(const std::string &password);
+	std::string Decrypt(const std::vector<uint8_t> &encrypted);
 };
 
 

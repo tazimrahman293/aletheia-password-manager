@@ -49,10 +49,10 @@ int main(int argc, char *argv[])
 
         // Spin up server instance and run listen loop
         HTTPServer server(hostAddress, hostPort);
-        server.Init(&database);
+        server.Init(&database, auth);
         server.Run(false);  // quiet = false
     } else {
-        cli.SetDatabase(&database); // Use initialized database
+        cli.Init(&database, auth);
         std::string command;
         cli.PrintLine("Welcome to Aletheia password manager!");
         while (cli.IsRunning()) {
