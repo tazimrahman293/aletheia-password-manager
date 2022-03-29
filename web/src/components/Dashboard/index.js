@@ -24,7 +24,8 @@ import { Typography } from '@mui/material';
 import { Box } from '@mui/system';
 import useToken from '../UseToken/useToken';
 import axios from '../../api/axios';
-
+import { useFormik } from 'formik';
+import Demo from '../demo'
 
 const tableIcons = {
   Add: forwardRef((props, ref) => <AddBox {...props} ref={ref} />),
@@ -96,13 +97,15 @@ export default function Dashboard() {
     }
 
     if (errorList.length < 1) {
-      axios.patch("/account", JSON.stringify({
-        'pk': newData.pk,
-        'url': newData.url,
-        'label': newData.label,
-        'username': newData.username
-
-      }))
+      axios({
+        url: "/account",
+        method:"PATCH",
+        data: {
+        "pk": newData.pk,
+        "url": newData.url,
+        "label": newData.label,
+        "username": newData.username}
+      })
         .then(res => {
           const dataUpdate = [...data];
           const index = oldData.tableData.id;
@@ -138,14 +141,17 @@ export default function Dashboard() {
     if (newData.url === "") {
       errorList.push("Please enter a url")
     }
+    if (newData.password === "") {
+      errorList.push("Please enter a password")
+    }
 
     if (errorList.length < 1) { //no error
       axios.post("/account", JSON.stringify({
-        'pk': 1,
-        'username': newData.username,
-        'label': newData.label,
-        'url': newData.url,
-        'keyHash': newData.password,
+        "pk": 1,
+        "username": newData.username,
+        "label": newData.label,
+        "url": newData.url,
+        "keyHash": newData.password,
         "created": 0,
         "lastAccessed": 0,
         "lastModified": 0,
@@ -158,6 +164,7 @@ export default function Dashboard() {
           dataToAdd.push(newData);
           setData(dataToAdd);
           resolve()
+          window.location.reload();
           setErrorMessages([])
           setIserror(false)
         })
@@ -198,6 +205,28 @@ export default function Dashboard() {
       })
   }
 
+  const formik = useFormik({
+    initialValues: {
+      newPassword: '',
+      pk: 99,
+      random: false,
+      // if NOT random:
+      key: "PLAIN-TEXT-KEY",
+      // if random:
+      length: 8,
+      lowers: false,
+      uppers: false,
+      numbers: false,
+      specials: false
+
+    },
+    validateOnChange:false,
+    onSubmit: values => {
+      // API requests
+    }
+  })
+
+
   return (
 
     <Box
@@ -215,9 +244,8 @@ export default function Dashboard() {
         sx={{ mb: 3 }}
         variant="h4"
       >
-        Dashboard
+         Dashboard  
       </Typography>
-
       <div>
         {iserror &&
           <Alert severity="error">
@@ -228,7 +256,7 @@ export default function Dashboard() {
         }
       </div>
       <MaterialTable
-        title="Accounts"
+        title={<Demo/>}
         columns={columns}
         data={data}
         icons={tableIcons}

@@ -4,7 +4,7 @@ import NavbarUser from '../components/NavbarUser'
 import SidebarUser from '../components/SidebarUser'
 import { Helmet } from "react-helmet";
 import Dashboard from '../components/Dashboard';
-
+// import Demo from '../components/demo'
 /**
  * 
  * @returns Dashboard page from component
@@ -25,6 +25,7 @@ const DashboardPage = () => {
       </Helmet>
       <NavbarUser toggle={toggle} />
       <SidebarUser isOpen={isOpen} toggle={toggle} />
+      {/* <Demo/> */}
       <ScrollToTop />
       <Dashboard/>
     </>

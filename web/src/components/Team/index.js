@@ -1,7 +1,8 @@
 import React from 'react'
-import Icon1 from '../../images/svg1.svg'
+import Icon1 from '../../images/wallet.svg'
 import Icon2 from '../../images/svg2.svg'
-import Icon3 from '../../images/svg3.svg'
+import Icon3 from '../../images/productivity.svg'
+import Icon4 from '../../images/personal.svg'
 import {TeamContainer, TeamH1, TeamWrapper, TeamCard, TeamIcon, TeamH2, TeamP} from './TeamElements'
 
 /**
@@ -16,22 +17,22 @@ const Team = () => {
         <TeamCard>
           <TeamIcon src={Icon1}/>
           <TeamH2>Jeremy</TeamH2>
-          <TeamP>Description</TeamP>
+          <TeamP>Senior Year Computer Engineering</TeamP>
         </TeamCard>
         <TeamCard>
         <TeamIcon src={Icon2}/>
         <TeamH2>Tyrel</TeamH2>
-          <TeamP>Description</TeamP>
+          <TeamP>Senior Year Computer Engineering</TeamP>
         </TeamCard>
         <TeamCard>
-          <TeamIcon src={Icon3}/>
+          <TeamIcon src={Icon4}/>
           <TeamH2>Tazim</TeamH2>
-          <TeamP>Description</TeamP>
+          <TeamP>3rd-Year Computer Engineering</TeamP>
         </TeamCard>
         <TeamCard>
           <TeamIcon src={Icon3}/>
           <TeamH2>Akash</TeamH2>
-          <TeamP>Description</TeamP>
+          <TeamP>3rd-Year Computer Science</TeamP>
         </TeamCard>
       </TeamWrapper>
     </TeamContainer>
