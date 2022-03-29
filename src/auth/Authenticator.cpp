@@ -5,6 +5,8 @@
 #include <aletheia.h>
 #include <auth/Authenticator.h>
 #include <hydrogen.h>
+#include <stdlib.h>
+#include <cstring>
 
 
 /**
@@ -34,18 +36,24 @@ std::vector<uint8_t> Authenticator::Encrypt(std::string password)
 
 	// create a byte array for storing resultant encrypted message
 	int encryptedSize = encryptedOverhead + password.length();
-	uint8_t encryptedBytes[encryptedSize] = { 0 };
+	uint8_t *encryptedBytes = (uint8_t *)malloc(encryptedSize);
+	if (encryptedBytes == nullptr)
+		return std::vector<uint8_t>();;
+	memset(encryptedBytes, 0, encryptedSize);
 
 	// generate the encrypted message
 	int result = hydro_secretbox_encrypt(encryptedBytes, password.c_str(),
 		password.length(), encryptId, context, masterKey);
 
 	// return an empty vector if the creation attempt failed
-	if (result != 0)
+	if (result != 0) {
+		free(encryptedBytes);
 		return std::vector<uint8_t>();
+	}
 
 	// return a vector containing the encrypted password
 	std::vector<uint8_t> encrypted(encryptedBytes, encryptedBytes + encryptedSize);
+	free(encryptedBytes);
 	return encrypted;
 }
 
@@ -57,18 +65,22 @@ std::vector<uint8_t> Authenticator::Encrypt(std::string password)
  */
 std::string Authenticator::Decrypt(std::vector<uint8_t> encrypted)
 {
+	// decrypted password to return
+	std::string password = "";
+
 	// convert the encrypted message to a simple byte array
 	const uint8_t *encryptedBytes = &encrypted[0];
 
 	// prepare a byte array to receive the decrypted message
 	int decryptedSize = encrypted.size() - encryptedOverhead;
-	char decryptedString[decryptedSize] = { 0 };
+	char *decryptedString = (char *)malloc(decryptedSize);
+	if (decryptedString == nullptr)
+		return password;
+	memset(decryptedString, 0, decryptedSize);
 
 	// verify and decrypt the password
 	int result = hydro_secretbox_decrypt(decryptedString, encryptedBytes,
 		encrypted.size(), encryptId, context, masterKey);
-
-	std::string password = "";
 
 	// convert char array to std::string upon success
 	if (result == 0) {
@@ -76,5 +88,6 @@ std::string Authenticator::Decrypt(std::vector<uint8_t> encrypted)
 			password += decryptedString[i];
 	}
 
+	free(decryptedString);
 	return password;
 }
