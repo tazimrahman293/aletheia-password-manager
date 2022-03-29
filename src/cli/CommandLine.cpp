@@ -105,6 +105,8 @@ void CommandLine::DoLogin(const std::string &username, const std::string &passwo
 
 void CommandLine::HandleCommands(const std::string &command) {
 
+	PrintLine("");
+
     if (command == "login") {  // Login command
         if (!ctxManager.SetContext(Login)) {
             PrintLine("Cannot use login command from this menu.");
@@ -294,21 +296,26 @@ void CommandLine::HandleCommands(const std::string &command) {
         }
         std::vector<Account> userAccounts = database->GetAllAccountsByUserID(ctxManager.activeUserID);
 
-        long value_ms = std::chrono::duration_cast<std::chrono::milliseconds>(
-                std::chrono::time_point_cast<std::chrono::milliseconds>(
-                        std::chrono::high_resolution_clock::now()
-                        ).time_since_epoch()
-                        ).count();
+		if (userAccounts.empty()) {
+			PrintLine("No accounts! Type 'add-account' to add a new account.");
+		} else {
+			long value_ms = std::chrono::duration_cast<std::chrono::milliseconds>(
+	                std::chrono::time_point_cast<std::chrono::milliseconds>(
+	                        std::chrono::high_resolution_clock::now()
+	                        ).time_since_epoch()
+	                        ).count();
 
-        PrintLine("Your accounts:");
-        for (Account &account : userAccounts) {
-			auto hash = charsToHash(account.hash);
-		    auto decryptedPassword = auth->Decrypt(hash);
-            std::ostringstream accountLine;
-            accountLine << account.label << " - " << account.username << " (" << account.url << ") " << ": " << decryptedPassword;
-            PrintLine(accountLine.str());
-            account.lastAccessed = value_ms;
-        }
+			PrintLine("Your accounts:");
+
+	        for (Account &account : userAccounts) {
+				auto hash = charsToHash(account.hash);
+			    auto decryptedPassword = auth->Decrypt(hash);
+	            std::ostringstream accountLine;
+	            accountLine << account.label << " - " << account.username << " (" << account.url << ") " << ": " << decryptedPassword;
+	            PrintLine(accountLine.str());
+	            account.lastAccessed = value_ms;
+	        }
+		}
 
     } else if (command == "quit") {
         PrintLine("Logged out.");
@@ -317,18 +324,32 @@ void CommandLine::HandleCommands(const std::string &command) {
         ctxManager.quitting = true;
         return;
 
+    } else if (command == "new-password") {
+		std::string lengthStr = GetInput("How long would you like the password to be?");
+		int length = std::stoi(lengthStr);
+        std::string newPassword = rpg.NewPassword(length);
+		PrintLine("New Password Generated: " + newPassword);
+
     } else if (command == "help") {
-        // TODO Determine context and print only the commands that are currently valid
-        Print("Command list for Aletheia:\n");
-        Print("  login\t\tLog in to the password manager\n");
-        Print("  register\tCreate a new user profile\n");
-        Print("  new-account\tCreate a new account entry\n");
-        Print("  view-accounts\tView account information\n");
-        Print("  edit-account\tEdit an existing account\n");
-        PrintLine("  quit\t\tLog out and exit Aletheia\n");
+		PrintHelp();
 
     }
     else {
         PrintLine("Invalid command: " + command);
+		PrintHelp();
     }
+}
+
+
+void CommandLine::PrintHelp()
+{
+	// TODO Determine context and print only the commands that are currently valid
+	Print("Command list for Aletheia:\n");
+	Print("  login\t\tLog in to the password manager\n");
+	Print("  register\tCreate a new user profile\n");
+	Print("  new-account\tCreate a new account entry\n");
+	Print("  view-accounts\tView account information\n");
+	Print("  edit-account\tEdit an existing account\n");
+	Print("  new-password\tGenerate and view a random password\n");
+	PrintLine("  quit\t\tLog out and exit Aletheia\n");
 }
