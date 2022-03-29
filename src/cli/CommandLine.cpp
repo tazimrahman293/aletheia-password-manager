@@ -180,9 +180,12 @@ void CommandLine::HandleCommands(const std::string &command) {
         // Getting current time and converting to long data type in a single line (can be changed if needed)
         long value_ms = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::time_point_cast<std::chrono::milliseconds>(std::chrono::high_resolution_clock::now()).time_since_epoch()).count();
 
+		auto hash = auth->Encrypt(accountPassword);
+	    auto encryptedPassword = hashToChars(hash);
+
         Account newAccount;
         newAccount.username = accountUsername;
-        newAccount.keyHash = accountPassword;
+        newAccount.hash = encryptedPassword;
         newAccount.label = label;
         newAccount.url = URL;
         newAccount.userID = user->pk;
@@ -243,8 +246,9 @@ void CommandLine::HandleCommands(const std::string &command) {
                         password1 = GetInput("New password:");
                         password2 = GetInput("Confirm new password:");
                         if (password1 == password2) {
-                            // TODO hash the plain text
-                            modifiedAccount.keyHash = password2;
+							auto hash = auth->Encrypt(password1);
+						    auto encryptedPassword = hashToChars(hash);
+                            modifiedAccount.hash = encryptedPassword;
                         } else {
                             PrintLine("Passwords do not match - try again.");
                         }
@@ -298,8 +302,10 @@ void CommandLine::HandleCommands(const std::string &command) {
 
         PrintLine("Your accounts:");
         for (Account &account : userAccounts) {
+			auto hash = charsToHash(account.hash);
+		    auto decryptedPassword = auth->Decrypt(hash);
             std::ostringstream accountLine;
-            accountLine << account.label << " - " << account.username << " (" << account.url << ")";
+            accountLine << account.label << " - " << account.username << " (" << account.url << ") " << ": " << decryptedPassword;
             PrintLine(accountLine.str());
             account.lastAccessed = value_ms;
         }
@@ -326,5 +332,3 @@ void CommandLine::HandleCommands(const std::string &command) {
         PrintLine("Invalid command: " + command);
     }
 }
-
-

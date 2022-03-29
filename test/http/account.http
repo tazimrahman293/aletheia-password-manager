@@ -7,7 +7,7 @@ Content-Type: application/json
   "label": "steam",
   "url": "steampowered.com",
   "username": "john_smith_123",
-  "keyHash": "password",
+  "password": "password",
   "expiry": 0,
   "created": 0,
   "lastAccessed": 0,
