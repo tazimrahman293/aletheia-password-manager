@@ -17,63 +17,67 @@ TEST_CASE("auth-construct") {
 }
 
 
-TEST_CASE("auth-hash-and-verify") {
+TEST_CASE("auth-encrypt-and-verify") {
 	Authenticator *auth = new Authenticator();
-	const int hashSize = 128;
+
+	const int overheadSize = 36;
 	const int sampleSize = 10;
 
-	std::string password = "";
-	std::string passwordAttempt = "";
-	std::vector<uint8_t> hash[sampleSize];
-	bool valid = false;
+	int encryptedSize = 0;
 
-	SUBCASE("auth-hash-and-verify-valid-password") {
-		SUBCASE("auth-hash-and-verify-valid-password-normal") {
+	std::string password = "";
+	std::string passwordDecrypted = "";
+	std::vector<uint8_t> encrypted[sampleSize];
+
+	SUBCASE("auth-encrypt-and-verify-valid-password") {
+		SUBCASE("auth-encrypt-and-verify-valid-password-normal") {
 			password = "password";
 		}
 
-		SUBCASE("auth-hash-and-verify-valid-password-special") {
+		SUBCASE("auth-encrypt-and-verify-valid-password-numbers") {
+			password = "01234567899876543210";
+		}
+
+		SUBCASE("auth-encrypt-and-verify-valid-password-special") {
 			password = "pa$$word1234567890______~`!@#$%^&*()_-+={[}]|:;,.?";
 		}
 
-		SUBCASE("auth-hash-and-verify-valid-password-short") {
+		SUBCASE("auth-encrypt-and-verify-valid-password-short") {
 			password = "p";
 		}
 
-		SUBCASE("auth-hash-and-verify-valid-password-long") {
+		SUBCASE("auth-encrypt-and-verify-valid-password-long") {
 			password = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
 		}
 
-		// create many unique hashes for the same password
+		// calculate the encrypted size
+		encryptedSize = password.length() + overheadSize;
+
+		// create many unique encryptions for the same password
 		for (int i = 0; i < sampleSize; i++) {
-			hash[i] = auth->Hash(password);
+			encrypted[i] = auth->Encrypt(password);
 
-			// check that hash is correct size
-			CHECK_EQ(hash[i].size(), hashSize);
+			// check that encryption is correct size
+			CHECK_EQ(encrypted[i].size(), encryptedSize);
 
-			// check that all hashes are unique
+			// check that all encryptions are unique
 			for (int j = 1; i-j >= 0; j++) {
-				CHECK_NE(hash[i], hash[i-j]);
+				CHECK_NE(encrypted[i], encrypted[i-j]);
 			}
 
-			// check that new hash still validates password
-			valid = auth->Verify(hash[i], password);
-			CHECK(valid);
-
-			// check that an invalid password does not get validated
-			passwordAttempt = "__";
-			valid = auth->Verify(hash[i], passwordAttempt);
-			CHECK(!valid);
+			// check that new encryption still validates password
+			passwordDecrypted = auth->Decrypt(encrypted[i]);
+			CHECK_EQ(passwordDecrypted, password);
 		}
 	}
 
-	SUBCASE("auth-hash-and-verify-invalid-password") {
+	SUBCASE("auth-encrypt-and-verify-invalid-password") {
 		password = "";
 		for (int i = 0; i < sampleSize; i++) {
-			hash[i] = auth->Hash(password);
+			encrypted[i] = auth->Encrypt(password);
 
-			// check that hash is expected size (0 for empty password)
-			CHECK_EQ(hash[i].size(), 0);
+			// check that encryption is expected size (0 for empty password)
+			CHECK_EQ(encrypted[i].size(), 0);
 		}
 	}
 
