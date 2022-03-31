@@ -61,10 +61,7 @@ COV_INFO = $(COV_DIR)/coverage.info
 COV_HTML = $(COV_DIR)/html
 # List of exclusions from the lcov report
 COV_EXCL = '/usr*' \
-		   '${PROJ_DIR}/include/httplib.h' \
-		   '${PROJ_DIR}/include/hydrogen.h' \
-		   '${PROJ_DIR}/include/json.h' \
-		   '${PROJ_DIR}/include/sqlite_orm.h' \
+		   '${PROJ_DIR}/include/*' \
 		   '${PROJ_DIR}/src/network/*' \
 		   '${PROJ_DIR}/test/*'
 
@@ -120,6 +117,11 @@ test: CFLAGS += -DTEST
 test: INCLUDE += -Itest/include/
 test: build $(APP_DIR)/$(TEST_TARGET)
 	@./$(APP_DIR)/$(TEST_TARGET) $(TEST_FLAGS)
+
+debug-test: CFLAGS += -DTEST -DDEBUG -g -fno-inline -O0
+debug-test: INCLUDE += -Itest/include/
+debug-test: build $(APP_DIR)/$(TEST_TARGET)
+	@gdb --args $(APP_DIR)/$(TEST_TARGET) $(ARGS) $(TEST_FLAGS)
 
 auto-test: TEST_FLAGS += -r=junit -o=$(TEST_RESULT)
 auto-test: test
