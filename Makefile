@@ -62,7 +62,6 @@ COV_HTML = $(COV_DIR)/html
 # List of exclusions from the lcov report
 COV_EXCL = '/usr*' \
 		   '${PROJ_DIR}/include/*' \
-		   '${PROJ_DIR}/src/network/*' \
 		   '${PROJ_DIR}/test/*'
 
 TEST_RESULT  = $(COV_DIR)/test_results.xml
