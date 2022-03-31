@@ -57,6 +57,7 @@ public:
     std::string GetInput(const std::string &prompt);
 
     [[nodiscard]] bool IsRunning() const { return !ctxManager.quitting; }
+    [[nodiscard]] bool IsLoggedIn() const { return ctxManager.authenticated; }
 
     void HandleCommands(const std::string &command);
 
@@ -67,6 +68,12 @@ public:
             const std::string &password
             );
     void DoLogin(const std::string &username, const std::string &password);
+    void DoLogout()
+    {
+        ctxManager.SetContext(Welcome);
+        ctxManager.authenticated = false;
+        ctxManager.activeUserID = 0;
+    }
 
     void Init(Storage *db, Authenticator *authenticator) { this->database = db; this->auth = authenticator; };
 

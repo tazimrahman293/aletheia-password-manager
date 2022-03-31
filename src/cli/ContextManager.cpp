@@ -10,8 +10,7 @@ bool ContextManager::SetContext(Context ctx)
     bool switched = false;
     switch (context) {
         case Welcome:
-            if (ctx == Login || ctx == Register)
-                switched = true;
+            switched = true;
             break;
         case Login:
         case Register:

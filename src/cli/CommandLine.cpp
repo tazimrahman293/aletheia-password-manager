@@ -38,7 +38,7 @@ std::string CommandLine::GetInput(const std::string &prompt)
     if (!testMode)
         std::cout << prompt << " " << std::flush;
     else
-        outStream << prompt;
+        outStream << prompt << " ";
 
     std::string input;
     if (testMode)
@@ -83,23 +83,26 @@ void CommandLine::DoLogin(const std::string &username, const std::string &passwo
 {
     auto user = database->GetUserByUsername(username);
 
-    auto hash = charsToHash(user->hash);
-    auto k = auth->Decrypt(hash);
+    if (user != nullptr) {
+        auto hash = charsToHash(user->hash);
+        auto k = auth->Decrypt(hash);
 
-    if (user != nullptr && password == k) {
-        // User exists and password is correct
-        if (!ctxManager.SetContext(Main)) {
-            PrintLine("Unable to log in at this time.");
+        if (password == k) {
+            // User exists and password is correct
+            if (!ctxManager.SetContext(Main)) {
+                PrintLine("Unable to log in at this time.");
+                return;
+            }
+            ctxManager.authenticated = true;
+            ctxManager.activeUserID = user->pk;
+            PrintLine("Welcome " + user->firstName + ".");
             return;
         }
-        ctxManager.authenticated = true;
-        ctxManager.activeUserID = user->pk;
-        PrintLine("Welcome " + user->firstName + ".");
 
-    } else {
-        // Non-existing username provided or password is incorrect
-        PrintLine("Invalid login!");
     }
+
+    // Non-existing username provided or password is incorrect
+    PrintLine("Invalid login!");
 }
 
 
@@ -118,6 +121,7 @@ void CommandLine::HandleCommands(const std::string &command) {
             username = GetInput("Username:");
             password = GetInput("Password:");
             DoLogin(username, password);
+            if (testMode) break;
         }
 
     } else if (command == "register") {
@@ -138,6 +142,7 @@ void CommandLine::HandleCommands(const std::string &command) {
             } else {
                 PrintLine("User " + username + " exists - try again.");
             }
+            if (testMode) break;
         }
 
         std::string firstName, lastName;
@@ -160,6 +165,8 @@ void CommandLine::HandleCommands(const std::string &command) {
             }
 
             PrintLine("Passwords do not match - try again.");
+
+            if (testMode) break;
 
         } while (password1 != password2 || password2.empty());
 
@@ -248,13 +255,17 @@ void CommandLine::HandleCommands(const std::string &command) {
                         password1 = GetInput("New password:");
                         password2 = GetInput("Confirm new password:");
                         if (password1 == password2) {
-							auto hash = auth->Encrypt(password1);
-						    auto encryptedPassword = hashToChars(hash);
+                            auto hash = auth->Encrypt(password1);
+                            auto encryptedPassword = hashToChars(hash);
                             modifiedAccount.hash = encryptedPassword;
                         } else {
                             PrintLine("Passwords do not match - try again.");
                         }
+                        if (testMode) break;
                     }
+
+                } else if (fieldToModify == "url") {
+                    modifiedAccount.url = GetInput("New URL:");
 
                 } else if (fieldToModify == "label") {
                     modifiedAccount.label = GetInput("New label:");
@@ -287,10 +298,12 @@ void CommandLine::HandleCommands(const std::string &command) {
             }
 
             success = true;
+
+            if (testMode) break;
         }
 
-    } else if (command == "view-accounts"){
-        if (ctxManager.GetContext() != Main || !ctxManager.authenticated){
+    } else if (command == "view-accounts") {
+        if (ctxManager.GetContext() != Main || !ctxManager.authenticated) {
             PrintLine("Please sign in before viewing accounts.");
             return;
         }
@@ -333,8 +346,7 @@ void CommandLine::HandleCommands(const std::string &command) {
     } else if (command == "help") {
 		PrintHelp();
 
-    }
-    else {
+    } else {
         PrintLine("Invalid command: " + command);
 		PrintHelp();
     }

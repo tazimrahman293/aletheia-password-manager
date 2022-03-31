@@ -121,6 +121,11 @@ test: INCLUDE += -Itest/include/
 test: build $(APP_DIR)/$(TEST_TARGET)
 	@./$(APP_DIR)/$(TEST_TARGET) $(TEST_FLAGS)
 
+debug-test: CFLAGS += -DTEST -DDEBUG -g -fno-inline -O0
+debug-test: INCLUDE += -Itest/include/
+debug-test: build $(APP_DIR)/$(TEST_TARGET)
+	@gdb --args $(APP_DIR)/$(TEST_TARGET) $(ARGS) $(TEST_FLAGS)
+
 auto-test: TEST_FLAGS += -r=junit -o=$(TEST_RESULT)
 auto-test: test
 
